@@ -25,7 +25,7 @@ all:  thesis
 texfiles = $(wildcard *.tex)
 
 .PHONY: thesis
-thesis: thesis.pdf thesis.ps
+thesis: thesis.pdf
 
 thesis.pdf: $(texfiles) thesis.bbl
 	$(Q) rm -rf build/pdf/; mkdir -p build/pdf/
