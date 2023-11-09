@@ -1,6 +1,105 @@
-@book{bringhurst1996ets,
-  title={{The Elements of Typographic Style}},
-  author={Bringhurst, Robert},
-  year={1996},
-  publisher={Hartley \& Marks}
+@misc{rfc9420,
+  series = {Request for Comments},
+  number = 9420,
+  howpublished = {RFC 9420},
+  publisher = {RFC Editor},
+  doi = {10.17487/RFC9420},
+  url = {https://www.rfc-editor.org/info/rfc9420},
+  author = {Richard Barnes and Benjamin Beurdouche and Raphael Robert and Jon
+            Millican and Emad Omara and Katriel Cohn-Gordon},
+  title = {{The Messaging Layer Security (MLS) Protocol}},
+  pagetotal = 132,
+  year = 2023,
+  month = jul,
+  abstract = {Messaging applications are increasingly making use of end-to-end
+              security mechanisms to ensure that messages are only accessible to
+              the communicating endpoints, and not to any servers involved in
+              delivering messages. Establishing keys to provide such protections
+              is challenging for group chat settings, in which more than two
+              clients need to agree on a key but may not be online at the same
+              time. In this document, we specify a key establishment protocol
+              that provides efficient asynchronous group key establishment with
+              forward secrecy (FS) and post-compromise security (PCS) for groups
+              in size ranging from two to thousands.},
 }
+
+@misc{ttkem,
+  author = {Joël Alwen and Margarita Capretto and Miguel Cueto and Chethan
+            Kamath and Karen Klein and Ilia Markov and Guillermo Pascual-Perez
+            and Krzysztof Pietrzak and Michael Walter and Michelle Yeo},
+  title = {Keep the Dirt: Tainted TreeKEM, Adaptively and Actively Secure
+           Continuous Group Key Agreement},
+  howpublished = {Cryptology ePrint Archive, Paper 2019/1489},
+  year = {2019},
+  note = {\url{https://eprint.iacr.org/2019/1489}},
+  url = {https://eprint.iacr.org/2019/1489},
+}
+
+@inproceedings{gsd,
+  author = {Panjwani, Saurabh},
+  title = {Tackling Adaptive Corruptions in Multicast Encryption Protocols},
+  year = {2007},
+  isbn = {9783540709350},
+  publisher = {Springer-Verlag},
+  address = {Berlin, Heidelberg},
+  abstract = {We prove a computational soundness theorem for symmetric-key
+              encryption protocols that can be used to analyze security against
+              adaptively corrupting adversaries (that is, adversaries who corrupt
+              protocol participants during protocol execution). Our soundness
+              theorem shows that if the encryption scheme used in the protocol is
+              semantically secure, and encryption cycles are absent , then
+              security against adaptive corruptions is achievable via a reduction
+              factor of O(n undefined (2n)l), with n and l being (respectively)
+              the size and depth of the key graph generated during any protocol
+              execution. Since, in most protocols of practical interest, the
+              depth of key graphs (measured as the longest chain of ciphertexts
+              of the form undefinedk1 (k2), undefinedk2 (k3), undefinedk3 (k4),
+              ...) is much smaller than their size (the total number of keys),
+              this gives us a powerful tool to argue about the adaptive security
+              of such protocols, without resorting to non-standard techniques
+              (like non-committing encryption). We apply our soundness theorem to
+              the security analysis of multicast encryption protocols and show
+              that a variant of the Logical Key Hierarchy (LKH) protocol is
+              adaptively secure (its security being quasi-polynomially related to
+              the security of the underlying encryption scheme).},
+  booktitle = {Proceedings of the 4th Conference on Theory of Cryptography},
+  pages = {21–40},
+  numpages = {20},
+  keywords = {multicast, selective decryption, encryption, adaptive corruptions},
+  location = {Amsterdam, The Netherlands},
+  series = {TCC'07},
+}
+
+
+@techreport{tkem,
+  TITLE = {{TreeKEM: Asynchronous Decentralized Key Management for Large Dynamic
+           Groups A protocol proposal for Messaging Layer Security (MLS)}},
+  AUTHOR = {Bhargavan, Karthikeyan and Barnes, Richard and Rescorla, Eric},
+  URL = {https://inria.hal.science/hal-02425247},
+  TYPE = {Research Report},
+  INSTITUTION = {{Inria Paris}},
+  YEAR = {2018},
+  MONTH = May,
+  HAL_ID = {hal-02425247},
+  HAL_VERSION = {v1},
+}
+
+@misc{google-mls,
+  author = {Giles Hogben},
+  title = {An important step towards secure and interoperable messaging},
+  year = 2023,
+  howpublished = { \url{
+                  https://security.googleblog.com/2023/07/an-important-step-towards-secure-and.html
+                  } },
+  note = {Accessed: 2023-11-01},
+}
+
+
+@misc{mls-support,
+  author = {IETF},
+  title = {Support for MLS},
+  year = 2023,
+  howpublished = {\url{https://www.ietf.org/blog/support-for-mls-2023/}},
+  note = {Accessed: 2023-11-01},
+}
+

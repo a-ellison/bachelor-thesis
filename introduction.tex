@@ -1,0 +1,22 @@
+\chapter{Introduction}
+
+
+% TODO: write accessible introduction on why this is important
+\todo{TODO: more accessible introduction on why this is important}
+We all rely on messaging applications like WhatsApp, Signal, etc. in our daily lives and take it for granted
+that our messages will be transmitted securely (\todo{``see it as a prerequisite" maybe better?}).
+\todo{smoother transition to talking about protocols?}
+For two parties, the Double Ratchet protocol is a common solution (\todo{true?}) to transmit messages
+securely and efficiently. For more than two parties this problem was only solved recently with the MLS protocol.
+
+
+The Messaging Layer Security (MLS) protocol, recently standardized in RFC 9420 \cite{rfc9420}, aims to provide efficient asynchronous group key establishment with strong security guarantees. The main component of MLS, which is the source of its important efficiency and security properties, is a protocol called TreeKEM (initially proposed in \cite{tkem}). In essence, TreeKEM, as adopted from its predecessors, structures a group of users as a binary tree with the group key at the root and all group members as leaves. Group members may then compute the group key, update it or add/remove other members with a number of operations logarithmic in the group size.
+
+As for any scheme, it is important to have formal security guarantees for TreeKEM based on precise hardness assumptions. Providing security definitions for the scheme already helps to describe exactly what assumptions are made on the capabilities of an adversary and what kind of security one should expect when using the scheme in practice. Moreover, proofs of (reasonably tight) security under these definitions serve as a guide to implementors on what values to choose for the security parameters of the scheme and provide strong justification that there are no flaws in its design. Given that a major vision for the MLS protocol is for it to be used by messaging applications and that it has support from several large companies (\cite{google-mls}, \cite{mls-support}), it has the potential to be used by a huge number of users. Thus, it is important to better understand the security of MLS and hence also of TreeKEM.
+
+One choice that can be made when defining the security of TreeKEM is whether the adversary is modeled as \emph{selective} or \emph{adaptive}. In the former case, the adversary must provide all the interactions it will have with the protocol and when it will attempt to break the scheme at the beginning of the security game, while in the latter case the adversary can make its decisions based on responses from previous interactions. Clearly, the adaptive setting is much closer to how an attack would unfold in practice, so it is desirable to prove security against adaptive adversaries. However, achieving this without too much of a blow-up in the security loss is a challenge since one often resorts to guessing actions performed by the adversary.
+
+The Generalized Selective Decryption (GSD) security game (\cite{gsd}) was introduced precisely to analyze adaptive security for protocols based on a graph-like structure (as is the case with TreeKEM). In \cite{ttkem}, a variant of TreeKEM was proven adaptively secure in the Random Oracle Model (ROM) with a security loss in $\mathcal{O}((n \cdot Q)^2)$, where $n$ is the number of users and $Q$ the number of protocol operations performed by these users. The proof mainly relies on showing that the encryption scheme employed in TreeKEM, a slight modification of an arbitrary IND-CPA secure encryption scheme, is GSD secure in the ROM.
+
+% TODO: describe results and contribution in detail
+\todo{TODO: describe results and contribution in detail}

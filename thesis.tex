@@ -45,10 +45,6 @@
 %% LaTeX' own graphics handling
 \usepackage{graphicx}
 
-%% We unfortunately need this for the Rules chapter.  Remove it
-%% afterwards; or at least NEVER use its underlining features.
-\usepackage{soul}
-
 %% This allows you to add .pdf files. It is used to add the
 %% declaration of originality.
 \usepackage{pdfpages}
@@ -76,7 +72,7 @@
 %% Document information
 %% ====================
 
-\title{Title of Thesis}
+\title{Tighter Security for Group Key Agreement in the Random Oracle Model}
 \author{A. Ellison}
 \thesistype{Bachelor Thesis}
 \advisors{Advisors: Prof.\ Dr.\ D. Hofheinz, Dr. K. Klein}
@@ -104,7 +100,14 @@
 \tableofcontents
 \mainmatter
 
+\question{Is there a predefined structure to the thesis?}
+
 %% Your real content!
+\input{introduction}
+
+\question{Should all necessary concepts be explained in detail in "Preliminaries" and new contributions later?}
+\input{preliminaries}
+
 \input{sections}
 
 \appendix
