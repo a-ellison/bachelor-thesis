@@ -1,10 +1,3 @@
-%% Custom commands
-
-\newcommand{\question}[1]{\textcolor{magenta}{#1}}
-\newcommand{\todo}[1]{\textcolor{red}{#1}}
-
-%% ===============
-
 %% Special characters for number sets, e.g. real or complex numbers.
 \newcommand{\C}{\mathbb{C}}
 \newcommand{\K}{\mathbb{K}}
@@ -17,6 +10,7 @@
 %% Fixed/scaling delimiter examples (see mathtools documentation)
 \DeclarePairedDelimiter\abs{\lvert}{\rvert}
 \DeclarePairedDelimiter\norm{\lVert}{\rVert}
+\DeclarePairedDelimiter\bracks{\lbrack}{\rbrack}
 
 %% Use the alternative epsilon per default and define the old one as \oldepsilon
 \let\oldepsilon\epsilon
@@ -25,3 +19,28 @@
 %% Also set the alternate phi as default.
 \let\oldphi\phi
 \renewcommand{\phi}{\ensuremath{\varphi}}
+
+%% Custom commands
+
+\newcommand{\question}[1]{\textcolor{magenta}{\textbf{Q:} #1}}
+\newcommand{\todo}[1]{\textcolor{red}{\textbf{TODO:} #1}}
+\newcommand{\from}{\leftarrow}
+\newcommand{\gen}{\mathrm{Gen}}
+\newcommand{\enc}{\mathrm{Enc}}
+\newcommand{\dec}{\mathrm{Dec}}
+\newcommand{\hgen}{H_\mathrm{gen}}
+\newcommand{\qgen}{Q_\mathrm{gen}}
+\newcommand{\hdep}{H_\mathrm{dep}}
+\newcommand{\qdep}{Q_\mathrm{dep}}
+\newcommand{\hdh}{H_\mathrm{DH}}
+\newcommand{\fdh}{F_\mathrm{DH}}
+\newcommand{\qdh}{Q_\mathrm{DH}}
+\newcommand{\qs}{Q_\mathrm{s}}
+
+
+\newcommand{\sdgsdexperiment}[2][\mathcal{A}]{\mathrm{Exp}_{#1, #2}^{\mathrm{SD-GSD}}}
+\newcommand{\dhies}{\Pi_{\mathrm{DH}}}
+\newcommand{\wins}{\mathcal{A} \text{ wins}}
+\newcommand{\pr}[1]{\Pr\bracks*{#1}}
+
+%% ===============
