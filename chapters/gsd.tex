@@ -10,14 +10,16 @@ We call our adaptation of GSD security \emph{Seeded GSD with Dependencies} (SD-G
 
 \todo{Explain definition in words.}
 \todo{Motivate restrictions to the adversary.}
+\todo{Do not allow cycles in $(V, E \cup D)$ either.}
+\todo{Add remark that cycles are (maybe) ok in the ROM.}
 
-We will refer to the following interchangeably as the \emph{SD-GSD experiment} or the \emph{SD-GSD game}.
+We will refer to the following as the \emph{SD-GSD experiment} or the \emph{SD-GSD game} interchangeably.
 
 \question{Where best to define things like \emph{hidden} seeds or \emph{corrupted} nodes?}
 
 \begin{definition}[The SD-GSD Experiment]
 
-	Let $\lambda \in \N$ a security parameter. \question{Where to define $\lambda$?} Let $\Pi = (\mathrm{Gen}, \mathrm{Enc}, \mathrm{Dec})$ a public-key encryption scheme such that the key space is a subset of the message space. Let $H_{\mathrm{gen}} \colon \{0, 1\}^\lambda \to ?, H_{\mathrm{dep}} \colon \{0, 1\}^\lambda \to \{0, 1\}^\lambda$ two KDFs. Define the experiment $\mathrm{Exp}_{\adv, \Pi}^{\mathrm{SD-GSD}}$ for an adversary $\adv$:
+	Let $\lambda \in \N$ a security parameter. \question{Where to define $\lambda$?} Let $\Pi = (\mathrm{Gen}, \mathrm{Enc}, \mathrm{Dec})$ a public-key encryption scheme. Let $H_{\mathrm{gen}}, H_{\mathrm{dep}} \colon \{0, 1\}^\lambda \to \{0, 1\}^\lambda$ two KDFs. Define the experiment $\mathrm{Exp}_{\adv, \Pi}^{\mathrm{SD-GSD}}$ for an adversary $\adv$:
 	\begin{enumerate}[1.]
 		\item The adversary $\adv$ outputs $n \in \N$ and a list of dependencies $D = \{(a_{i}, b_{i})\}_{i=1}^m \in [n]^2$. For each $v \in [n]$:
 		      \begin{enumerate}[(i)]
@@ -28,20 +30,20 @@ We will refer to the following interchangeably as the \emph{SD-GSD experiment} o
 			            We call $s_v$ the \emph{seed} of the node $v$.
 			      \item Compute $(sk_v, pk_v) = \gen(\hgen(s_v))$. \todo{Define what RHS means.}
 		      \end{enumerate}
-		      Set $\mathcal{C} = E = \varnothing$. We call the graph $([n], E)$ a \emph{GSD graph} of \emph{size} $n$.
+		      Set $\mathcal{C} = E = \varnothing$. We call the directed graph $([n], E)$ a \emph{GSD graph} of \emph{size} $n$.
 		\item $\adv$ may adaptively do the following queries:
 		      \begin{itemize}
 			      \item $\mathrm{reveal}(v)$ for $v \in [n]$: $\adv$ is given $pk_v$.
 			      \item $\mathrm{encrypt}(u, v)$ for $u, v \in [n], u \neq v$: $(u, v)$ is added to $E$ and $\adv$ is given $c \from \mathrm{Enc}_{pk_u}(s_v)$.
-			      \item $\mathrm{corrupt}(v)$ for $v \in [n]$: $\adv$ is given $s_v$ and $v$ is added to $\mathcal{C}$. We call such a node $v \in \mathcal{C}$ \emph{corrupted}. All nodes not reachable from any corrupted node in $([n], E \cup D)$ are \emph{safe} and we say their seeds are \emph{hidden} (even if an non-safe node happens to have the same seed).
+			      \item $\mathrm{corrupt}(v)$ for $v \in [n]$: $\adv$ is given $s_v$ and $v$ is added to $\mathcal{C}$. We call such a node $v \in \mathcal{C}$ \emph{corrupted}. All nodes not reachable from any corrupted node in the graph $([n], E \cup D)$ are \emph{safe} and we say their seeds are \emph{hidden} (even if an non-safe node happens to have the same seed).
 		      \end{itemize}
 		\item $\adv$ outputs a node $v \in [n]$. We call $v$ the \emph{challenge node}. A bit $b \from \{0, 1\}$ is sampled and $\adv$ is given
-		      $$
+		      \[
 			      r = \begin{cases}
 				      \hdep(s_v) & b = 0 \\
 				      s          & b = 1
 			      \end{cases},
-		      $$
+		      \]
 		      where $s \from \{0, 1\}^\lambda$. $\adv$ may continue to do queries as before.
 		\item $\adv$ outputs a bit $b'$. The output of the experiment is defined to be $1$ if $b' = b$, and $0$ otherwise.
 	\end{enumerate}
@@ -54,33 +56,30 @@ We will refer to the following interchangeably as the \emph{SD-GSD experiment} o
 		\item The graphs $(V, E)$ and $(V, D)$ always remain acyclic and without self-loops.
 		\item All paths in the graph $(V, D)$ are vertex disjoint.
 	\end{itemize}
-
-	We call an adversary for the above experiment that adheres to these rules an \emph{SD-GSD adversary}.
-
 \end{definition}
+
+\todo{Remove random oracles from SD-GSD security and add them to Theorem~\vref{theorem:sdgsd-security} instead.}
 
 Since we are only interested in the security of the SD-GSD game for the case where $\hgen$ and $\hdep$ are random oracles, we directly assume in our definition that the KDFs are modelled as such.
 
 \begin{definition}[SD-GSD security in the ROM]
-
-	A public-key encryption scheme $\Pi$ is \emph{$(t, \epsilon, N, \delta)$-SD-GSD secure} if for any SD-GSD adversary $\adv$ constructing a GSD graph of size at most $N$ and indegree at most $\delta$ and running in $t$ time we have
+	A public-key encryption scheme $\Pi$ is \emph{$(t, \epsilon, N, \delta)$-SD-GSD secure} if for any adversary $\adv$ constructing a GSD graph of size at most $N$ and indegree at most $\delta$ and running in $t$ time we have
 	\begin{align*}
 		\mathrm{Adv}_{\Pi}^{\mathrm{SD-GSD}}(\adv) \coloneqq 2 \cdot \abs*{\pr{\mathrm{Exp}_{\adv, \Pi}^{\mathrm{SD-GSD}} = 1} - \frac{1}{2}} \le \epsilon
 	\end{align*}
 	when $\hgen$ and $\hdep$ are random oracles.
-
 \end{definition}
 
 \section{Proving SD-GSD security for DHIES}
 
 \todo{Add assumption that $\Pi_s.\gen$ samples uniformly from $\{0, 1\}^x$}
+\todo{Comment on switch from IND-CPA security to EAV security.}
 
 \begin{theorem} \label{theorem:sdgsd-security}
 	Let $N, \delta \in \N$ arbitrary. Let $\Pi_{\mathrm{DH}}$ the DHIES scheme instantiated with a private-key encryption scheme $\Pi_s$. Let $\hdh$ the KDF and $\mathbb{G}$ the group used in $\Pi_{\mathrm{DH}}$. If $\Pi_s$ is $(t, \epsilon)$-EAV secure, the DDH problem is $(t, \epsilon)$-hard in $\mathbb{G}$ and $\hdh$ is modelled as a random oracle, then $\Pi_{\mathrm{DH}}$ is $(\tilde{t}, \tilde{\epsilon}, N, \delta)$-SD-GSD secure.
 \end{theorem}
 \begin{proof}
-	Let $\adv$ an arbitrary SD-GSD adversary running in time $\tilde{t}$. For an execution of $\sdgsdexperiment{\dhies}$, we call the seed $s_v$ of a node $v$ in the GSD graph \emph{hidden}, if $v$ is not reachable by any node in $\mathcal{C}$. Additionally, we say ``\emph{$\adv$ wins}" to denote the event $\sdgsdexperiment{\dhies} = 1$.
-
+	Let $\adv$ an arbitrary SD-GSD adversary running in time $\tilde{t}$. For an execution of $\sdgsdexperiment{\dhies}$ we say ``\emph{$\adv$ wins}" to denote the event $\sdgsdexperiment{\dhies} = 1$.
 	As usual with random oracles we proceed by a case distinction on whether they were queried on some interesting value. Accordingly, let $Q_{\mathrm{x}}$ denote the event that $\adv$ queries $H_{\mathrm{x}}$ on a hidden seed for $x \in \{\mathrm{gen}, \mathrm{dep}\}$. (\question{What if corrupted seed is queried and it happens to coincide with a hidden seed?}) Then we can write
 	\begin{align*}
 		\pr{\wins} & = \pr{\wins \land \qdep} + \pr{\wins \land \overline{\qdep} \,} \\
@@ -91,32 +90,32 @@ Since we are only interested in the security of the SD-GSD game for the case whe
 
 	\todo{Justify (*). (And perhaps name it better?)}
 
-	The heart of the proof is to bound $\pr{\qs}$. When the adversary first triggers $\qs$ by querying the seed of some node $v$, it can only have learned the seed through encryptions $c_1 \from \dhies.\mathrm{Enc}_{pk_{u_1}}(s_v), \ldots, c_d \from \dhies.\mathrm{Enc}_{pk_{u_d}}(s_v)$ where $(u_1, v), \ldots, (u_d, v)$ are edges in the GSD graph. The proof in \cite{ttkem} simply argued that this is not too likely if these encryptions were made with an IND-CPA secure scheme. In the context of the DHIES scheme we can say more about these encryptions and achieve a better reduction loss. Let $x_i = \log_g(pk_{u_i})$. Each encryption $c_i$ is a tuple of the form $\langle g^{y_i}, \Pi_s.\enc_{k_i}(s_v) \rangle$ where $k_i = \hdh\left(g^{x_i \cdot y_i}\right)$. Now we can again do a case distinction on whether $\hdh$ was queried for some group element $g^{x_i \cdot y_i}$ or not.
+	The heart of the proof is to bound $\pr{\qs}$. When the adversary first triggers $\qs$ by querying the seed of some node $v$, it can only have learned the seed through encryptions $c_1 \from \dhies.\mathrm{Enc}_{pk_{u_1}}(s_v), \ldots, c_d \from \dhies.\mathrm{Enc}_{pk_{u_d}}(s_v)$ where $(u_1, v), \ldots, (u_d, v)$ are edges in the GSD graph. The proof in \cite{ttkem} simply argued that this is not too likely if these encryptions were made with an IND-CPA secure scheme. In the context of the DHIES scheme we can say more about these encryptions and achieve a better reduction loss. Let $x_i = \log_g(pk_{u_i})$. Each encryption $c_i$ is a tuple of the form $\langle g^{y_i}, \Pi_s.\enc_{k_i}(s_v) \rangle$ where $y_i \from [\abs{\mathbb{G}}], k_i = \hdh\left(g^{x_i \cdot y_i}\right)$. Now we can again do a case distinction on whether $\hdh$ was queried for some group element $g^{x_j \cdot y_j}$ or not.
 	\begin{itemize}
-		\item If such a query was made, then $\adv$ solved the DH challenge $(g^{x_i}, g^{y_i})$. (Remember that we assumed that $v$ is the first node for which $\qs$ is triggered and if the seed of $v$ is hidden, then so are the seeds of the nodes $u_i$. Thus the adversary has not yet queried $\hgen(s_{u_i})$ and doesn't know any of the exponents $x_i$.)
+		\item If such a query was made, then $\adv$ solved the Diffie-Hellman challenge $(g^{x_j}, g^{y_j})$. (Remember that we assumed that $v$ is the first node for which $\qs$ is triggered and if the seed of $v$ is hidden, then so are the seeds of the nodes $u_i$. Thus the adversary has not learned the exponent $x_i$ through querying $\hgen(s_{u_i})$ for any $i$.)
 		\item If no such query was made, then from $\adv$'s perspective all the $k_i$ are independent, uniformly random keys and it still was able to learn $s_v$ from the EAV secure encryptions $\Pi_s.\enc_{k_1}(s_v), \ldots, \Pi_s.\enc_{k_d}(s_v)$.
 	\end{itemize}
 	We can bound the probability of either of these events occuring using hardness of the DDH problem in $\mathbb{G}$ and EAV security of $\Pi_s$, respectively.
 
-	To this end, we call a group element $k \in \mathbb{G}$ a \emph{hidden DH key} if $k = pk_u^{y_{u, v}}$, where $(u, v)$ is an edge in the GSD graph, $u$ is not reachable from any node and $y_{u, v}$ is the exponent chosen in the DHIES encryption of $s_v$ (i.e. $\adv$ was given a ciphertext of the form $\langle g^{y_{u, v}}, \ldots\rangle$ when it queried $\mathrm{encrypt}(u, v)$). Now analogously to above let $\qdh$ the event that $\adv$ queries $\hdh$ on a hidden DH key and let $\fdh$ the event that $\adv$ triggers $\qdh$ \emph{before} having triggered $\qs$. Then we have
+	To this end, we call a group element $k \in \mathbb{G}$ a \emph{hidden DH key} if $k = pk_u^{y_{u, v}}$, where $(u, v)$ is an edge in the GSD graph, $u$ is safe and $y_{u, v}$ is the exponent chosen in the DHIES encryption of $s_v$ (i.e. $\adv$ was given a ciphertext of the form $\langle g^{y_{u, v}}, \ldots\rangle$ when it queried $\mathrm{encrypt}(u, v)$). Now analogously to above let $\qdh$ the event that $\adv$ queries $\hdh$ on a hidden DH key and let $\fdh$ the event that $\adv$ triggers $\qdh$ \emph{before} having triggered $\qs$. Then we can split of the event $\qs$ into two cases:
 	\begin{align*}
 		\pr{\qs} & = \pr{\qs \land \fdh} + \pr{\qs \land \overline{\fdh}\,}.
 	\end{align*}
 	We show in Lemma~\vref{lemma:dh-reduction} that
-	$$
+	\[
 		\pr{\qs \land \fdh} \le \ldots
-	$$
+	\]
 	and in Lemma~\vref{lemma:eav-reduction} that
-	$$
+	\[
 		\pr{\qs \land \overline{\fdh}\,} \le \ldots
-	$$
+	\]
 	Then
-	$$
+	\[
 		\pr{\wins} \le x + \frac{1}{2},
-	$$ so
-	$$
+	\] so
+	\[
 		\mathrm{Adv}_{\Pi}^{\mathrm{SD-GSD}}(\adv) \le 2 \cdot \abs*{x} = \tilde{\epsilon}.
-	$$
+	\]
 	\todo{How to argue about $\tilde{t}$?}
 \end{proof}
 
@@ -124,9 +123,9 @@ Since we are only interested in the security of the SD-GSD game for the case whe
 
 \begin{lemma} \label{lemma:dh-reduction}
 	Let $\adv$ an SD-GSD adversary. Let $\dhies, \hdh, \mathbb{G}$ and the events $\qs, \qdh, \fdh$ as in the statement and proof of Theorem~\vref{theorem:sdgsd-security} and assume that the DDH problem is $(t, \epsilon)$-hard in $\mathbb{G}$. Then
-	$$
+	\[
 		\pr{\qs \land \fdh} \le \ldots.
-	$$
+	\]
 \end{lemma}
 \begin{proof}
 	\todo{Make a note that we only care about $\qdh$ being triggered before $\qgen$ for the proof, but we need the remaining information about $\qdep$ in Lemma~\vref{lemma:eav-reduction}}
@@ -140,7 +139,7 @@ Since we are only interested in the security of the SD-GSD game for the case whe
 	Let $\Pi$ a private-key encryption scheme. Define the experiment $\mathrm{Exp}_{\adv, \Pi}^{\mathrm{MI-EAV}}$ for an adversary $\adv$:
 	\begin{enumerate}[1.]
 		\item The adversary $\adv$ outputs $q \in \N$ and a pair of messages $m_0, m_1$ of the same length. We refer to $q$ as the number of \emph{queries} made by $\adv$.
-		\item A bit $b \from \{0, 1\}$ is sampled. For each $i \in [q]$, $\adv$ is given an encryption $c_i \from \Pi.\enc_{k_i}(m_b)$ where $k_i \from Gen()$ is generated independently from the other keys.
+		\item A bit $b \from \{0, 1\}$ is sampled. For each $i \in [q]$, $\adv$ is given an encryption $c_i \from \Pi.\enc_{k_i}(m_b)$ where $k_i \from \Pi.\gen()$ is generated independently from the other keys.
 		\item $\adv$ outputs a bit $b'$. The output of the experiment is defined to be $1$ if $b' = b$, and $0$ otherwise.
 	\end{enumerate}
 \end{definition}
