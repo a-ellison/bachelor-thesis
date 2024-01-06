@@ -4,39 +4,39 @@
 
 \todo{Define public-key encryption scheme.}
 
-\begin{definition}[The IND-CPA Experiment]
-	Let $\Pi$ a private-key encryption scheme. Define the experiment $\mathrm{Exp}_{\adv, \Pi}^{\mathrm{IND-CPA}}$ for an adversary $\adv$:
+\begin{definition}[The IND-CPA Game]
+	Let $\Pi$ a private-key encryption scheme. Define the game $\mathrm{Game}_{\adv, \Pi}^{\mathrm{IND-CPA}}$ for an adversary $\adv$:
 	\begin{enumerate}[1.]
 		\item A key $k \from \gen()$ is generated.
 		\item The adversary $\adv$ is given oracle access to $\Pi.\enc_k$ and outputs a pair of messages $m_0, m_1$ of the same length.
 		\item A bit $b \from \{0, 1\}$ is sampled and $\adv$ is given the ciphertext $c \from \enc_k(m_b)$. ($\adv$ continues to have oracle access to $\Pi.\enc_k$.)
-		\item $\adv$ outputs a bit $b'$. The output of the experiment is defined to be $1$ if $b' = b$, and $0$ otherwise.
+		\item $\adv$ outputs a bit $b'$. The output of the game is defined to be $1$ if $b' = b$, and $0$ otherwise.
 	\end{enumerate}
 \end{definition}
 
 \begin{definition}[IND-CPA security]
 	A private-key encryption scheme $\Pi$ is \emph{$(t, \epsilon, q)$-IND-CPA secure} if for any adversary $\adv$ running in time $t$ we have
 	\begin{align*}
-		\mathrm{Adv}_{\Pi}^{\mathrm{MI-EAV}}(\adv) \coloneqq 2 \cdot \abs*{\pr{\mathrm{Exp}_{\adv, \Pi}^{\mathrm{MI-EAV}} = 1} - \frac{1}{2}} \le \epsilon.
+		\mathrm{Adv}_{\Pi}^{\mathrm{MI-EAV}}(\adv) \coloneqq 2 \cdot \abs*{\pr{\mathrm{Game}_{\adv, \Pi}^{\mathrm{MI-EAV}} = 1} - \frac{1}{2}} \le \epsilon.
 	\end{align*}
 \end{definition}
 
 \todo{Shortly motivate EAV security and reference Katz and Lindell.}
 
-\begin{definition}[The EAV Experiment]
-	Let $\Pi$ a private-key encryption scheme. Define the experiment $\mathrm{Exp}_{\adv, \Pi}^{\mathrm{EAV}}$ for an adversary $\adv$:
+\begin{definition}[The EAV Game]
+	Let $\Pi$ a private-key encryption scheme. Define the game $\mathrm{Game}_{\adv, \Pi}^{\mathrm{EAV}}$ for an adversary $\adv$:
 	\begin{enumerate}[1.]
 		\item A key $k \from \gen()$ is generated.
 		\item The adversary $\adv$ outputs a pair of messages $m_0, m_1$ of the same length.
 		\item A bit $b \from \{0, 1\}$ is sampled and $\adv$ is given the ciphertext $c \from \enc_k(m_b)$.
-		\item $\adv$ outputs a bit $b'$. The output of the experiment is defined to be $1$ if $b' = b$, and $0$ otherwise.
+		\item $\adv$ outputs a bit $b'$. The output of the game is defined to be $1$ if $b' = b$, and $0$ otherwise.
 	\end{enumerate}
 \end{definition}
 
 \begin{definition}[EAV security]
 	A private-key encryption scheme $\Pi$ is \emph{$(t, \epsilon)$-EAV secure} if for any adversary $\adv$ running in time $t$ we have
 	\begin{align*}
-		\mathrm{Adv}_{\Pi}^{\mathrm{EAV}}(\adv) \coloneqq 2 \cdot \abs*{\pr{\mathrm{Exp}_{\adv, \Pi}^{\mathrm{EAV}} = 1} - \frac{1}{2}} \le \epsilon.
+		\mathrm{Adv}_{\Pi}^{\mathrm{EAV}}(\adv) \coloneqq 2 \cdot \abs*{\pr{\mathrm{Game}_{\adv, \Pi}^{\mathrm{EAV}} = 1} - \frac{1}{2}} \le \epsilon.
 	\end{align*}
 \end{definition}
 

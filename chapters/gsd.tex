@@ -13,21 +13,17 @@ We call our adaptation of GSD security \emph{Seeded GSD with Dependencies} (SD-G
 \todo{Do not allow cycles in $(V, E \cup D)$ either.}
 \todo{Add remark that cycles are (maybe) ok in the ROM.}
 
-We will refer to the following as the \emph{SD-GSD experiment} or the \emph{SD-GSD game} interchangeably.
+\begin{definition}[The SD-GSD Game]
 
-\question{Where best to define things like \emph{hidden} seeds or \emph{corrupted} nodes?}
-
-\begin{definition}[The SD-GSD Experiment]
-
-	Let $\lambda \in \N$ a security parameter. \question{Where to define $\lambda$?} Let $\Pi = (\mathrm{Gen}, \mathrm{Enc}, \mathrm{Dec})$ a public-key encryption scheme. Let $H_{\mathrm{gen}}, H_{\mathrm{dep}} \colon \{0, 1\}^\lambda \to \{0, 1\}^\lambda$ two KDFs. Define the experiment $\mathrm{Exp}_{\adv, \Pi}^{\mathrm{SD-GSD}}$ for an adversary $\adv$:
+	Let $\lambda \in \N$ a security parameter. \question{Where to define $\lambda$?} Let $\Pi = (\mathrm{Gen}, \mathrm{Enc}, \mathrm{Dec})$ a public-key encryption scheme. Let $H_{\mathrm{gen}}, H_{\mathrm{dep}} \colon \{0, 1\}^\lambda \to \{0, 1\}^\lambda$ two KDFs. Define the game $\mathrm{Game}_{\adv, \Pi}^{\mathrm{SD-GSD}}$ for an adversary $\adv$:
 	\begin{enumerate}[1.]
-		\item The adversary $\adv$ outputs $n \in \N$ and a list of dependencies $D = \{(a_{i}, b_{i})\}_{i=1}^m \in [n]^2$. For each $v \in [n]$:
+		\item \label{def:sd-gsd-game-step-1} The adversary $\adv$ outputs $n \in \N$ and a list of dependencies $D = \{(a_{i}, b_{i})\}_{i=1}^m \in [n]^2$. For each $v \in [n]$:
 		      \begin{enumerate}[(i)]
 			      \item \begin{itemize}
 				            \item \textbf{Case $v = b_i$ for some $i$ ($v$ is the target of some dependency):} set $s_v = H_{\mathrm{dep}}(s_{a_i})$.
 				            \item \textbf{Otherwise:} sample $s_v \from \{0, 1\}^\lambda$.
 			            \end{itemize}
-			            We call $s_v$ the \emph{seed} of the node $v$.
+			            We call $s_v$ the \emph{seed} of the node $v$ and a tuple $(a, b) \in D$ a \emph{seed dependency}.
 			      \item Compute $(sk_v, pk_v) = \gen(\hgen(s_v))$. \todo{Define what RHS means.}
 		      \end{enumerate}
 		      Set $\mathcal{C} = E = \varnothing$. We call the directed graph $([n], E)$ a \emph{GSD graph} of \emph{size} $n$.
@@ -35,7 +31,7 @@ We will refer to the following as the \emph{SD-GSD experiment} or the \emph{SD-G
 		      \begin{itemize}
 			      \item $\mathrm{reveal}(v)$ for $v \in [n]$: $\adv$ is given $pk_v$.
 			      \item $\mathrm{encrypt}(u, v)$ for $u, v \in [n], u \neq v$: $(u, v)$ is added to $E$ and $\adv$ is given $c \from \mathrm{Enc}_{pk_u}(s_v)$.
-			      \item $\mathrm{corrupt}(v)$ for $v \in [n]$: $\adv$ is given $s_v$ and $v$ is added to $\mathcal{C}$. We call such a node $v \in \mathcal{C}$ \emph{corrupted}. All nodes not reachable from any corrupted node in the graph $([n], E \cup D)$ are \emph{safe} and we say their seeds are \emph{hidden} (even if an non-safe node happens to have the same seed).
+			      \item $\mathrm{corrupt}(v)$ for $v \in [n]$: $\adv$ is given $s_v$ and $v$ is added to $\mathcal{C}$. We call such a node $v \in \mathcal{C}$ \emph{corrupted}. All nodes not reachable from any corrupted node in the graph $([n], E \cup D)$ are \emph{safe} (while all other nodes are \emph{unsafe}) and we say their seeds are \emph{hidden} (even if an unsafe node happens to have the same seed).
 		      \end{itemize}
 		\item $\adv$ outputs a node $v \in [n]$. We call $v$ the \emph{challenge node}. A bit $b \from \{0, 1\}$ is sampled and $\adv$ is given
 		      \[
@@ -45,10 +41,10 @@ We will refer to the following as the \emph{SD-GSD experiment} or the \emph{SD-G
 			      \end{cases},
 		      \]
 		      where $s \from \{0, 1\}^\lambda$. $\adv$ may continue to do queries as before.
-		\item $\adv$ outputs a bit $b'$. The output of the experiment is defined to be $1$ if $b' = b$, and $0$ otherwise.
+		\item \label{def:sd-gsd-game-step-4} $\adv$ outputs a bit $b'$. The output of the game is defined to be $1$ if $b' = b$, and $0$ otherwise.
 	\end{enumerate}
 
-	During execution of the above experiment, we require that the adversary adhere to the following:
+	We require an adversary playing the above game to adhere to the following:
 	\begin{itemize}
 		\item The challenge node always remains a sink.
 		\item The challenge node is safe.
@@ -65,7 +61,7 @@ Since we are only interested in the security of the SD-GSD game for the case whe
 \begin{definition}[SD-GSD security in the ROM]
 	A public-key encryption scheme $\Pi$ is \emph{$(t, \epsilon, N, \delta)$-SD-GSD secure} if for any adversary $\adv$ constructing a GSD graph of size at most $N$ and indegree at most $\delta$ and running in $t$ time we have
 	\begin{align*}
-		\mathrm{Adv}_{\Pi}^{\mathrm{SD-GSD}}(\adv) \coloneqq 2 \cdot \abs*{\pr{\mathrm{Exp}_{\adv, \Pi}^{\mathrm{SD-GSD}} = 1} - \frac{1}{2}} \le \epsilon
+		\mathrm{Adv}_{\Pi}^{\mathrm{SD-GSD}}(\adv) \coloneqq 2 \cdot \abs*{\pr{\mathrm{Game}_{\adv, \Pi}^{\mathrm{SD-GSD}} = 1} - \frac{1}{2}} \le \epsilon
 	\end{align*}
 	when $\hgen$ and $\hdep$ are random oracles.
 \end{definition}
@@ -135,19 +131,19 @@ Since we are only interested in the security of the SD-GSD game for the case whe
 
 \todo{Motivation for MI-EAV}
 
-\begin{definition}[The MI-EAV Experiment]
-	Let $\Pi$ a private-key encryption scheme. Define the experiment $\mathrm{Exp}_{\adv, \Pi}^{\mathrm{MI-EAV}}$ for an adversary $\adv$:
+\begin{definition}[The MI-EAV Game]
+	Let $\Pi$ a private-key encryption scheme. Define the game $\mathrm{Game}_{\adv, \Pi}^{\mathrm{MI-EAV}}$ for an adversary $\adv$:
 	\begin{enumerate}[1.]
 		\item The adversary $\adv$ outputs $q \in \N$ and a pair of messages $m_0, m_1$ of the same length. We refer to $q$ as the number of \emph{queries} made by $\adv$.
 		\item A bit $b \from \{0, 1\}$ is sampled. For each $i \in [q]$, $\adv$ is given an encryption $c_i \from \Pi.\enc_{k_i}(m_b)$ where $k_i \from \Pi.\gen()$ is generated independently from the other keys.
-		\item $\adv$ outputs a bit $b'$. The output of the experiment is defined to be $1$ if $b' = b$, and $0$ otherwise.
+		\item $\adv$ outputs a bit $b'$. The output of the game is defined to be $1$ if $b' = b$, and $0$ otherwise.
 	\end{enumerate}
 \end{definition}
 
 \begin{definition}[MI-EAV security]
 	A private-key encryption scheme $\Pi$ is \emph{$(t, \epsilon, q)$-MI-EAV secure} if for any adversary $\adv$ making at most $q$ queries and running in time $t$ we have
 	\begin{align*}
-		\mathrm{Adv}_{\Pi}^{\mathrm{MI-EAV}}(\adv) \coloneqq 2 \cdot \abs*{\pr{\mathrm{Exp}_{\adv, \Pi}^{\mathrm{MI-EAV}} = 1} - \frac{1}{2}} \le \epsilon.
+		\mathrm{Adv}_{\Pi}^{\mathrm{MI-EAV}}(\adv) \coloneqq 2 \cdot \abs*{\pr{\mathrm{Game}_{\adv, \Pi}^{\mathrm{MI-EAV}} = 1} - \frac{1}{2}} \le \epsilon.
 	\end{align*}
 \end{definition}
 
@@ -158,10 +154,10 @@ Similar to how IND-CPA security for a single encryption query implies IND-CPA se
 for arbitrary $i$.
 When $\adv'$ simulates $H_{i - 1}$ or $H_{i}$ to $\adv$ depending on which message from the $i$-th query gets encrypted by the IND-CPA challenger, it makes use of the encryption oracle in the IND-CPA security game to pass on the right encryptions to $\adv$ for all other queries. Now notice that if we wanted to simulate to an MI-EAV adversary we wouldn't need access to an encryption oracle since for the MI-EAV security game all the other encryptions can easily be generated by manually sampling the new keys.
 
-\begin{lemma}
+\begin{lemma} \label{lemma:mi-eav-from-eav}
 	Let $\Pi$ a private-key encryption scheme with finite message space. Let $t_{\gen}, t_{\enc}$ upper bounds for the runtime of $\Pi.\gen$ and $\Pi.\enc$, respectively. If $\Pi$ is $(t, \epsilon)$-EAV secure, then for all $q \in \N$, $\Pi$ is $(\tilde{t}, q \cdot \epsilon, q)$-MI-EAV secure with $\tilde{t} = t - \mathcal{O}(q \cdot (t_\gen + t_\enc))$.
 \end{lemma}
-\begin{proof} Note that since the message space is finite, the time to encrypt a message is bounded. As outlined above this follows from a simple hybrid argument. Let $q \in \N$ and $\adv$ an arbitrary MI-EAV adversary running in time $\tilde{t}$ and making at most $q$ queries. Define the sequence of hybrid games $H_0, \ldots, H_q$ where in the game $H_i$ the first $i$ encryptions given to the adversary encrypt $m_1$ and all remaining encryptions encrypt $m_0$. We will write
+\begin{proof} Note that since the message space is finite, the time to encrypt a message is bounded. As outlined above the Lemma follows from a simple hybrid argument. Let $q \in \N$ and $\adv$ an arbitrary MI-EAV adversary running in time $\tilde{t}$ and making at most $q$ queries. Define the sequence of hybrid games $H_0, \ldots, H_q$ where in the game $H_i$ the first $i$ encryptions given to the adversary encrypt $m_1$ and all remaining encryptions encrypt $m_0$. We will write
 	\[
 		\pr{\adv \rightarrow 1 \mid H_i}
 	\]
