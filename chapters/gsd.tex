@@ -72,47 +72,74 @@ Since we are only interested in the security of the SD-GSD game for the case whe
 \todo{Comment on switch from IND-CPA security to EAV security.}
 
 \begin{theorem} \label{theorem:sdgsd-security}
-	Let $N, \delta \in \N$ arbitrary. Let $\Pi_{\mathrm{DH}}$ the DHIES scheme instantiated with a private-key encryption scheme $\Pi_s$. Let $\hdh$ the KDF and $\mathbb{G}$ the group used in $\Pi_{\mathrm{DH}}$. If $\Pi_s$ is $(t, \epsilon)$-EAV secure, the DDH problem is $(t, \epsilon)$-hard in $\mathbb{G}$ and $\hdh$ is modelled as a random oracle, then $\Pi_{\mathrm{DH}}$ is $(\tilde{t}, \tilde{\epsilon}, N, \delta)$-SD-GSD secure.
+	Let $N, \delta \in \N$ arbitrary with $\delta \le N$. Let $\Pi_{\mathrm{DH}}$ the DHIES scheme instantiated with a private-key encryption scheme $\Pi_s$ where $\Pi_s.\gen$ samples a key uniformly at random from $\{0, 1\}^\lambda$. Let $\hdh$ the KDF and $\mathbb{G}$ the group used in $\dhies$. If $\Pi_s$ is $(t, \epsilon)$-EAV secure, the DDH problem is $(t, \epsilon)$-hard in $\mathbb{G}$ and $\hdh$ is modelled as a random oracle, then $\Pi_{\mathrm{DH}}$ is $(\tilde{t}, \tilde{\epsilon}, N, \delta)$-SD-GSD secure with
+	\begin{equation*}
+		\begin{split}
+			\tilde{t} = t - \mathcal{O}\big(\ms + & \mdh  \\ + & N \cdot (t_{\hdep} + t_{\mathrm{sample}} + t_{\hgen} + t_{\dhies.\gen})  \\ + & N^2 \cdot t_{\dhies.\enc}\big).
+		\end{split}
+	\end{equation*}
+	and
+	\[
+		\tilde{\epsilon} = \ldots
+	\]
+	and where $\ms$ is an upper bound on the number of queries made to either $\hgen$ or $\hdep$ and $\mdh$ is an upper bound on the number of queries made to $\mdh$. \todo{Nicer way to introduce $\ms$ and $\mdh$?}
 \end{theorem}
-\begin{proof}
-	Let $\adv$ an arbitrary SD-GSD adversary running in time $\tilde{t}$. For an execution of $\sdgsdexperiment{\dhies}$ we say ``\emph{$\adv$ wins}" to denote the event $\sdgsdexperiment{\dhies} = 1$.
-	As usual with random oracles we proceed by a case distinction on whether they were queried on some interesting value. Accordingly, let $Q_{\mathrm{x}}$ denote the event that $\adv$ queries $H_{\mathrm{x}}$ on a hidden seed for $x \in \{\mathrm{gen}, \mathrm{dep}\}$. (\question{What if corrupted seed is queried and it happens to coincide with a hidden seed?}) Then we can write
-	\begin{align*}
+\paragraph{Intuition}
+Consider an arbitrary SD-GSD adversary $\adv$. For an execution of $\sdgsdgame{\dhies}$ we say ``\emph{$\adv$ wins}" to denote the event $\sdgsdgame{\dhies} = 1$.
+As usual with random oracles we proceed by a case distinction on whether they were queried on some interesting value. Accordingly, let $Q_{\mathrm{x}}$ denote the event that $\adv$ queries $H_{\mathrm{x}}$ on a hidden seed for $x \in \{\mathrm{gen}, \mathrm{dep}\}$. (\question{What if corrupted seed is queried and it happens to coincide with a hidden seed?}) Then we can write
+\begin{align*} \label{eq:theorem-sd-gsd-security-win-cases}
+	\begin{split}
 		\pr{\wins} & = \pr{\wins \land \qdep} + \pr{\wins \land \overline{\qdep} \,} \\
-		           & \stackrel{(*)}{=}  \pr{\wins \land \qdep} + \frac{1}{2}         \\
-		           & \le \pr{\qs} + \frac{1}{2},
-	\end{align*}
-	where $\qs \coloneqq \qgen \cup \qdep$ ($\mathrm{s}$ for \emph{seed}).
+		& \stackrel{(*)}{=}  \pr{\wins \land \qdep} + \frac{1}{2}         \\
+		& \le \pr{\qdep} + \frac{1}{2} \\
+		& \le \pr{\qs} + \frac{1}{2},
+	\end{split}
+\end{align*}
+where $\qs \coloneqq \qgen \cup \qdep$ ($\mathrm{s}$ for \emph{seed}).
 
-	\todo{Justify (*). (And perhaps name it better?)}
+\todo{Justify (*). (And perhaps name it better?)}
 
-	The heart of the proof is to bound $\pr{\qs}$. When the adversary first triggers $\qs$ by querying the seed of some node $v$, it can only have learned the seed through encryptions $c_1 \from \dhies.\mathrm{Enc}_{pk_{u_1}}(s_v), \ldots, c_d \from \dhies.\mathrm{Enc}_{pk_{u_d}}(s_v)$ where $(u_1, v), \ldots, (u_d, v)$ are edges in the GSD graph. The proof in \cite{ttkem} simply argued that this is not too likely if these encryptions were made with an IND-CPA secure scheme. In the context of the DHIES scheme we can say more about these encryptions and achieve a better reduction loss. Let $x_i = \log_g(pk_{u_i})$. Each encryption $c_i$ is a tuple of the form $\langle g^{y_i}, \Pi_s.\enc_{k_i}(s_v) \rangle$ where $y_i \from [\abs{\mathbb{G}}], k_i = \hdh\left(g^{x_i \cdot y_i}\right)$. Now we can again do a case distinction on whether $\hdh$ was queried for some group element $g^{x_j \cdot y_j}$ or not.
-	\begin{itemize}
-		\item If such a query was made, then $\adv$ solved the Diffie-Hellman challenge $(g^{x_j}, g^{y_j})$. (Remember that we assumed that $v$ is the first node for which $\qs$ is triggered and if the seed of $v$ is hidden, then so are the seeds of the nodes $u_i$. Thus the adversary has not learned the exponent $x_i$ through querying $\hgen(s_{u_i})$ for any $i$.)
-		\item If no such query was made, then from $\adv$'s perspective all the $k_i$ are independent, uniformly random keys and it still was able to learn $s_v$ from the EAV secure encryptions $\Pi_s.\enc_{k_1}(s_v), \ldots, \Pi_s.\enc_{k_d}(s_v)$.
-	\end{itemize}
-	We can bound the probability of either of these events occuring using hardness of the DDH problem in $\mathbb{G}$ and EAV security of $\Pi_s$, respectively.
+\todo{Motivate why we introduce $\qs$. (Reason: If we try to bound $\qdep$ by itself, we must separately deal with the case where the adversary was able to trigger it at a node $v$ by triggering $\qgen$ at a parent node $p$ and subsequently decrypting a ciphertext. But our argument  To eliminate this, we want to look at the point in time where either of the two events was first triggered.)}
 
-	To this end, we call a group element $k \in \mathbb{G}$ a \emph{hidden DH key} if $k = pk_u^{y_{u, v}}$, where $(u, v)$ is an edge in the GSD graph, $u$ is safe and $y_{u, v}$ is the exponent chosen in the DHIES encryption of $s_v$ (i.e. $\adv$ was given a ciphertext of the form $\langle g^{y_{u, v}}, \ldots\rangle$ when it queried $\mathrm{encrypt}(u, v)$). Now analogously to above let $\qdh$ the event that $\adv$ queries $\hdh$ on a hidden DH key and let $\fdh$ the event that $\adv$ triggers $\qdh$ \emph{before} having triggered $\qs$. Then we can split of the event $\qs$ into two cases:
-	\begin{align*}
-		\pr{\qs} & = \pr{\qs \land \fdh} + \pr{\qs \land \overline{\fdh}\,}.
-	\end{align*}
-	We show in Lemma~\vref{lemma:dh-reduction} that
+The heart of the proof is to bound $\pr{\qs}$. When the adversary first triggers $\qs$ by querying the seed of some hidden node $w$, it can only have learned the seed through encryptions
+$c_1 \from \dhies.\mathrm{Enc}_{pk_{u_1}}(s_w), \ldots, c_d \from \dhies.\mathrm{Enc}_{pk_{u_d}}(s_w)$
+where $(u_1, w), \ldots, (u_d, w)$ are edges in the GSD graph (obtained through corresponding queries $\mathrm{encrypt}(u_1, w), \ldots, \mathrm{encrypt}(u_d, w)$).
+
+\todo{Add plot illustrating edges in GSD graph and a potential seed dependency. Add note why no information is learned through $\hdh$. (No information is learned since all parent nodes of $w$ are also safe and querying $\hdh(s_p)$ for a parent $p$ would thus trigger $\qdep$.)}
+
+The proof in \cite{ttkem} simply argued that this is not too likely if these encryptions were made with an IND-CPA secure scheme. In the context of the DHIES scheme we can say more about these encryptions and achieve a better reduction loss.
+Let $x_i = \log_g(pk_{u_i})$. Each encryption $c_i$ is a tuple of the form $\langle g^{y_i}, \Pi_s.\enc_{k_i}(s_w) \rangle$ where $y_i \from [\abs{\mathbb{G}}], k_i = \hdh\left(g^{x_i \cdot y_i}\right)$. Now we can again do a case distinction on whether $\hdh$ was queried for some group element $g^{x_j \cdot y_j}$ or not.
+\begin{itemize}
+	\item If such a query was made, then $\adv$ solved the Diffie-Hellman challenge $(g^{x_j}, g^{y_j})$. (Remember that we assumed that $w$ is the first node for which $\qs$ is triggered and if the seed of $w$ is hidden, then so are the seeds of the nodes $u_i$. Thus the adversary has not learned the exponent $x_i$ through querying $\hgen(s_{u_i})$ for any $i$.)
+	\item If no such query was made, then from $\adv$'s perspective all the $k_i$ are independent, uniformly random keys and it still was able to learn $s_w$ from the EAV secure encryptions $\Pi_s.\enc_{k_1}(s_w), \ldots, \Pi_s.\enc_{k_d}(s_w)$.
+\end{itemize}
+We can bound the probability of either of these events occurring using hardness of the DDH problem in $\mathbb{G}$ and EAV security of $\Pi_s$, respectively.
+
+To this end, we call a group element $k \in \mathbb{G}$ a \emph{hidden Diffie-Hellman key} if $k = pk_u^{y_{u, w}}$, where $(u, w)$ is an edge in the GSD graph, $u$ is safe and $y_{u, w}$ is the exponent chosen in the DHIES encryption of $s_w$ (i.e. $\adv$ was given a ciphertext of the form $\langle g^{y_{u, w}}, \ldots\rangle$ when it queried $\mathrm{encrypt}(u, w)$). Now analogously to above let $\qdh$ the event that $\adv$ queries $\hdh$ on a hidden Diffie-Hellman key and let $\fdh$ the event that $\adv$ triggers $\qdh$ \emph{before} having triggered $\qs$. Then we can split of the event $\qs$ into two cases:
+\begin{align*}
+	\pr{\qs} & = \pr{\qs \land \fdh} + \pr{\qs \land \overline{\fdh}\,}.
+\end{align*}
+We bound $\pr{\qs \land \fdh}$ and $\pr{\qs \land \fdh}$ in Lemma~\ref{lemma:mi-eav-from-eav} and Lemma~\ref{lemma:eav-reduction}, respectively, which overall gives us a bound on the advantage of $\adv$ using \eqref{eq:theorem-sd-gsd-security-win-cases}.
+
+\begin{proof}[of Theorem~\ref{theorem:sdgsd-security}]
+	Let $\adv$ an arbitrary SD-GSD adversary running in time $\tilde{t}$. We will use the events defined above. We first justify step $(*)$ in \eqref{eq:theorem-sd-gsd-security-win-cases}.
+
+
+	By Lemma~\vref{lemma:dh-reduction} we have
 	\[
 		\pr{\qs \land \fdh} \le \ldots
 	\]
-	and in Lemma~\vref{lemma:eav-reduction} that
+	and by Lemma~\vref{lemma:eav-reduction} we have
 	\[
 		\pr{\qs \land \overline{\fdh}\,} \le \ldots
 	\]
-	Then
+	Then by \eqref{eq:theorem-sd-gsd-security-win-cases}
 	\[
 		\pr{\wins} \le x + \frac{1}{2},
 	\] so
 	\[
 		\mathrm{Adv}_{\Pi}^{\mathrm{SD-GSD}}(\adv) \le 2 \cdot \abs*{x} = \tilde{\epsilon}.
 	\]
-	\todo{How to argue about $\tilde{t}$?}
 \end{proof}
 
 \subsection{Reducing to the DDH problem}
