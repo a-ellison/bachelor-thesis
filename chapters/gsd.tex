@@ -410,12 +410,41 @@ Thus the advantage of the adversary is about $\pr{\qs \land \overline{\fdh}\,}$ 
 	as was to prove.
 \end{proof}
 
-\subsubsection{Tighter EAV security for certain schemes}
+\subsubsection{Tighter MI-EAV security for certain schemes}
 
-\begin{definition}[Rerandomizability]
-	Let $\Pi$ a private-key encryption scheme. $\Pi$ is \emph{rerandomizable} if there exists a probabilistic algorithm $\mathrm{ReRan}$ running in time polynomial in ?, such that given $c \from \enc_k(m)$ for any $m$ and $k \from Gen()$, $\mathrm{text}$
+In our reduction from MI-EAV security to EAV security (Lemma~\ref{lemma:mi-eav-from-eav}) we applied a general hybrid argument. It is also tempting to try a more direct approach. The EAV and MI-EAV games seem less far apart than IND-CPA for single and multiple encryptions: All additional encrpytions in the MI-EAV game encrypt the same message, with the only difference being that each encryption is performed using a fresh key. If only we could take a single encryption $c \from \enc_k(m)$ and from it produce several encryptions $c_i \from \enc_{k_i}(m)$ for $k_i \from \gen()$ (without knowing $k$ or $m$), then the additional encryptions would leak no new information to the adversary, and we would have a tight bound on MI-EAV security from EAV security. There is a simple EAV secure scheme that achieves the above property: the one-time pad. Given an encryption $c = k \oplus m$, we can simply sample $k' \from \{0, 1\}^\kappa$ and compute the ciphertext $c' = c \oplus k' = (k \oplus k') \oplus m$, an encryption of $m$ under the uniformly random key $k \oplus k'$. In the following, we formalize this property of a private-key encryption scheme and use it to prove the desired bound on MI-EAV security.
+
+\begin{definition}[Key-rerandomizability] \label{def:key-rerandomizability}
+	Let $\Pi$ a private-key encryption scheme with security parameter $\kappa$. $\Pi$ is \emph{key-rerandomizable} if there exists a probabilistic polynomial time algorithm $\mathrm{ReRan}$ achieving the following: Given $c \from \enc_k(m)$ for any fixed message $m$ in the message space and $k \from \gen()$, the output $c' \from \mathrm{ReRan}(c)$ follows the same distribution as the process of sampling $k' \from \gen()$ and computing a ciphertext $\enc_{k'}(m)$. The runtime must be polynomial in $\kappa$ and the length of the ciphertext $c$.
 \end{definition}
 
-\begin{lemma}
+\paragraph{Example} As outlined above, the one-time pad is an example of a key-rerandomizable encryption scheme.
 
+\question{Is there a key-rerandomizable IND-CPA secure scheme? If yes, this would imply a key-rerandomizable AE scheme using the encrypt-then-authenticate paradigm, since a rerandomized tag can easily produced for the ciphertext by sampling a fresh MAC key.}
+
+The key idea underlying the proof of the following Lemma was already provided at the beginning of this section.
+
+\begin{lemma}
+	Let $\Pi$ a key-rerandomizable private-key encryption scheme with finite message space. Let $\mathrm{ReRan}$ the corresponding algorithm to rerandomize ciphertexts and $t_{\mathrm{ReRan}}$ an upper bound for the runtime of $\mathrm{ReRan}$. If $\Pi$ is $(t, \epsilon)$-EAV secure, then for all $q \in \N$, $\Pi$ is $(\tilde{t}, \epsilon, q)$-MI-EAV secure with $\tilde{t} = t - \mathcal{O}(q \cdot t_{\mathrm{ReRan}})$.
 \end{lemma}
+
+\begin{proof}
+	Note that since the message space and thus the ciphertext space is finite, the runtime of $\mathrm{ReRan}$ is indeed bounded. Let $\adv$ an MI-EAV adversary running in time $\tilde{t}$ and making at most $q$ queries. We construct an EAV adversary $\adv'$ that behaves as follows:
+	\begin{enumerate}[1.]
+		\item $\adv'$ runs $\adv$ to get the number of queries $q$ and messages $m_0, m_1$.
+		\item $\adv'$ gives $m_0, m_1$ to the challenger and receives. Let $c_1$ the ciphertext it gets back.
+		\item $\adv'$ computes ciphertexts $c_2 \from \mathrm{ReRan}(c_1), \ldots, c_q \from \mathrm{ReRan}(c_1)$ (with independent runs of $\mathrm{ReRan}$).
+		\item $\adv'$ gives the ciphertexts $c_1, \ldots, c_q$ to $\adv$.
+		\item $\adv'$ outputs whatever bit $\adv$ outputs.
+	\end{enumerate}
+	We apply the properties of $\mathrm{ReRan}$ given in Definition~\ref{def:key-rerandomizability} to show that the game simulated to $\adv$ is distributed identically to the MI-EAV game. For this we need only show that the ciphertexts $c_1, \ldots, c_q$ given to $\adv$ in the simulation are distributed identically to the ciphertexts $c_1', \ldots, c_q'$ that $\adv$ would get in the real MI-EAV game. It is immediate that $c_1$ is distributed identically to $c_1'$. Now let $i \in \{2, \ldots, q\}$. By Definition~\ref{def:key-rerandomizability} $\mathrm{ReRan}(c)$ outputs a ciphertext encrypting $m_b$ (where $b$ is the bit chosen by the EAV challenger) distributed identically to a ciphertext encrypting $m_b$ output by the MI-EAV challenger. Thus, indeed for any $i$, $c_i$ is distributed identically to $c_i'$ and the claim holds. Therefore
+	\begin{equation} \label{eq:lemma-key-rerandomizability-advantage-same}
+		\mathrm{Adv}_{\Pi}^{\mathrm{MI-EAV}}(\adv) = \mathrm{Adv}_{\Pi}^{\mathrm{EAV}}(\adv').
+	\end{equation}
+
+	Because $\adv'$ is an EAV adversary running in time $\tilde{t} + \mathcal{O}(q \cdot t_{\mathrm{ReRan}}) = t$ we know that
+	\[
+		\mathrm{Adv}_{\Pi}^{\mathrm{EAV}}(\adv') \le \epsilon,
+	\]
+	which together with \eqref{eq:lemma-key-rerandomizability-advantage-same} concludes the proof.
+\end{proof}
