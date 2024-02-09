@@ -251,7 +251,7 @@ The adversary $\adv'$ simulates $H_{i - 1}$ or $H_{i}$ to $\adv$ depending on wh
 \end{proof}
 
 \begin{lemma} \label{lemma:eav-reduction}
-	Recall the variables and events defined in the statement and proof of Theorem~\ref{theorem:sdgsd-security}. In particular, assume that $\Pi_s$ is $(t, \epsilon)$-EAV secure. Let $\adv$ an SD-GSD adversary running in time $\tilde{t}$, making at most $\ms$ queries to $\hgen$ or $\hdep$ and at most $\mdh$ queries to $\hdh$. Then
+	Recall the assumptions, variables and events from the statement and proof of Theorem~\ref{theorem:sdgsd-security}. In particular, assume that $\Pi_s$ is $(t, \epsilon)$-EAV secure. Let $\adv$ an SD-GSD adversary running in time $\tilde{t}$, making at most $\ms$ queries to $\hgen$ or $\hdep$ and at most $\mdh$ queries to $\hdh$. Then
 	\[
 		\pr{\qs \land \overline{\fdh}\,} \le \delta \cdot N \cdot \epsilon + \frac{\ms \cdot N}{2^\lambda}.
 	\]
@@ -362,8 +362,8 @@ Thus the advantage of the adversary is about $\pr{\qs \land \overline{\fdh}\,}$ 
 
 	Second, returning to \eqref{eq:lemma-eav-reduction-advantage}, we can more easily show that $\pr{\adv' \to 1 \mid b = 1}$ is negligible. In the SD-GSD game simulated to $\adv$ during an execution of $\mathrm{Game}_{\adv, \Pi_s}^{\mathrm{MI-EAV}}$ with $b = 1$, the seed $s_z$ is a random variable independent of any information given to $\adv$:
 	\begin{itemize}
-		\item the game aborts when $z$ becomes unsafe, so $s_z$ cannot be learned by querying $\mathrm{corrupt}(z)$ or by querying $\hdep(s_p)$ for an unsafe node $p$ where $(p, w)$ is a seed dependency
-		\item querying $\hdep(s_p)$ for a safe node $p$ where $(p, w)$ is a seed dependency results in the game being aborted
+		\item the game aborts when $z$ becomes unsafe, so $s_z$ cannot be learned by querying $\mathrm{corrupt}(z)$ or by querying $\hdep(s_p)$ for an unsafe node $p$ where $(p, z)$ is a seed dependency
+		\item querying $\hdep(s_p)$ for a safe node $p$ where $(p, z)$ is a seed dependency results in the game being aborted and by virtue of $\hdep$ being a random oracle, from $\adv$'s perspective $s_z$ follows the same distribution regardless of whether there is a seed dependency $(p, z)$ or not
 		\item with $b = 1$ queries $\mathrm{encrypt}(u, z)$ yield encryptions of $s$ instead of $s_z$
 	\end{itemize}
 	Therefore, for any seed $s'$ that $\adv$ queries to $\hgen$ or $\hdep$ we have
