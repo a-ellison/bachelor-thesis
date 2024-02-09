@@ -2,7 +2,7 @@
 
 \todo{Motivate GSD}
 
-Following the general approach used in \cite{ttkem} to prove the security of (a variant of) TreeKEM in the ROM, we first prove a result on the GSD security of an IND-CPA secure encryption scheme. We do this specifically for the DHIES scheme. Moreover, we will make some notable modifications to the public-key GSD game defined in \cite{ttkem}, to allow for results to be applied to TreeKEM more directly. We motivate the modifications made later in Section~\vref{sec:application-to-treekem}.
+Following the general approach used in \cite{ttkem} to prove the security of (a variant of) TreeKEM in the ROM, we first prove a result on the GSD security of an IND-CPA secure encryption scheme. We do this specifically for the DHIES scheme. Moreover, we will make some notable modifications to the public-key GSD game defined in \cite{ttkem}, to allow for the results to be applied to TreeKEM more directly. We motivate the modifications made later in Section~\vref{sec:application-to-treekem}.
 
 \section{Seeded GSD with Dependencies}
 
@@ -13,7 +13,7 @@ We call our adaptation of GSD security \emph{Seeded GSD with Dependencies} (SD-G
 \todo{Do not allow cycles in $(V, E \cup D)$ either.}
 \todo{Add remark that cycles are (maybe) ok in the ROM.}
 
-\begin{definition}[The SD-GSD Game]
+\begin{definition}[The SD-GSD game]
 
 	Let $\lambda \in \N$ a security parameter. \question{Where to define $\lambda$?} Let $\Pi = (\mathrm{Gen}, \mathrm{Enc}, \mathrm{Dec})$ a public-key encryption scheme. Let $H_{\mathrm{gen}}, H_{\mathrm{dep}} \colon \{0, 1\}^\lambda \to \{0, 1\}^\lambda$ two KDFs. Define the game $\mathrm{Game}_{\adv, \Pi}^{\mathrm{SD-GSD}}$ for an adversary $\adv$:
 	\begin{enumerate}[1.]
@@ -30,8 +30,8 @@ We call our adaptation of GSD security \emph{Seeded GSD with Dependencies} (SD-G
 		\item $\adv$ may adaptively do the following queries:
 		      \begin{itemize}
 			      \item $\mathrm{reveal}(v)$ for $v \in [n]$: $\adv$ is given $pk_v$.
-			      \item $\mathrm{encrypt}(u, v)$ for $u, v \in [n], u \neq v$: $(u, v)$ is added to $E$ and $\adv$ is given $c \from \mathrm{Enc}_{pk_u}(s_v)$.
-			      \item $\mathrm{corrupt}(v)$ for $v \in [n]$: $\adv$ is given $s_v$ and $v$ is added to $\mathcal{C}$. We call such a node $v \in \mathcal{C}$ \emph{corrupted}. All nodes not reachable from any corrupted node in the graph $([n], E \cup D)$ are \emph{safe} (while all other nodes are \emph{unsafe}) and we say their seeds are \emph{hidden} (even if an unsafe node happens to have the same seed).
+			      \item $\mathrm{encrypt}(u, v)$ for $u, v \in [n], u \neq v, (u, v) \notin E$: $(u, v)$ is added to $E$ and $\adv$ is given $c \from \mathrm{Enc}_{pk_u}(s_v)$.
+			      \item $\mathrm{corrupt}(v)$ for $v \in [n], v \notin \mathcal{C}$: $\adv$ is given $s_v$ and $v$ is added to $\mathcal{C}$. We call such a node $v \in \mathcal{C}$ \emph{corrupted}. All nodes not reachable from any corrupted node in the graph $([n], E \cup D)$ are \emph{safe} (while all other nodes are \emph{unsafe}) and we call their seeds \emph{hidden} (even if an unsafe node happens to have the same seed).
 		      \end{itemize}
 		\item $\adv$ outputs a node $v \in [n]$. We call $v$ the \emph{challenge node}. A bit $b \from \{0, 1\}$ is sampled and $\adv$ is given
 		      \[
@@ -50,76 +50,84 @@ We call our adaptation of GSD security \emph{Seeded GSD with Dependencies} (SD-G
 		\item The challenge node is safe.
 		\item $\mathrm{reveal}$ is never queried on the challenge node.
 		\item The graphs $(V, E)$ and $(V, D)$ always remain acyclic and without self-loops.
-		\item All paths in the graph $(V, D)$ are vertex disjoint.
+		\item All paths in the graph $(V, D)$ are vertex disjoint. \todo{This avoids multiple sources for single target.}
 	\end{itemize}
 \end{definition}
 
-\todo{Remove random oracles from SD-GSD security and add them to Theorem~\vref{theorem:sdgsd-security} instead.}
+Since we are only interested in the security of the SD-GSD game for the case where $\hgen$ and $\hdep$ are random oracles, our definition of security is centered around the choice of the encryption scheme $\Pi$.
 
-Since we are only interested in the security of the SD-GSD game for the case where $\hgen$ and $\hdep$ are random oracles, we directly assume in our definition that the KDFs are modelled as such.
-
-\begin{definition}[SD-GSD security in the ROM]
-	A public-key encryption scheme $\Pi$ is \emph{$(t, \epsilon, N, \delta)$-SD-GSD secure} if for any adversary $\adv$ constructing a GSD graph of size at most $N$ and indegree at most $\delta$ and running in $t$ time we have
+\begin{definition}[SD-GSD security]
+	A public-key encryption scheme $\Pi$ is \emph{$(t, \epsilon, N, \delta)$-SD-GSD secure} if there exist instantiations of the KDFs $\hgen$ and $\hdep$ such that (\todo{This formulation with KDFs makes sense?}) for any adversary $\adv$ constructing a GSD graph of size at most $N$ and indegree at most $\delta$ and running in $t$ time we have
 	\begin{align*}
-		\mathrm{Adv}_{\Pi}^{\mathrm{SD-GSD}}(\adv) \coloneqq 2 \cdot \abs*{\pr{\mathrm{Game}_{\adv, \Pi}^{\mathrm{SD-GSD}} = 1} - \frac{1}{2}} \le \epsilon
+		\mathrm{Adv}_{\Pi}^{\mathrm{SD-GSD}}(\adv) \coloneqq 2 \cdot \abs*{\pr{\mathrm{Game}_{\adv, \Pi}^{\mathrm{SD-GSD}} = 1} - \frac{1}{2}} \le \epsilon.
 	\end{align*}
-	when $\hgen$ and $\hdep$ are random oracles.
 \end{definition}
 
 \section{Proving SD-GSD security for DHIES}
 
-\todo{Add assumption that $\Pi_s.\gen$ samples uniformly from $\{0, 1\}^x$}
 \todo{Comment on switch from IND-CPA security to EAV security.}
 
 \begin{theorem} \label{theorem:sdgsd-security}
-	Let $N, \delta \in \N$ arbitrary with $\delta \le N$. Let $\Pi_{\mathrm{DH}}$ the DHIES scheme instantiated with a private-key encryption scheme $\Pi_s$ where $\Pi_s.\gen$ samples a key uniformly at random from $\{0, 1\}^\lambda$. Let $\hdh$ the KDF and $\mathbb{G}$ the group used in $\dhies$. If $\Pi_s$ is $(t, \epsilon)$-EAV secure, the DDH problem is $(t, \epsilon)$-hard in $\mathbb{G}$ and $\hdh$ is modelled as a random oracle, then $\Pi_{\mathrm{DH}}$ is $(\tilde{t}, \tilde{\epsilon}, N, \delta)$-SD-GSD secure with
-	\begin{equation*}
-		\begin{split}
-			\tilde{t} = t - \mathcal{O}\big(\ms + & \mdh  \\ + & N \cdot (t_{\hdep} + t_{\mathrm{sample}} + t_{\hgen} + t_{\dhies.\gen})  \\ + & N^2 \cdot t_{\dhies.\enc}\big).
-		\end{split}
-	\end{equation*}
+	Let $N, \delta \in \N$ arbitrary with $\delta \le N$. Let $\Pi_{\mathrm{DH}}$ the DHIES scheme instantiated with a private-key encryption scheme $\Pi_s$ where $\Pi_s.\gen$ samples a key uniformly at random from $\{0, 1\}^\kappa$. Let $\hdh$ the KDF and $\mathbb{G}$ the group used in $\dhies$. If $\Pi_s$ is $(t, \epsilon)$-EAV secure, the DDH problem is $(t, \epsilon)$-hard in $\mathbb{G}$ and $\hgen, \hdep$ and $\hdh$ are modelled as random oracles, then $\Pi_{\mathrm{DH}}$ is $(\tilde{t}, \tilde{\epsilon}, N, \delta)$-SD-GSD secure with
+	\[
+		\tilde{t} = t \begin{aligned}[t]
+			- & \mathcal{O}\big(\lambda \cdot \ms
+			\begin{aligned}[t]
+				+ & \gamma \cdot \mdh \\ + & N \cdot (t_{\hdep} + t_{\mathrm{sample}} + t_{\hgen} + t_{\dhies.\gen})  \\ + & N^2 \cdot t_{\dhies.\enc}\big) \\
+			\end{aligned} \\
+			- & \mathcal{O}(N \cdot \kappa \cdot t_{\mathrm{sample}})
+		\end{aligned}
+	\]
 	and
 	\[
 		\tilde{\epsilon} = \ldots
 	\]
 	and where $\ms$ is an upper bound on the number of queries made to either $\hgen$ or $\hdep$ and $\mdh$ is an upper bound on the number of queries made to $\mdh$. \todo{Nicer way to introduce $\ms$ and $\mdh$?}
+
+	\todo{Explain variables $t_*$.}
+	\begin{itemize}
+		\item $t_{\mathrm{sample}}$: time to sample a bit
+		\item $t_{\dhies.\enc}$: time to encrypt $s \in \{0, 1\}^\lambda$
+		\item $\kappa$: length of encryption key in $\Pi_s$
+		\item $\gamma$: length of encoding of a group element $\mathbb{G}$
+	\end{itemize}
 \end{theorem}
 \paragraph{Intuition}
 Consider an arbitrary SD-GSD adversary $\adv$. For an execution of $\sdgsdgame{\dhies}$ we say ``\emph{$\adv$ wins}" to denote the event $\sdgsdgame{\dhies} = 1$.
 As usual with random oracles we proceed by a case distinction on whether they were queried on some interesting value. Accordingly, let $Q_{\mathrm{x}}$ denote the event that $\adv$ queries $H_{\mathrm{x}}$ on a hidden seed for $x \in \{\mathrm{gen}, \mathrm{dep}\}$. (\question{What if corrupted seed is queried and it happens to coincide with a hidden seed?}) Then we can write
-\begin{align*} \label{eq:theorem-sd-gsd-security-win-cases}
+\begin{align} \label{eq:theorem-sd-gsd-security-win-cases}
 	\begin{split}
 		\pr{\wins} & = \pr{\wins \land \qdep} + \pr{\wins \land \overline{\qdep} \,} \\
 		& \stackrel{(*)}{=}  \pr{\wins \land \qdep} + \frac{1}{2}         \\
 		& \le \pr{\qdep} + \frac{1}{2} \\
 		& \le \pr{\qs} + \frac{1}{2},
 	\end{split}
-\end{align*}
+\end{align}
 where $\qs \coloneqq \qgen \cup \qdep$ ($\mathrm{s}$ for \emph{seed}).
 
 \todo{Justify (*). (And perhaps name it better?)}
 
 \todo{Motivate why we introduce $\qs$. (Reason: If we try to bound $\qdep$ by itself, we must separately deal with the case where the adversary was able to trigger it at a node $v$ by triggering $\qgen$ at a parent node $p$ and subsequently decrypting a ciphertext. But our argument  To eliminate this, we want to look at the point in time where either of the two events was first triggered.)}
 
-The heart of the proof is to bound $\pr{\qs}$. When the adversary first triggers $\qs$ by querying the seed of some hidden node $w$, it can only have learned the seed through encryptions
-$c_1 \from \dhies.\mathrm{Enc}_{pk_{u_1}}(s_w), \ldots, c_d \from \dhies.\mathrm{Enc}_{pk_{u_d}}(s_w)$
-where $(u_1, w), \ldots, (u_d, w)$ are edges in the GSD graph (obtained through corresponding queries $\mathrm{encrypt}(u_1, w), \ldots, \mathrm{encrypt}(u_d, w)$).
+The heart of the proof is to bound $\pr{\qs}$. When the adversary first triggers $\qs$ by querying the seed of some safe node $w$, (with overwhelming probability $w$ will be the only node with this seed and) it can only have learned the seed through encryptions
+$c_1 \from \dhies.\enc_{pk_{u_1}}(s_w), \ldots, c_d \from \dhies.\enc_{pk_{u_d}}(s_w)$
+where $(u_1, w), \ldots, (u_d, w)$ are edges in the GSD graph (obtained through corresponding queries $\mathrm{encrypt}(u_1, w), \ldots, \mathrm{encrypt}(u_d, w)$). The only other potential source of information about $s_w$ would be a seed dependency $(p, w)$, but this tells $\adv$ nothing: Since $w$ is safe, $p$ would also be safe and $\hdep(s_p)$ cannot have been queried due to the assumption that $w$ was the first node to trigger $\qs$. Without having queried $\hdep(s_p)$, by virtue of $\hdep$ being a random oracle $s_w$ has the same distribution as a seed without a dependency from $\adv$'s perspective (uniformly random).
 
-\todo{Add plot illustrating edges in GSD graph and a potential seed dependency. Add note why no information is learned through $\hdh$. (No information is learned since all parent nodes of $w$ are also safe and querying $\hdh(s_p)$ for a parent $p$ would thus trigger $\qdep$.)}
+\todo{Add plot illustrating edges in GSD graph and a potential seed dependency.}
 
 The proof in \cite{ttkem} simply argued that this is not too likely if these encryptions were made with an IND-CPA secure scheme. In the context of the DHIES scheme we can say more about these encryptions and achieve a better reduction loss.
-Let $x_i = \log_g(pk_{u_i})$. Each encryption $c_i$ is a tuple of the form $\langle g^{y_i}, \Pi_s.\enc_{k_i}(s_w) \rangle$ where $y_i \from [\abs{\mathbb{G}}], k_i = \hdh\left(g^{x_i \cdot y_i}\right)$. Now we can again do a case distinction on whether $\hdh$ was queried for some group element $g^{x_j \cdot y_j}$ or not.
+Let $x_i = \log_g(pk_{u_i})$ (where $g$ is the generator of $\mathbb{G}$ being used in $\dhies$). Each encryption $c_i$ is a tuple of the form $\langle g^{y_i}, \Pi_s.\enc_{k_i}(s_w) \rangle$ where $y_i \from [\abs{\mathbb{G}}], k_i = \hdh\left(g^{x_i \cdot y_i}\right)$. Now we can again do a case distinction on whether $\hdh$ was queried for some group element $g^{x_j \cdot y_j}$ or not:
 \begin{itemize}
-	\item If such a query was made, then $\adv$ solved the Diffie-Hellman challenge $(g^{x_j}, g^{y_j})$. (Remember that we assumed that $w$ is the first node for which $\qs$ is triggered and if the seed of $w$ is hidden, then so are the seeds of the nodes $u_i$. Thus the adversary has not learned the exponent $x_i$ through querying $\hgen(s_{u_i})$ for any $i$.)
+	\item If such a query was made, then $\adv$ solved the Diffie-Hellman challenge $(g^{x_j}, g^{y_j})$. (Remember that we assumed that $w$ is the first node for which $\qs$ is triggered and as before if $w$ is safe, then so are the nodes $u_i$. Thus the adversary has not learned the exponent $x_i$ through querying $\hgen(s_{u_i})$ for any $i$.)
 	\item If no such query was made, then from $\adv$'s perspective all the $k_i$ are independent, uniformly random keys and it still was able to learn $s_w$ from the EAV secure encryptions $\Pi_s.\enc_{k_1}(s_w), \ldots, \Pi_s.\enc_{k_d}(s_w)$.
 \end{itemize}
 We can bound the probability of either of these events occurring using hardness of the DDH problem in $\mathbb{G}$ and EAV security of $\Pi_s$, respectively.
 
-To this end, we call a group element $k \in \mathbb{G}$ a \emph{hidden Diffie-Hellman key} if $k = pk_u^{y_{u, w}}$, where $(u, w)$ is an edge in the GSD graph, $u$ is safe and $y_{u, w}$ is the exponent chosen in the DHIES encryption of $s_w$ (i.e. $\adv$ was given a ciphertext of the form $\langle g^{y_{u, w}}, \ldots\rangle$ when it queried $\mathrm{encrypt}(u, w)$). Now analogously to above let $\qdh$ the event that $\adv$ queries $\hdh$ on a hidden Diffie-Hellman key and let $\fdh$ the event that $\adv$ triggers $\qdh$ \emph{before} having triggered $\qs$. Then we can split of the event $\qs$ into two cases:
+To this end, we call a group element $k \in \mathbb{G}$ a \emph{hidden Diffie-Hellman key} if $k = pk_u^{y_{u, v}}$, where $(u, v)$ is an edge in the GSD graph, $u$ is safe and $y_{u, v}$ is the exponent chosen in the DHIES encryption of $s_v$ (i.e. $\adv$ was given a ciphertext of the form $\langle g^{y_{u, v}}, \ldots\rangle$ when it queried $\mathrm{encrypt}(u, v)$). Now analogously to above let $\qdh$ the event that $\adv$ queries $\hdh$ on a hidden Diffie-Hellman key and let $\fdh$ the event that $\adv$ triggers $\qdh$ \emph{before} having triggered $\qs$. Then we can split the event $\qs$ into two cases as motivated above:
 \begin{align*}
 	\pr{\qs} & = \pr{\qs \land \fdh} + \pr{\qs \land \overline{\fdh}\,}.
 \end{align*}
-We bound $\pr{\qs \land \fdh}$ and $\pr{\qs \land \fdh}$ in Lemma~\ref{lemma:mi-eav-from-eav} and Lemma~\ref{lemma:eav-reduction}, respectively, which overall gives us a bound on the advantage of $\adv$ using \eqref{eq:theorem-sd-gsd-security-win-cases}.
+We bound $\pr{\qs \land \fdh}$ and $\pr{\qs \land \fdh}$ in Lemma~\ref{lemma:dh-reduction} and Lemma~\ref{lemma:eav-reduction}, respectively. Overall this gives us a bound on the advantage of $\adv$ using \eqref{eq:theorem-sd-gsd-security-win-cases}. (To be precise, the event $\qs \land \fdh$ is a superset of the first scenario described further above. However, the argument applied in Lemma~\ref{lemma:dh-reduction} gives the same bound for either event and this more general event has the advantage of being simpler.)
 
 \begin{proof}[of Theorem~\ref{theorem:sdgsd-security}]
 	Let $\adv$ an arbitrary SD-GSD adversary running in time $\tilde{t}$. We will use the events defined above. We first justify step $(*)$ in \eqref{eq:theorem-sd-gsd-security-win-cases}.
@@ -156,9 +164,9 @@ We bound $\pr{\qs \land \fdh}$ and $\pr{\qs \land \fdh}$ in Lemma~\ref{lemma:mi-
 
 \subsection{Reducing to EAV security}
 
-\todo{Motivation for MI-EAV}
+\todo{Motivate MI-EAV security by relating to intuition of Lemma~\ref{theorem:sdgsd-security}.}
 
-\begin{definition}[The MI-EAV Game]
+\begin{definition}[The MI-EAV game]
 	Let $\Pi$ a private-key encryption scheme. Define the game $\mathrm{Game}_{\adv, \Pi}^{\mathrm{MI-EAV}}$ for an adversary $\adv$:
 	\begin{enumerate}[1.]
 		\item The adversary $\adv$ outputs $q \in \N$ and a pair of messages $m_0, m_1$ of the same length. We refer to $q$ as the number of \emph{queries} made by $\adv$.
@@ -174,16 +182,17 @@ We bound $\pr{\qs \land \fdh}$ and $\pr{\qs \land \fdh}$ in Lemma~\ref{lemma:mi-
 	\end{align*}
 \end{definition}
 
-Similar to how IND-CPA security for a single encryption query implies IND-CPA security for $q$ queries with a security loss of $q$ by a standard hybrid argument, we can show that EAV security implies MI-EAV security with the same loss. Given the well known result for IND-CPA security it seems intuitive that one should be able to adapt the hybrid argument to show MI-EAV security from IND-CPA security. To see why we can make do with EAV security, recall the hybrid argument for IND-CPA security: We define the sequence of hybrid games $H_0, \ldots, H_q$ where in the game $H_i$ always the second message is encrypted for the first $i$ encryption queries and always the first for the remaining $q - i$ queries. Then given an IND-CPA adversary $\adv$ for multiple encryptions, an IND-CPA adversary $\adv'$ is constructed to bound
+Similar to how IND-CPA security for a single encryption query implies IND-CPA security for $q$ queries with a security loss of $q$ by a standard hybrid argument, we can show that EAV security implies MI-EAV security with the same loss. Given the well known result for IND-CPA security, it is clear that one should be able to use an analogous hybrid argument to show MI-EAV security from IND-CPA security. To see why we can make do with EAV security, recall the hybrid argument for IND-CPA security: We define the sequence of hybrid games $H_0, \ldots, H_q$ where in the game $H_i$ the first $i$ encryption queries encrypt the second message and the remaining $q - i$ queries encrypt the first message. Then given an IND-CPA adversary $\adv$ for multiple encryptions, an IND-CPA adversary $\adv'$ is constructed to bound
 \[
 	\abs*{\pr{\adv \text{ outputs } 1 \text{ in game } H_{i - 1}} - \pr{\adv \text{ outputs } 1 \text{ in game } H_{i}}}
 \]
 for arbitrary $i$.
-When $\adv'$ simulates $H_{i - 1}$ or $H_{i}$ to $\adv$ depending on which message from the $i$-th query gets encrypted by the IND-CPA challenger, it makes use of the encryption oracle in the IND-CPA security game to pass on the right encryptions to $\adv$ for all other queries. Now notice that if we wanted to simulate to an MI-EAV adversary we wouldn't need access to an encryption oracle since for the MI-EAV security game all the other encryptions can easily be generated by manually sampling the new keys.
+The adversary $\adv'$ simulates $H_{i - 1}$ or $H_{i}$ to $\adv$ depending on whether the ciphertext received from the (single-query) IND-CPA challenger, which gets passed on as the response to the $i$-th query, encrypts the first or the second message from the $i$-th pair of messages. $\adv'$ then uses the encryption oracle to pass on the right encryptions to $\adv$ for all other queries. Now notice that if we wanted to simulate to an MI-EAV adversary we wouldn't need access to an encryption oracle since for the MI-EAV security game all the other encryptions can easily be generated by $\adv'$ sampling the new keys itself.
 
 \begin{lemma} \label{lemma:mi-eav-from-eav}
 	Let $\Pi$ a private-key encryption scheme with finite message space. Let $t_{\gen}, t_{\enc}$ upper bounds for the runtime of $\Pi.\gen$ and $\Pi.\enc$, respectively. If $\Pi$ is $(t, \epsilon)$-EAV secure, then for all $q \in \N$, $\Pi$ is $(\tilde{t}, q \cdot \epsilon, q)$-MI-EAV secure with $\tilde{t} = t - \mathcal{O}(q \cdot (t_\gen + t_\enc))$.
 \end{lemma}
+\question{Move proof to appendix?}
 \begin{proof} Note that since the message space is finite, the time to encrypt a message is bounded. As outlined above the Lemma follows from a simple hybrid argument. Let $q \in \N$ and $\adv$ an arbitrary MI-EAV adversary running in time $\tilde{t}$ and making at most $q$ queries. Define the sequence of hybrid games $H_0, \ldots, H_q$ where in the game $H_i$ the first $i$ encryptions given to the adversary encrypt $m_1$ and all remaining encryptions encrypt $m_0$. We will write
 	\[
 		\pr{\adv \rightarrow 1 \mid H_i}
@@ -248,54 +257,59 @@ When $\adv'$ simulates $H_{i - 1}$ or $H_{i}$ to $\adv$ depending on which messa
 	\]
 \end{lemma}
 
-\paragraph{Intuition} By Lemma~\vref{lemma:mi-eav-from-eav} we know that $\Pi_s$ is MI-EAV secure. Continuing the high-level argument before the proof of Theorem~\ref{theorem:sdgsd-security}, consider the first moment that $\adv$ triggers $\qs \land \overline{\fdh}$ by querying the seed of some safe node $w$. Since $w$ is safe, a node $a$ that is the source of a seed dependency $(a, w) \in D$ must therefore also be safe. Therefore $\adv$ cannot have learned $s_w$ through such a seed dependency by querying $\hdep$ because that would have triggered $\qs$ earlier. \todo{Make sure not to repeat previous argument elsewhere.}
-Moreover, as already motivated, it follows from the definition of the event $\fdh$ that from $\adv$'s perspective all DHIES ciphertexts it got from queries $\mathrm{encrypt}(u, w)$ contain encryptions of $s_w$ under independent, uniformly random keys using $\Pi_s$. Notice that since $\hdep$ was not queried, these ciphertexts were also the only information that $\adv$ had at its proposal to learn $s_w$.
+\paragraph{Intuition} By Lemma~\vref{lemma:mi-eav-from-eav} we know that $\Pi_s$ is MI-EAV secure. Continuing the high-level argument before the proof of Theorem~\ref{theorem:sdgsd-security}, consider the first moment that $\adv$ triggers $\qs \land \overline{\fdh}$ by querying the seed of some safe node $w$.  As intended, it follows from the definition of the event $\fdh$ that from $\adv$'s perspective all DHIES ciphertexts it got from queries $\mathrm{encrypt}(u, w)$ contain encryptions of $s_w$ under independent, uniformly random keys using $\Pi_s$. Moreover, as already argued once $\adv$ has learned nothing from a potential seed dependency $(p, w)$, so these encryptions are everything $\adv$ had at its proposal to learn $s_w$.
 
-We can use $\adv$'s ability to compute the seed $s_w$ of a safe node $w$ from encryptions of $s_w$ to construct an MI-EAV adversary: We first guess the safe node $v$ whose seed $\adv$ may query. Next we give the MI-EAV challenger $s_w$ and some other independent seed $s$, and embed the encryptions we get back into the SD-GSD game when answering queries of the form $\mathrm{encrypt}(u, w)$ for any $u$.
-If the challenger chooses to encrypt $s_w$, then $\adv$ will trigger the event $\qs \land \overline{\fdh}$, with the same probability as before. If $\adv$ triggers $\qs \land \overline{\fdh}$ and we guessed $v$ correctly, we can detect that this happened (by checking if $\hgen(s_w)$ or $\hdep(s_w)$ was queried by $\adv$ during the simulation). If the challenger chooses to encrypt $s$, then $\adv$ receives no information about $s_w$ and has negligible probability of querying it. Thus the advantage of the adversary is about $\pr{\qs \land \overline{\fdh}\,}$ and using that $\Pi_s$ is MI-EAV secure we can bound the probability. Since we are only interested in checking whether the event was triggered for $w$, the adversary can abort when this is no longer possible ($w$ is corrupted, other hidden seed is queried, etc.).
+We can use $\adv$'s ability to compute the seed $s_w$ of a safe node $w$ from encryptions of $s_w$ to construct an MI-EAV adversary: We first guess a node $z$ whose seed $\adv$ may query. Next we give the MI-EAV challenger $s_z$ and some other independent seed $s$, and embed the encryptions we get back into the SD-GSD game when answering queries of the form $\mathrm{encrypt}(u, z)$ for any $u$. Now consider the behavior of $\adv$ depending on which seed the challenger chooses to encrypt:
+\begin{itemize}
+	\item If the challenger chooses to encrypt $s_z$, then $\adv$ will trigger the event $\qs \land \overline{\fdh}$ with the same probability as before and if we guessed $z$ correctly (i.e. $z = w$) we can detect whether $\qs \land \overline{\fdh}$ gets triggered (by checking if $\hgen(s_z)$ or $\hdep(s_z)$ was queried by $\adv$ during the simulation).
+	\item If the challenger chooses to encrypt $s$, then $\adv$ receives no information about $s_z$ and has negligible probability of querying it.
+\end{itemize}
+Thus the advantage of the adversary is about $\pr{\qs \land \overline{\fdh}\,}$ and using that $\Pi_s$ is MI-EAV secure we can bound the probability. Since we are only interested in checking whether the event was triggered for $z$, the adversary can abort when this is no longer possible ($z$ is corrupted, some other hidden seed is queried, etc.).
 
 \begin{proof}[of Lemma~\ref{lemma:eav-reduction}]
 	As motivated above we construct an MI-EAV adversary $\adv'$ to derive the bound. $\adv'$ behaves as follows:
 	\begin{enumerate}[1.]
-		\item $\adv'$ runs $\adv$ to get $n$ and $D$ and initializes the GSD graph, seeds and set of corrupted nodes as in step \ref{def:sd-gsd-game-step-1} of the SD-GSD game.
-		\item $\adv'$ samples $w \from [n], s \from \{0, 1\}^\lambda$ and gives $\delta$ and the messages $s_w, s$ to the challenger. Let $c_1, \ldots, c_\delta$ the encryptions it gets back.
-		\item $\adv'$ faithfully simulates the SD-GSD game to $\adv$ with the following exception: Whenever $\adv$ makes a query of the form $\mathrm{encrypt}(u, w)$, $\adv'$ replies with $\langle g^x, c_i \rangle$ for $x \from [\abs{\mathbb{G}}]$ and where $i$ is index of the next ciphertext (from step 2) not yet used.
+		\item $\adv'$ runs $\adv$ to get $n$ and $D$ and initializes the GSD graph, seeds and the set of edges and corrupted nodes as in step \ref{def:sd-gsd-game-step-1} of the SD-GSD game.
+		\item $\adv'$ samples $z \from [n], s \from \{0, 1\}^\lambda$ and gives $\delta$ and the messages $s_z, s$ to the challenger. Let $c_1, \ldots, c_\delta$ the encryptions it gets back.
+		\item $\adv'$ faithfully simulates the SD-GSD game to $\adv$ with the following exception: Whenever $\adv$ makes a query of the form $\mathrm{encrypt}(u, z)$ for any $u$, $\adv'$ replies with $\langle g^x, c_i \rangle$ where $x \from [\abs{\mathbb{G}}]$ and $i$ is the index of the next ciphertext (from step 2) not yet used.
 
 		      During the simulation $\adv'$ also pays attention to the following:
 		      \begin{itemize}
 			      \item If any of the following events occur, $\adv'$ aborts the simulation and outputs 0:
 			            \begin{itemize}
 				            \item $\adv$ queries $\hdh$ for a hidden Diffie-Hellman key
-				            \item $\adv$ queries $\hgen$ or $\hdep$ for a hidden seed that is not $s_w$
-				            \item $\adv$ queries $\mathrm{corrupt}(u)$ for some node $u$ such that $w$ is no longer safe
+				            \item $\adv$ queries $\hgen$ or $\hdep$ for a hidden seed that is not $s_z$
+				            \item $\adv$ queries $\mathrm{corrupt}(u)$ for some node $u$ such that $z$ is no longer safe
 			            \end{itemize}
-			      \item If $\adv$ queries $\hgen$ or $\hdep$ for $s_w$, $\adv'$ aborts the simulation and outputs 1. This is the only point at which $\adv$ outputs 1.
+			      \item If $\adv$ queries $\hgen(s_z)$ or $\hdep(s_z)$, $\adv'$ aborts the simulation and outputs 1. This is the only point at which $\adv'$ outputs 1.
 		      \end{itemize}
 
-		      If the simulation arrives to the point where $\adv$ outputs its guess $b'$ (step \ref{def:sd-gsd-game-step-4} of the SD-GSD game), then $\adv'$ outputs 0.
+		      If the simulation arrives to the point where $\adv$ outputs its guess (step \ref{def:sd-gsd-game-step-4} of the SD-GSD game), then $\adv'$ outputs 0.
 	\end{enumerate}
 
 	The advantage of $\adv'$ is given by
 	\begin{equation} \label{eq:lemma-eav-reduction-advantage}
-		\mathrm{Adv}_{\Pi}^{\mathrm{MI-EAV}}(\adv') = \abs*{\pr{\adv' \to 1 \mid b = 0} - \pr{\adv' \to 1 \mid b = 1}}.
+		\mathrm{Adv}_{\Pi}^{\mathrm{MI-EAV}}(\adv') = \abs*{\pr{\adv' \to 1 \mid b = 0} - \pr{\adv' \to 1 \mid b = 1}},
 	\end{equation}
+	where $b$ is the bit sampled by the MI-EAV challenger.
 
-	First we will show that
+
+	First, we will show that
 	\begin{equation} \label{eq:lemma-eav-reduction-b=0}
 		\pr{\adv' \to 1 \mid b = 0} \ge \frac{\pr{\qs \land \overline{\fdh}\,}}{N}.
 	\end{equation}
 	Let $E = \qs \land \overline{\fdh}$ and let $E'$ the same event in the SD-GSD game simulated to $\adv$ during an execution of $\mathrm{Game}_{\adv, \Pi_s}^{\mathrm{MI-EAV}}$ with $b = 0$. In the following while showing \eqref{eq:lemma-eav-reduction-b=0} we will implicitly assume that $b = 0$ when referring to the game simulated to $\adv$ by $\adv'$.
-	On a high level \eqref{eq:lemma-eav-reduction-b=0} holds because, as long as the game has not been aborted, the encyptions $\adv$ receives from $\adv'$ are indistinguishable from what it would get in the real SD-GSD game and we lose a factor $\frac{1}{N}$ due to guessing the node that triggered $E$. However, showing this requires a few steps.
+	On a high level \eqref{eq:lemma-eav-reduction-b=0} holds due to the fact that as long as the game has not been aborted the encyptions $\adv$ receives from $\adv'$ are indistinguishable from what it would get in the real SD-GSD game and we get a factor $\frac{1}{N}$ from guessing the node that triggered $E$. However, showing this requires a few steps.
 
 	Consider a modification of the SD-GSD game $G_1$ where the game is aborted whenever one of the following events occurs, where for all these events $\adv'$ would also abort the simulation:
 	\begin{itemize}
 		\item $\adv$ queries $\hdh$ for a hidden Diffie-Hellman key
 		\item $\adv$ queries $\hgen$ or $\hdep$ for a hidden seed
 	\end{itemize}
-	(Since we are not interested in the output of the game we can define \emph{aborting the game} as the game ending with output 0.) The game $G_1$ is something between the real SD-GSD game and what $\adv'$ simulates to $\adv$. The only difference in when $G_1$ aborts compared to the game simulated by $\adv'$ is that we aren't paying attention to some specific node $w$ remaining safe. Aborting the game in this way does not alter the probability of $\adv$ triggering the event $E$ in $G_1$, since in any case where the game is aborted either $E$ or $\overline{E}$ will already be known to hold:
+	(Since we are not interested in the output of the game we can define \emph{aborting the game} as the game ending with output 0.) The game $G_1$ is something between the real SD-GSD game and what $\adv'$ simulates to $\adv$. The only difference in when $G_1$ aborts compared to the game simulated by $\adv'$ is that we aren't paying attention to some specific node $z$ remaining safe. Aborting the game in this way does not alter the probability of $\adv$ triggering the event $E$ in $G_1$, since in either case when the game is aborted either $E$ or $\overline{E}$ is already known to hold:
 	\begin{itemize}
 		\item If $\adv$ queries $\hdh$ for a hidden Diffie-Hellman key, then it triggers $\qdh$ and $\qs$ has not been triggered before since this would have caused the game to be aborted. Thus $\adv$ triggered $\fdh$ and $\qs \land \overline{\fdh}$ cannot hold in this execution of the game.
-		\item If $\adv$ queries $\hgen$ or $\hdep$ for a hidden seed, then this triggers $\qs$. Moreover, $\overline{\fdh}$ is also triggered at this moment since if $\fdh$ had been triggered before (by triggering $\qdh$), then the game would have already aborted. Thus $\qs \land \overline{\fdh}$ was triggered.
+		\item If $\adv$ queries $\hgen$ or $\hdep$ for a hidden seed, then this triggers $\qs$. Moreover, $\overline{\fdh}$ also holds at this moment since the game would have aborted earlier if $\qdh$ had already been triggered. Thus $\qs \land \overline{\fdh}$ holds.
 	\end{itemize}
 	Let $E_1$ the same event as $E$ in the game $G_1$. As argued above we have
 	\begin{equation} \label{eq:lemma-eav-reduction-E=E_1}
@@ -303,58 +317,60 @@ If the challenger chooses to encrypt $s_w$, then $\adv$ will trigger the event $
 	\end{equation}
 
 
-	Now consider a game $G_2$ which is a modification of game $G_1$ where at the beginning of the game $w_2 \from [n]$ is sampled and the game also aborts if $\adv$ queries $\mathrm{corrupt}(u)$ for some node $u$ such that $w_2$ is no longer safe, just as in the game simulated by $\adv'$. The game $G_2$ is again something between the game $G_1$ and what $\adv'$ simulates to $\adv$. We also modify $G_1$ such that it also samples $w_1 \from [n]$ at the beginning of the game. This does not change the fact that \eqref{eq:lemma-eav-reduction-E=E_1} holds as the sampling of $w_1$ has no effect on the execution of the game. We further introduce a new random variable $V$ to analyze the games $G_1$, $G_2$ and the game simulated by $\adv'$, where
+	Now consider a game $G_2$ which is a modification of the game $G_1$ where at the beginning of the game $z_2 \from [n]$ is sampled and the game also aborts if $\adv$ queries $\mathrm{corrupt}(u)$ for some node $u$ such that $z_2$ is no longer safe, just as in the game simulated by $\adv'$. The game $G_2$ is again something between the game $G_1$ and what $\adv'$ simulates to $\adv$. We also modify $G_1$ such that it also samples $z_1 \from [n]$ at the beginning of the game. This does not change the fact that \eqref{eq:lemma-eav-reduction-E=E_1} holds as the sampling of $z_1$ has no effect on the execution of the game.
+
+	Let $E_2$ and $E'$ the events corresponding to $E$ in the game $G_2$ and the game simulated by $\adv'$, respectively. We further introduce a new random variable $W$ to analyze each game where
 	\[
-		V = \begin{cases}
+		W = \begin{cases}
 			0 & \overline{E}                       \\
-			v & E \text{ was triggered at node } v
+			w & E \text{ was triggered at node } w
 		\end{cases}.
 	\]
-	Let $V_1$, $V_2$ and $V'$ be the corresponding random variables in game $G_1$, game $G_2$ and the game simulated by $\adv'$. Consider the probability $\pr{V_1 = w_1 \mid E_1}$. The node $w_1$ is sampled independently and does not affect the execution of the game we have. Therefore, in an execution where $E_1$ occurs and the GSD graph has size $n$, we have a probability of $\frac{1}{n} \ge \frac{1}{N}$ of correctly guessing $V_1 = w_1$. Thus
+	Let $W_1$, $W_2$ and $W'$ be the corresponding random variables in game $G_1$, game $G_2$ and the game simulated by $\adv'$. Consider the probability $\pr{W_1 = z_1 \mid E_1}$. The node $z_1$ is sampled independently and does not affect the execution of the game. Therefore, in an execution where $E_1$ occurs and the GSD graph has size $n$ (so $W_1 \in [n]$), we correctly guess $W_1 = z_1$ with probability exactly $\frac{1}{n} \ge \frac{1}{N}$. Thus
 	\[
-		\pr{V_1 = w_1 \mid E_1} \ge \frac{1}{N}.
+		\pr{W_1 = z_1 \mid E_1} \ge \frac{1}{N}
 	\]
-	and also using \eqref{eq:lemma-eav-reduction-E=E_1} we get
+	and combining this with \eqref{eq:lemma-eav-reduction-E=E_1} we get
 	\begin{align} \label{eq:lemma-eav-reduction-detect-E1-G1}
 		\begin{split}
-			\pr{V_1 = w_1 \land E_1} & = \pr{V_1 = w_1 \mid E_1} \cdot \pr{E_1} \\
+			\pr{W_1 = z_1 \land E_1} & = \pr{W_1 = z_1 \mid E_1} \cdot \pr{E_1} \\
 			& \ge \frac{1}{N} \cdot \pr{E}.
 		\end{split}
 	\end{align}
 
-	Analogously to the argument used to show \eqref{eq:lemma-eav-reduction-E=E_1}, we will show that
+	Analogously to the argument used to justify \eqref{eq:lemma-eav-reduction-E=E_1}, we can argue that
 	\begin{equation} \label{eq:lemma-eav-reduction-G1-vs-G2}
-		\pr{V_1 = w_1 \land E_1} = \pr{V_2 = w_2 \land E_2}.
+		\pr{W_1 = z_1 \land E_1} = \pr{W_2 = z_2 \land E_2}.
 	\end{equation}
-	The only difference from $G_1$ to $G_2$ is that $G_2$ aborts when $w_2$ is no longer safe. But if $w_2$ is no longer safe then we know that $V_2 \neq w_2$ (the game would have already aborted if $w_2$'s seed had been queried while it was safe) and it is already decided that $V_2 = w_2 \land E_2$ does not hold. Thus the claim indeed holds.
+	The only difference from $G_1$ to $G_2$ is that $G_2$ aborts when $z_2$ is no longer safe. But if $z_2$ is no longer safe then we know that $W_2 \neq z_2$ (if $W_2 = z_2$ the game would have already aborted when $z_2$'s seed was queried while it was safe) and it is already decided that $W_2 = z_2 \land E_2$ does not hold. Thus the claim indeed holds.
 
-	We now show an analogous similar result comparing the game $G_2$ to the game simulated by $\adv'$:
+	We now show an analogous result comparing the game $G_2$ to the game simulated by $\adv'$:
 	\begin{equation} \label{eq:lemma-eav-reduction-G2-vs-simulation}
-		\pr{V_2 = w_2 \land E_2} = \pr{V' = w \land E'}.
+		\pr{W_2 = z_2 \land E_2} = \pr{W' = z \land E'}.
 	\end{equation}
-	Consider how $G_2$ differs from the game simulated by $\adv'$. Both games abort at exactly the same events. They only differ in how $\adv'$ answers queries $\mathrm{encrypt}(u, w)$ for any $u$. In $G_2$ such a query is answered with a ciphertext $\langle g^x, c \rangle$ where $x \from [\abs{\mathbb{G}}], c \from \Pi_s.\enc_k(s_w)$ and $k = \hdh(pk_u^x)$. $\adv'$ answers such a query with $\langle g^{x'}, c' \rangle$ where $x' \from [\abs{\mathbb{G}}], c' \from \Pi_s.\enc_{k'}(s_w)$ and $k' \from \{0, 1\}^\lambda$. Now notice that as long as the simulation of the game is ongoing, $pk_u^{x'}$ is a hidden Diffie-Hellman key and $\adv$ has not queried $pk_u^{x'}$ to $\hdh$, because if it had then the game would already have aborted. Therefore, from $\adv$'s view $k'$ follows the same distribution as $k$. Thus, overall the game $G_2$ and the game simulated by $\adv'$ are indistinguishable to $\adv'$ and \eqref{eq:lemma-eav-reduction-G2-vs-simulation} holds.
+	Consider how $G_2$ differs from the game simulated by $\adv'$. Both games abort at exactly the same events (verify this! \question{Ok to add such a note for the reader?}). They only differ in how $\adv'$ answers queries $\mathrm{encrypt}(u, z)$ for any $u$. In $G_2$ such a query is answered with a ciphertext $\langle g^x, c \rangle$ where $x \from [\abs{\mathbb{G}}], c \from \Pi_s.\enc_k(s_z)$ and $k = \hdh(pk_u^x)$. $\adv'$ answers such a query with $\langle g^{x'}, c' \rangle$ where $x' \from [\abs{\mathbb{G}}], c' \from \Pi_s.\enc_{k'}(s_z)$ and $k' \from \{0, 1\}^\lambda$. Now notice that as long as the game $G_2$ is ongoing, $pk_u^{x}$ is a hidden Diffie-Hellman key and $\adv$ has not queried $pk_u^{x}$ to $\hdh$. If it had, then the game would have already aborted. Therefore, from $\adv$'s view $k$ follows the same distribution as $k'$. Thus, overall the game $G_2$ and the game simulated by $\adv'$ are indistinguishable to $\adv$ and \eqref{eq:lemma-eav-reduction-G2-vs-simulation} holds.
 
-	Finally, notice that $\adv'$ outputs 1 iff.\ the event $V' = w \land E'$ occurred. Then we have
+	Finally, notice that $\adv'$ outputs 1 iff.\ the event $W' = z \land E'$ occurred. Then we have
 	\begin{align*}
-		\pr{\adv' \to 1 \mid b = 0} & = \pr{V' = w \land E'}                                                                 \\
-		                            & \stackrel{\eqref{eq:lemma-eav-reduction-G2-vs-simulation}}{=} \pr{V_2 = w_2 \land E_2} \\
-		                            & \stackrel{\eqref{eq:lemma-eav-reduction-G1-vs-G2}}{=}  \pr{V_1 = w_1 \land E_1}        \\
+		\pr{\adv' \to 1 \mid b = 0} & = \pr{W' = z \land E'}                                                                 \\
+		                            & \stackrel{\eqref{eq:lemma-eav-reduction-G2-vs-simulation}}{=} \pr{W_2 = z_2 \land E_2} \\
+		                            & \stackrel{\eqref{eq:lemma-eav-reduction-G1-vs-G2}}{=}  \pr{W_1 = z_1 \land E_1}        \\
 		                            & \stackrel{\eqref{eq:lemma-eav-reduction-detect-E1-G1}}{\ge} \frac{\pr{E}}{N}           \\
 		                            & = \frac{\pr{\qs \land \overline{\fdh}\,}}{N},
 	\end{align*}
 	as promised.
 
-	Second we can more easily show that $\pr{\adv' \to 1 \mid b = 1}$ is negligible. In the SD-GSD game simulated to $\adv$ during an execution of $\mathrm{Game}_{\adv, \Pi_s}^{\mathrm{MI-EAV}}$ with $b = 1$ the seed $s_w$ is a random variable independent of any information given to $\adv$:
+	Second, returning to \eqref{eq:lemma-eav-reduction-advantage}, we can more easily show that $\pr{\adv' \to 1 \mid b = 1}$ is negligible. In the SD-GSD game simulated to $\adv$ during an execution of $\mathrm{Game}_{\adv, \Pi_s}^{\mathrm{MI-EAV}}$ with $b = 1$, the seed $s_z$ is a random variable independent of any information given to $\adv$:
 	\begin{itemize}
-		\item the game aborts when $w$ becomes unsafe, so $s_w$ cannot be learned by querying $\mathrm{corrupt}(w)$ or by querying $\hdep(p)$ for an unsafe node $p$ where $(p, w)$ is a seed dependency
-		\item querying $\hdep(p)$ for a safe node $p$ where $(p, w)$ is a seed dependency results in the game being aborted
-		\item with $b = 1$ queries $\mathrm{encrypt}(u, w)$ yield encryptions of $s$ instead of $s_w$
+		\item the game aborts when $z$ becomes unsafe, so $s_z$ cannot be learned by querying $\mathrm{corrupt}(z)$ or by querying $\hdep(s_p)$ for an unsafe node $p$ where $(p, w)$ is a seed dependency
+		\item querying $\hdep(s_p)$ for a safe node $p$ where $(p, w)$ is a seed dependency results in the game being aborted
+		\item with $b = 1$ queries $\mathrm{encrypt}(u, z)$ yield encryptions of $s$ instead of $s_z$
 	\end{itemize}
 	Therefore, for any seed $s'$ that $\adv$ queries to $\hgen$ or $\hdep$ we have
 	\[
-		\pr{s_w = s'} = \frac{1}{2^\lambda}.
+		\pr{s_z = s'} = \frac{1}{2^\lambda}.
 	\]
-	Thus, using the union bound we have
+	Thus, by a union bound we have
 	\begin{equation} \label{eq:lemma-eav-reduction-b=1}
 		\pr{\adv' \to 1 \mid b = 1} \le \frac{\ms}{2^\lambda}.
 	\end{equation}
@@ -366,20 +382,21 @@ If the challenger chooses to encrypt $s_w$, then $\adv$ will trigger the event $
 			& \ge \frac{\pr{\qs \land \overline{\fdh}\,}}{N} - \frac{\ms}{2^\lambda}.
 		\end{split}
 	\end{align}
-	Furthemore, going through the details yields that $\adv'$ runs in time (the simulation of the SD-GSD game dominating the additional runtime)
+	Furthemore, going through the details yields that $\adv'$ runs in time
 	\begin{align*}
 		\begin{split}
-			t_{\adv'} \coloneqq \tilde{t} + \mathcal{O}\big(\ms & +  \mdh  \\
-			& + N \cdot (t_{\hdep} + t_{\mathrm{sample}} + t_{\hgen} + t_{\dhies.\gen})  \\
-			& +  N^2 \cdot t_{\dhies.\enc}\big).
+			t_{\adv'} \coloneqq \tilde{t} + \mathcal{O}\big(\lambda \cdot \ms & +  \gamma \cdot \mdh  \\
+			& + N \cdot (t_{\hdep} + \lambda \cdot t_{\mathrm{sample}} + t_{\hgen} + t_{\dhies.\gen})  \\
+			& +  N^2 \cdot t_{\dhies.\enc}\big)
 		\end{split}
 	\end{align*}
-	Using that $\delta \le N, t_{\Pi_s.\gen} = t_{\mathrm{sample}}$, $t_{\Pi_s.\enc} \le t_{\dhies.\enc}$ (as encrypting with $\dhies$ involves an encryption with $\Pi_s$) and the definition of $\tilde{t}$, with appropriately chosen constants we have
+	(the simulation of the SD-GSD game dominating the additional runtime).
+	Using that $\delta \le N, t_{\Pi_s.\gen} = \mathcal{O}(\kappa \cdot t_{\mathrm{sample}})$, $t_{\Pi_s.\enc} \le t_{\dhies.\enc}$ (as encrypting with $\dhies$ involves an encryption with $\Pi_s$) and the definition of $\tilde{t}$, with appropriately chosen constants we have
 	\[
 		t_{\adv'} \le t - \mathcal{O}(\delta \cdot (t_{\Pi_s.\gen} + t_{\Pi_s.\enc})).
 	\]
 
-	By Lemma~\ref{lemma:mi-eav-from-eav} $\Pi_s$ is $(t - \mathcal{O}(\delta \cdot (t_{\Pi_s.\gen + \Pi_s.\enc})), \delta \cdot \epsilon, \delta)$-MI-EAV secure, so
+	By Lemma~\ref{lemma:mi-eav-from-eav} $\Pi_s$ is $(t - \mathcal{O}(\delta \cdot (t_{\Pi_s.\gen} + \Pi_s.\enc)), \delta \cdot \epsilon, \delta)$-MI-EAV secure, so
 	\begin{equation} \label{eq:lemma-eav-reduction-advantage-upper-bound}
 		\mathrm{Adv}_{\Pi}^{\mathrm{MI-EAV}}(\adv') \le \delta \cdot \epsilon.
 	\end{equation}
