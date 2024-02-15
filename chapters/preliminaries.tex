@@ -1,10 +1,61 @@
 \chapter{Preliminaries}
 
-\todo{Define private-key encryption scheme.}
+\section{Notation}
 
-\todo{Define public-key encryption scheme.}
+We will use the following notation throughout:
+\begin{itemize}
+	\item We write $x \from S$ to say that $x$ is sampled uniformly at random from the finite set $S$
+	\item If $\mathbb{G}$ is a cyclic group and $g$ a generator, then
+	      \begin{itemize}
+		      \item We write the group operation in $\mathbb{G}$ multiplicatively
+		      \item $h^{-1}$ denotes the inverse of $h \in \mathbb{G}$
+		      \item $\log_g(h)$ denotes the unique $x \in [\abs{\mathbb{G}}]$ such that $g^x = h$
+	      \end{itemize}
+	\item We write $\adv \rightarrow b$ to denote the event that a probabilistic polynomial time adversary $\adv$ outputs the bit $b$ when playing a game where it must output a bit in the end.
+\end{itemize}
 
-\begin{definition}[The IND-CPA Game]
+
+\section{Basic definitions}
+
+The definitions presented in this section were taken from \cite{introduction-to-modern-cryptography}.
+
+\subsection{Encryption schemes}
+
+\subsubsection{Private-key encryption schemes}
+
+\question{Ok to copy more or less word for word?}
+
+\begin{definition}
+	A \emph{private-key encryption scheme} $\Pi$ consists of three probabilistic polynomial-time algorithms $(\gen, \enc, \dec)$ such that:
+	\begin{enumerate}[1.]
+		\item The \emph{key-generation algorithm} $\gen$ takes as input $1^n$ (in unary) where $n$ is the security parameter and outputs a key $k$. We will assume the security parameter to be fixed and write $k \from \gen()$.
+		\item The \emph{encryption algorithm} $\enc$ takes as input a key $k$ and a plaintext message $m \in \{0, 1\}^*$ , or $m \in \{0, 1\}^{\le \eta}$ for some $\eta$ if the message space is finite, and outputs a ciphertext $c$. We write this as $c \from \enc_k(m)$.
+		\item The \emph{decryption algorithm} $\dec$ takes as input a key $k$ and a ciphertext $c$, and outputs a message $m$ or $\bot$ (denoting an error). We write this as $m = \dec_sk(c)$.
+	\end{enumerate}
+
+	We may also refer to algorithm $X$ by $\Pi.X$ for $X \in \{\gen, \enc, \dec\}$.
+
+	It is required that for every $n$, every key $k$ output by $\gen$, and every message $m$, it holds that $\dec_k(\enc_k(m)) = m$.
+\end{definition}
+
+\subsubsection{Public-key encryption schemes}
+
+\begin{definition}
+	A \emph{public-key encryption scheme} $\Pi$ consists of three probabilistic polynomial-time algorithms $(\gen, \enc, \dec)$ such that:
+	\begin{enumerate}[1.]
+		\item The \emph{key-generation algorithm} $\gen$ takes as input $1^n$ (in unary) where $n$ is the security parameter and outputs a pair of keys $(pk, sk)$ (a public and private key). We will assume the security parameter to be fixed and write $(pk, sk) \from \gen()$.
+		\item The \emph{encryption algorithm} $\enc$ takes as input a public key $pk$ and a plaintext message $m \in \mathcal{M}$ where $\mathcal{M}$ is the message space and outputs a ciphertext $c$. We write this as $c \from \enc_{pk}(m)$.
+		\item The \emph{decryption algorithm} $\dec$ takes as input a private key $sk$ and a ciphertext $c$, and outputs a message $m$ or $\bot$ (denoting an error). We write this as $m = \dec_{sk}(c)$.
+	\end{enumerate}
+
+	We may also refer to algorithm $X$ by $\Pi.X$ for $X \in \{\gen, \enc, \dec\}$.
+
+	It is required that for every $n$, every key $(pk, sk)$ output by $\gen$, and every message $m$, it holds that $\dec_{sk}(\enc_{pk}(m)) = m$.
+\end{definition}
+
+\subsection{Security definitions}
+
+\begin{definition}[The IND-CPA game]
 	Let $\Pi$ a private-key encryption scheme. Define the game $\mathrm{Game}_{\adv, \Pi}^{\mathrm{IND-CPA}}$ for an adversary $\adv$:
 	\begin{enumerate}[1.]
 		\item A key $k \from \gen()$ is generated.
@@ -21,9 +72,9 @@
 	\end{align*}
 \end{definition}
 
-\todo{Shortly motivate EAV security and reference Katz and Lindell.}
+We will make use a slightly weaker form of security called indistinguishability in the presence of an eavesdropper and will refer to it as EAV security. It is identical to IND-CPA security with the sole exception that the adversary does not have access to an encryption oracle.
 
-\begin{definition}[The EAV Game]
+\begin{definition}[The EAV game]
 	Let $\Pi$ a private-key encryption scheme. Define the game $\mathrm{Game}_{\adv, \Pi}^{\mathrm{EAV}}$ for an adversary $\adv$:
 	\begin{enumerate}[1.]
 		\item A key $k \from \gen()$ is generated.
@@ -48,5 +99,34 @@
 	This follows immediately from the fact that any EAV adversary is also an IND-CPA adversary.
 \end{proof}
 
+\begin{definition}[The Decisional Diffie-Hellman (DDH) problem]
+	Let $\mathbb{G}$ a cyclic group and $g$ a generator. Define the game $\mathrm{Game}_{\adv, (\mathbb{G}, g)}^{\mathrm{DDH}}$ for an adversary $\adv$:
+	\begin{enumerate}[1.]
+		\item Exponents $x, y \from [\abs{\mathbb{G}}]$ and a bit $b \from \{0, 1\}$ are sampled.
+		\item The adversary $\adv$ is given $h_1 \coloneqq g^x, h_2 \coloneqq g^y$ and
+		      \[
+			      k = \begin{cases}
+				      g^{x \cdot y} & b = 0 \\
+				      \tilde{k}     & b = 1
+			      \end{cases}
+		      \]
+		      where $\tilde{k} \from \mathbb{G}$.
+		\item $\adv$ outputs a bit $b'$. The output of the game is defined to be $1$ if $b' = b$, and $0$ otherwise.
+	\end{enumerate}
+\end{definition}
 
-\todo{explain the ROM}
+\begin{definition}[Hardness of the DDH problem]
+	The DDH problem is \emph{$(t, \epsilon)$-hard in} $\mathbb{G}$ with the generator $g$ if for any adversary $\adv$ running in time $t$ we have
+	\begin{align*}
+		\mathrm{Adv}_{(\mathbb{G}, g)}^{\mathrm{DDH}}(\adv) \coloneqq 2 \cdot \abs*{\pr{\mathrm{Game}_{\adv, (\mathbb{G}, g)}^{\mathrm{DDH}} = 1} - \frac{1}{2}} \le \epsilon.
+	\end{align*}
+\end{definition}
+
+\subsection{The Random Oracle Model}
+
+We will work in the commonly used Random Oracle Model (ROM) to prove our results. The ROM introduces the concept of a \emph{random oracle}. A random oracle is a function $H : A \to B$ where certain assumptions are made about what an adversary $\adv$ knows about $H$ and how it interacts with it:
+\begin{itemize}
+	\item From $\adv$'s perspective, $H$ is a black-box function. The only way for $\adv$ to interact with $H$ is for it to provide a value $a \in A$ and get back $H(a)$, and this is the only way for $\adv$ to learn $H(a)$. We say that $\adv$ \emph{queries} $H(a)$ or that $\adv$ \emph{queries $H$ for $a$}.
+	\item From $\adv$'s perspective, $H$ is a random variable, uniformly sampled from the set of all functions from $A$ to $B$. Thus, if $\adv$ queries $H$ for some $a \in A$ that it has not queried before, the value $H(a)$ is a random variable uniformly distributed in $B$ from $\adv$'s perspective.
+\end{itemize}
+We do not rely on the property known as ``programmability'' in this work.
