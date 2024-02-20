@@ -11,7 +11,7 @@ We will use the following notation throughout:
 		      \item $h^{-1}$ denotes the inverse of $h \in \mathbb{G}$
 		      \item $\log_g(h)$ denotes the unique $x \in [\abs{\mathbb{G}}]$ such that $g^x = h$
 	      \end{itemize}
-	\item We write $\adv \rightarrow b$ to denote the event that a probabilistic polynomial time adversary $\adv$ outputs the bit $b$ when playing a game where it must output a bit in the end
+	\item We write $b \from \adv$ to denote the event that a probabilistic polynomial time adversary $\adv$ outputs the bit $b$ when playing a game where it must output a bit in the end
 	\item For $a, b \in \{0, 1\}^n$, $a \oplus b$ denotes the XOR of $a$ and $b$
 	\item For $n \in \mathbb{N} \setminus \{0\}$, $[n] = \{1, \ldots, n\}$
 \end{itemize}
@@ -83,7 +83,7 @@ The following fact will be applied several times throughout without reference.
 	\]
 	In particular, if $\adv$ is an adversary with output in $\{0, 1\}$ playing a game where a bit $b \from \{0, 1\}$ is sampled, then for $x \in \{0, 1\}$
 	\[
-		2 \cdot \abs*{\pr{\adv \rightarrow b} - \frac{1}{2}} = \abs*{\pr{\adv \rightarrow x \mid b = 1} - \pr{\adv \rightarrow x \mid b = 0}}.
+		2 \cdot \abs*{\pr{b \from \adv} - \frac{1}{2}} = \abs*{\pr{x \from \adv \mid b = 1} - \pr{x \from \adv \mid b = 0}}.
 	\]
 \end{lemma}
 \begin{proof}

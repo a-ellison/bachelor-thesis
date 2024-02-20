@@ -135,20 +135,20 @@ We bound $\pr{\qs \land \fdh}$ and $\pr{\qs \land \overline{\fdh} \,}$ in Lemma~
 	Let $\adv$ an arbitrary SD-GSD adversary running in time $\tilde{t}$. We will use the events defined above. We first justify step $(\dagger)$ in \eqref{eq:theorem-sd-gsd-security-win-cases}. Note that by the rules imposed on the adversary in the SD-GSD game, the challenge node $v$ is safe and its seed $s_v$ thus indeed hidden. If $\qdep$ does not hold, then $\adv$ has not queried $\hdep$ for $s_v$ and, by virtue of $\hdep$ being a random oracle, $\hdep(s_v)$ is a uniformly distributed value in $\{0, 1\}^\lambda$ from $\adv$'s perspective. The value $s$ follows the same distribution. Thus, $\adv$ behaves the same when given either $r = s$ or $r = \hdep(s_v)$ and
 	\begin{align} \label{eq:theorem-sd-gsd-security-not-qdep-behavior}
 		\begin{split}
-			\pr{\adv \rightarrow 1 \mid \overline{\qdep}, b = 1} & = \pr{\adv \rightarrow 1 \mid \overline{\qdep}, r = s}          \\
-			& = \pr{\adv \rightarrow 1 \mid \overline{\qdep}, r = \hdep(s_v)} \\
-			& = \pr{\adv \rightarrow 1 \mid \overline{\qdep}, b = 0}.
+			\pr{1 \from \adv \mid \overline{\qdep}, b = 1} & = \pr{1 \from \adv \mid \overline{\qdep}, r = s}          \\
+			& = \pr{1 \from \adv \mid \overline{\qdep}, r = \hdep(s_v)} \\
+			& = \pr{1 \from \adv \mid \overline{\qdep}, b = 0}.
 		\end{split}
 	\end{align}
 	Therefore
 	\begin{align*}
 		\pr{\wins \mid \overline{\qdep} \,} & = \begin{aligned}[t]
-			                                         & \pr{\adv \rightarrow 1 \mid \overline{\qdep}, b = 1} \cdot \frac{1}{2}   \\
-			                                         & + \pr{\adv \rightarrow 0 \mid \overline{\qdep}, b = 0} \cdot \frac{1}{2}
+			                                         & \pr{1 \from \adv \mid \overline{\qdep}, b = 1} \cdot \frac{1}{2}   \\
+			                                         & + \pr{0 \from \adv \mid \overline{\qdep}, b = 0} \cdot \frac{1}{2}
 		                                        \end{aligned}                                                                             \\
 		                                    & \stackrel{\mathclap{\eqref{eq:theorem-sd-gsd-security-not-qdep-behavior}}}{=} \begin{aligned}[t]
-			                                                                                                                     & \pr{\adv \rightarrow 1 \mid \overline{\qdep}, b = 0} \cdot \frac{1}{2}   \\
-			                                                                                                                     & + \pr{\adv \rightarrow 0 \mid \overline{\qdep}, b = 0} \cdot \frac{1}{2}
+			                                                                                                                     & \pr{1 \from \adv \mid \overline{\qdep}, b = 0} \cdot \frac{1}{2}   \\
+			                                                                                                                     & + \pr{0 \from \adv \mid \overline{\qdep}, b = 0} \cdot \frac{1}{2}
 		                                                                                                                    \end{aligned} \\
 		                                    & = \frac{1}{2}.
 	\end{align*}
@@ -209,7 +209,7 @@ The adversary $\adv'$ simulates $H_{i - 1}$ or $H_{i}$ to $\adv$ depending on wh
 \question{Move proof to appendix?}
 \begin{proof} Note that since the message space is finite, the time to encrypt a message is bounded. As outlined above the Lemma follows from a simple hybrid argument. Let $q \in \N$ and $\adv$ an arbitrary MI-EAV adversary running in time $\tilde{t}$ and making at most $q$ queries. Define the sequence of hybrid games $H_0, \ldots, H_q$ where in the game $H_i$ the first $i$ encryptions given to the adversary encrypt $m_1$ and all remaining encryptions encrypt $m_0$. We will write
 	\[
-		\pr{\adv \rightarrow 1 \mid H_i}
+		\pr{1 \from \adv \mid H_i}
 	\]
 	for the probability of $\adv$ outputting $1$ when playing the hybrid game $H_i$.
 
@@ -230,17 +230,17 @@ The adversary $\adv'$ simulates $H_{i - 1}$ or $H_{i}$ to $\adv$ depending on wh
 	\end{enumerate}
 	Now consider the value of the bit $b$ sampled in the EAV game. If $b = 0$, then the first $i - 1$ ciphertexts that $\adv$ received were encryptions of $m_1$ and the remaining ciphertexts were encryptions of $m_0$, where all encryptions were under keys sampled independently with $\Pi.\gen$. Thus, from the view of $\adv$ everything followed the same distribution as in the game $H_{i - 1}$ and
 	\[
-		\pr{\adv' \rightarrow 1 \mid b = 0} = \pr{\adv \rightarrow 1 \mid H_{i - 1}}.
+		\pr{\adv' \rightarrow 1 \mid b = 0} = \pr{1 \from \adv \mid H_{i - 1}}.
 	\]
 	Analogously, in the case $b = 1$ the first $i$ ciphertexts received by $\adv$ were encryptions of $m_1$ and the rest encryptions of $m_0$ so
 	\[
-		\pr{\adv' \rightarrow 1 \mid b = 1} = \pr{\adv \rightarrow 1 \mid H_{i}}.
+		\pr{\adv' \rightarrow 1 \mid b = 1} = \pr{1 \from \adv \mid H_{i}}.
 	\]
 	Then
 	\begin{align} \label{eq:eav-to-mi-eav-hybrid-distinguisher}
 		\begin{split}
 			\begin{split}
-				| \pr{\adv \rightarrow 1 \mid H_{i - 1}} - & \pr{\adv \rightarrow 1 \mid H_{i}} | \\
+				| \pr{1 \from \adv \mid H_{i - 1}} - & \pr{1 \from \adv \mid H_{i}} | \\
 				& = \abs*{\pr{\adv' \rightarrow 1 \mid b = 0} - \pr{\adv' \rightarrow 1 \mid b = 1}}
 			\end{split} \\
 			& = \mathrm{Adv}_{\Pi}^{\mathrm{EAV}}(\adv')                                         \\
@@ -249,18 +249,18 @@ The adversary $\adv'$ simulates $H_{i - 1}$ or $H_{i}$ to $\adv$ depending on wh
 	\end{align}
 	by $(t, \epsilon)$-EAV security of $\Pi$ since $\adv'$ runs in time $\tilde{t} + \mathcal{O}(q \cdot (t_\gen + t_\enc)) = t$. Now let $b$ be the bit sampled in the MI-EAV game. Notice that
 	\[
-		\pr{\adv \rightarrow 1 \mid b = 0} = \pr{\adv \rightarrow 1 \mid H_0}
+		\pr{1 \from \adv \mid b = 0} = \pr{1 \from \adv \mid H_0}
 	\]
 	and
 	\[
-		\pr{\adv \rightarrow 1 \mid b = 1} = \pr{\adv \rightarrow 1 \mid H_q}.
+		\pr{1 \from \adv \mid b = 1} = \pr{1 \from \adv \mid H_q}.
 	\]
 	Then
 	\begin{align*}
-		\mathrm{Adv}_{\Pi}^{\mathrm{MI-EAV}}(\adv) & = \abs*{\pr{\adv \rightarrow 1 \mid b = 0} - \pr{\adv \rightarrow 1 \mid b = 1}}                      \\
-		                                           & = \abs*{\pr{\adv \rightarrow 1 \mid H_0} - \pr{\adv \rightarrow 1 \mid H_q}}                          \\
-		                                           & = \abs*{\sum_{i = 1}^{q} \pr{\adv \rightarrow 1 \mid H_{i - 1}} - \pr{\adv \rightarrow 1 \mid H_i}}   \\
-		                                           & \le \sum_{i = 1}^{q} \abs*{\pr{\adv \rightarrow 1 \mid H_{i - 1}} - \pr{\adv \rightarrow 1 \mid H_i}} \\
+		\mathrm{Adv}_{\Pi}^{\mathrm{MI-EAV}}(\adv) & = \abs*{\pr{1 \from \adv \mid b = 0} - \pr{1 \from \adv \mid b = 1}}                       \\
+		                                           & = \abs*{\pr{1 \from \adv \mid H_0} - \pr{1 \from \adv \mid H_q}}                           \\
+		                                           & = \abs*{\sum_{i = 1}^{q} \pr{1 \from \adv \mid H_{i - 1}} - \pr{1 \from \adv \mid H_i}}    \\
+		                                           & \le \sum_{i = 1}^{q} \abs*{\pr{1 \from \adv \mid H_{i - 1}} - \pr{1 \from \adv \mid H_i}}  \\
 		                                           & \stackrel{\mathclap{\eqref{eq:eav-to-mi-eav-hybrid-distinguisher}}}{\le} q \cdot \epsilon.
 	\end{align*}
 \end{proof}
