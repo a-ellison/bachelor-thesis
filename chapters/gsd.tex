@@ -1,5 +1,7 @@
 \chapter{Tighter GSD security}
 
+\todo{Replace \textrm{mathrm} with \textrm{operatorname} where necessary.}
+
 \todo{Motivate GSD}
 
 Following the general approach used in \cite{ttkem} to prove the security of (a variant of) TreeKEM in the ROM, we first prove a result on the GSD security of an IND-CPA secure encryption scheme. We do this specifically for the DHIES scheme. Moreover, we will make some notable modifications to the public-key GSD game defined in \cite{ttkem}, to allow for the results to be applied to TreeKEM more directly. We motivate the modifications made later in Section~\vref{sec:application-to-treekem}.
@@ -172,6 +174,8 @@ We bound $\pr{\qs \land \fdh}$ and $\pr{\qs \land \overline{\fdh} \,}$ in Lemma~
 	\]
 \end{proof}
 
+\todo{Compare with result from \cite{ttkem}}.
+
 \subsection{Reducing to EAV security}
 
 \todo{Motivate MI-EAV security by relating to intuition of Lemma~\ref{theorem:sdgsd-security}.}
@@ -180,7 +184,7 @@ We bound $\pr{\qs \land \fdh}$ and $\pr{\qs \land \overline{\fdh} \,}$ in Lemma~
 	Let $\Pi$ a private-key encryption scheme. Define the game $\mathrm{Game}_{\adv, \Pi}^{\mathrm{MI-EAV}}$ for an adversary $\adv$:
 	\begin{enumerate}[1.]
 		\item The adversary $\adv$ outputs $q \in \N$ and a pair of messages $m_0, m_1$ of the same length. We refer to $q$ as the number of \emph{queries} made by $\adv$.
-		\item A bit $b \from \{0, 1\}$ is sampled. For each $i \in [q]$, $\adv$ is given an encryption $c_i \from \Pi.\enc_{k_i}(m_b)$ where $k_i \from \Pi.\gen()$ is generated independently from the other keys.
+		\item A bit $b \from \{0, 1\}$ is sampled. For each $i \in [q]$, $\adv$ is given an encryption $c_i \from \Pi.\enc_{k_i}(m_b)$ where $k_i \from \Pi.\gen()$ is generated independently of the other keys.
 		\item $\adv$ outputs a bit $b'$. The output of the game is defined to be $1$ if $b' = b$, and $0$ otherwise.
 	\end{enumerate}
 \end{definition}
@@ -219,12 +223,12 @@ The adversary $\adv'$ simulates $H_{i - 1}$ or $H_{i}$ to $\adv$ depending on wh
 				      \Pi.\enc_{k_j}(m_1) & i < j \\
 				      c                   & i = j \\
 				      \Pi.\enc_{k_j}(m_0) & i > j
-			      \end{cases}.
+			      \end{cases}
 		      \]
 		      and $k_j \from \Pi.\gen() \; \forall j$.
 		\item $\adv'$ outputs whatever bit $\adv$ outputs.
 	\end{enumerate}
-	Now consider the value of the bit $b$ sampled in the EAV game. If $b = 0$, then the first $i - 1$ ciphertexts that $\adv$ received were encryptions of $m_1$ and the remaining ciphertexts were encryptions of $m_0$, where all encryptions were under keys sampled independently with $\Pi.\gen$. Thus from the view of $\adv$ everything followed the same distribution as in the game $H_{i - 1}$ and
+	Now consider the value of the bit $b$ sampled in the EAV game. If $b = 0$, then the first $i - 1$ ciphertexts that $\adv$ received were encryptions of $m_1$ and the remaining ciphertexts were encryptions of $m_0$, where all encryptions were under keys sampled independently with $\Pi.\gen$. Thus, from the view of $\adv$ everything followed the same distribution as in the game $H_{i - 1}$ and
 	\[
 		\pr{\adv' \rightarrow 1 \mid b = 0} = \pr{\adv \rightarrow 1 \mid H_{i - 1}}.
 	\]
@@ -236,10 +240,11 @@ The adversary $\adv'$ simulates $H_{i - 1}$ or $H_{i}$ to $\adv$ depending on wh
 	\begin{align} \label{eq:eav-to-mi-eav-hybrid-distinguisher}
 		\begin{split}
 			\begin{split}
-				\abs*{\pr{\adv \rightarrow 1 \mid H_{i - 1}} - & \pr{\adv \rightarrow 1 \mid H_{i}}} \\ = {} & \abs*{\pr{\adv' \rightarrow 1 \mid b = 0} - \pr{\adv' \rightarrow 1 \mid b = 1}}
+				| \pr{\adv \rightarrow 1 \mid H_{i - 1}} - & \pr{\adv \rightarrow 1 \mid H_{i}} | \\
+				& = \abs*{\pr{\adv' \rightarrow 1 \mid b = 0} - \pr{\adv' \rightarrow 1 \mid b = 1}}
 			\end{split} \\
-			={} & \mathrm{Adv}_{\Pi}^{\mathrm{EAV}}(\adv')                                         \\
-			\le{} & \epsilon
+			& = \mathrm{Adv}_{\Pi}^{\mathrm{EAV}}(\adv')                                         \\
+			& \le \epsilon
 		\end{split}
 	\end{align}
 	by $(t, \epsilon)$-EAV security of $\Pi$ since $\adv'$ runs in time $\tilde{t} + \mathcal{O}(q \cdot (t_\gen + t_\enc)) = t$. Now let $b$ be the bit sampled in the MI-EAV game. Notice that
@@ -274,7 +279,7 @@ We can use $\adv$'s ability to compute the seed $s_w$ of a safe node $w$ from en
 	\item If the challenger chooses to encrypt $s_z$, then $\adv$ will trigger the event $\qs \land \overline{\fdh}$ with the same probability as before and if we guessed $z$ correctly (i.e. $z = w$) we can detect whether $\qs \land \overline{\fdh}$ gets triggered (by checking if $\hgen(s_z)$ or $\hdep(s_z)$ was queried by $\adv$ during the simulation).
 	\item If the challenger chooses to encrypt $s$, then $\adv$ receives no information about $s_z$ and has negligible probability of querying it.
 \end{itemize}
-Thus the advantage of the adversary is about $\pr{\qs \land \overline{\fdh}\,}/N$, where the factor $1/N$ arises from guessing $z$, and using that $\Pi_s$ is MI-EAV secure we can bound this probability. Since we are only interested in checking whether the event was triggered for $z$, the adversary can abort when this is no longer possible ($z$ is corrupted, some other hidden seed is queried, etc.).
+Thus, the advantage of the adversary is about $\pr{\qs \land \overline{\fdh}\,}/N$, where the factor $1/N$ arises from guessing $z$, and using that $\Pi_s$ is MI-EAV secure we can bound this probability. Since we are only interested in checking whether the event was triggered for $z$, the adversary can abort when this is no longer possible ($z$ is corrupted, some other hidden seed is queried, etc.).
 
 \begin{proof}[of Lemma~\ref{lemma:eav-reduction}]
 	As motivated above we construct an MI-EAV adversary $\adv'$ to derive the bound. $\adv'$ behaves as follows:
@@ -309,7 +314,7 @@ Thus the advantage of the adversary is about $\pr{\qs \land \overline{\fdh}\,}/N
 		\pr{\adv' \to 1 \mid b = 0} \ge \frac{\pr{\qs \land \overline{\fdh}\,}}{N}.
 	\end{equation}
 	Let $E = \qs \land \overline{\fdh}$ and let $E'$ the same event in the SD-GSD game simulated to $\adv$ during an execution of $\mathrm{Game}_{\adv', \Pi_s}^{\mathrm{MI-EAV}}$ with $b = 0$. In the following while showing \eqref{eq:lemma-eav-reduction-b=0} we will implicitly assume that $b = 0$ when referring to the game simulated to $\adv$ by $\adv'$.
-	On a high level \eqref{eq:lemma-eav-reduction-b=0} holds due to the fact that as long as the game has not been aborted the encyptions $\adv$ receives from $\adv'$ are indistinguishable from what it would get in the real SD-GSD game and we get a factor $\frac{1}{N}$ from guessing the node that triggered $E$. However, showing this requires a few steps.
+	On a high level \eqref{eq:lemma-eav-reduction-b=0} holds due to the fact that as long as the game has not been aborted the encryptions $\adv$ receives from $\adv'$ are indistinguishable from what it would get in the real SD-GSD game and we get a factor $\frac{1}{N}$ from guessing the node that triggered $E$. However, showing this requires a few steps.
 
 	Consider a modification of the SD-GSD game $G_1$ where the game is aborted whenever one of the following events occurs, where for all these events $\adv'$ would also abort the simulation:
 	\begin{itemize}
@@ -318,8 +323,8 @@ Thus the advantage of the adversary is about $\pr{\qs \land \overline{\fdh}\,}/N
 	\end{itemize}
 	(Since we are not interested in the output of the game we can define \emph{aborting the game} as the game ending with output 0.) The game $G_1$ is something between the real SD-GSD game and what $\adv'$ simulates to $\adv$. The only difference in when $G_1$ aborts compared to the game simulated by $\adv'$ is that we aren't paying attention to some specific node $w$ remaining safe. Aborting the game in this way does not alter the probability of $\adv$ triggering the event $E$ in $G_1$, since in either case when the game is aborted either $E$ or $\overline{E}$ is already known to hold:
 	\begin{itemize}
-		\item If $\adv$ queries $\hdh$ for a hidden Diffie-Hellman key, then it triggers $\qdh$ and $\qs$ has not been triggered before since this would have caused the game to be aborted. Thus $\adv$ triggered $\fdh$ and $\qs \land \overline{\fdh}$ cannot hold in this execution of the game.
-		\item If $\adv$ queries $\hgen$ or $\hdep$ for a hidden seed, then this triggers $\qs$. Moreover, $\overline{\fdh}$ also holds at this moment since the game would have aborted earlier if $\qdh$ had already been triggered. Thus $\qs \land \overline{\fdh}$ holds.
+		\item If $\adv$ queries $\hdh$ for a hidden Diffie-Hellman key, then it triggers $\qdh$ and $\qs$ has not been triggered before since this would have caused the game to be aborted. Thus, $\adv$ triggered $\fdh$ and $\qs \land \overline{\fdh}$ cannot hold in this execution of the game.
+		\item If $\adv$ queries $\hgen$ or $\hdep$ for a hidden seed, then this triggers $\qs$. Moreover, $\overline{\fdh}$ also holds at this moment since the game would have aborted earlier if $\qdh$ had already been triggered. Thus, $\qs \land \overline{\fdh}$ holds.
 	\end{itemize}
 	Let $E_1$ the same event as $E$ in the game $G_1$. As argued above we have
 	\begin{equation} \label{eq:lemma-eav-reduction-E=E_1}
@@ -336,7 +341,7 @@ Thus the advantage of the adversary is about $\pr{\qs \land \overline{\fdh}\,}/N
 			x & E \text{ was triggered at node } x
 		\end{cases}
 	\]
-	(if $x$ is not unique we choose the node with smallest identifier).
+	(if $x$ is not unique we choose the node with lowest identifier).
 	Let $W_1$, $W_2$ and $W'$ be the corresponding random variables in game $G_1$, game $G_2$ and the game simulated by $\adv'$. Consider the probability $\pr{W_1 = w_1 \mid E_1}$. The node $w_1$ is sampled independently and does not affect the execution of the game. Therefore, in an execution where $E_1$ occurs and the GSD graph has size $n$ (so $W_1 \in [n]$), we correctly guess $W_1 = w_1$ with probability exactly $\frac{1}{n} \ge \frac{1}{N}$. Thus
 	\[
 		\pr{W_1 = w_1 \mid E_1} \ge \frac{1}{N}
@@ -354,7 +359,7 @@ Thus the advantage of the adversary is about $\pr{\qs \land \overline{\fdh}\,}/N
 	\begin{equation} \label{eq:lemma-eav-reduction-G1-vs-G2}
 		\pr{W_1 = w_1} = \pr{W_2 = w_2}.
 	\end{equation}
-	The only difference from $G_1$ to $G_2$ is that $G_2$ aborts when $w_2$ is no longer safe. But if $w_2$ is no longer safe then we know that $W_2 \neq w_2$ (if $W_2 = w_2$ the game would have already aborted when $w_2$'s seed was queried while it was safe). Thus \eqref{eq:lemma-eav-reduction-E=E_1} indeed holds.
+	The only difference from $G_1$ to $G_2$ is that $G_2$ aborts when $w_2$ is no longer safe. But if $w_2$ is no longer safe then we know that $W_2 \neq w_2$ (if $W_2 = w_2$ the game would have already aborted when $w_2$'s seed was queried while it was safe). Thus, \eqref{eq:lemma-eav-reduction-E=E_1} indeed holds.
 
 	We now show an analogous result comparing the game $G_2$ to the game simulated by $\adv'$:
 	\begin{equation} \label{eq:lemma-eav-reduction-G2-vs-simulation}
@@ -394,7 +399,7 @@ Thus the advantage of the adversary is about $\pr{\qs \land \overline{\fdh}\,}/N
 			& \ge \frac{\pr{\qs \land \overline{\fdh}\,}}{N} - \frac{\ms}{2^\lambda}.
 		\end{split}
 	\end{align}
-	Furthemore, going through the details yields that $\adv'$ runs in time
+	Furthermore, going through the details yields that $\adv'$ runs in time
 	\begin{align*}
 		\begin{split}
 			t_{\adv'} \coloneqq \tilde{t} + \mathcal{O}\big(\lambda \cdot \ms & +  \gamma \cdot \mdh  \\
@@ -424,7 +429,7 @@ Thus the advantage of the adversary is about $\pr{\qs \land \overline{\fdh}\,}/N
 
 \subsubsection{Tighter MI-EAV security for certain schemes}
 
-In our reduction from MI-EAV security to EAV security (Lemma~\ref{lemma:mi-eav-from-eav}) we applied a general hybrid argument. It is also tempting to try a more direct approach. The EAV and MI-EAV games seem less far apart than IND-CPA for single and multiple encryptions: All additional encrpytions in the MI-EAV game encrypt the same message, with the only difference being that each encryption is performed using a fresh key. If only we could take a single encryption $c \from \enc_k(m)$ and from it produce several encryptions $c_i \from \enc_{k_i}(m)$ for $k_i \from \gen()$ (without knowing $k$ or $m$), then the additional encryptions would leak no new information to the adversary, and we would have a tight bound on MI-EAV security from EAV security. There is a simple EAV secure scheme that achieves the above property: the one-time pad. Given an encryption $c = k \oplus m$, we can simply sample $k' \from \{0, 1\}^\kappa$ and compute the ciphertext $c' = c \oplus k' = (k \oplus k') \oplus m$, an encryption of $m$ under the uniformly random key $k \oplus k'$. In the following, we formalize this property of a private-key encryption scheme and use it to prove the desired bound on MI-EAV security.
+In our reduction from MI-EAV security to EAV security (Lemma~\ref{lemma:mi-eav-from-eav}) we applied a general hybrid argument. It is also tempting to try a more direct approach. The EAV and MI-EAV games seem less far apart than IND-CPA for single and multiple encryptions: All additional encryptions in the MI-EAV game encrypt the same message, with the only difference being that each encryption is performed using a fresh key. If only we could take a single encryption $c \from \enc_k(m)$ and from it produce several encryptions $c_i \from \enc_{k_i}(m)$ for $k_i \from \gen()$ (without knowing $k$ or $m$), then the additional encryptions would leak no new information to the adversary, and we would have a tight bound on MI-EAV security from EAV security. There is a simple EAV secure scheme that achieves the above property: the one-time pad. Given an encryption $c = k \oplus m$, we can just sample $k' \from \{0, 1\}^\kappa$ and compute the ciphertext $c' = c \oplus k' = (k \oplus k') \oplus m$, an encryption of $m$ under the uniformly random key $k \oplus k'$. In the following, we formalize this property of a private-key encryption scheme and use it to prove the desired bound on MI-EAV security.
 
 \begin{definition}[Key-rerandomizability] \label{def:key-rerandomizability}
 	Let $\Pi$ a private-key encryption scheme with security parameter $\kappa$. $\Pi$ is \emph{key-rerandomizable} if there exists a probabilistic polynomial time algorithm $\mathrm{ReRan}$ achieving the following: Given $c \from \enc_k(m)$ for any fixed message $m$ in the message space and $k \from \gen()$, the output $c' \from \mathrm{ReRan}(c)$ follows the same distribution as the process of sampling $k' \from \gen()$ and computing a ciphertext $\enc_{k'}(m)$. The runtime must be polynomial in $\kappa$ and the length of the ciphertext $c$.
@@ -632,9 +637,9 @@ Now to determine whether $k$ is the real Diffie-Hellman key, we check whether $q
 	\]
 	and if we combine this with \eqref{eq:lemma-dh-reduction-advantage-lower-bound} we get
 	\begin{align*}
-		\frac{\pr{\fdh}}{N} - \frac{\mdh \cdot N}{\abs{\mathbb{G}}} & \le \epsilon \\
-		                                                            & \iff         \\
-		\pr{\fdh} & \le N \cdot \epsilon + \frac{\mdh \cdot N^2}{\abs{\mathbb{G}}},
+		\frac{\pr{\fdh}}{N} - \frac{\mdh \cdot N}{\abs{\mathbb{G}}} & \le \epsilon                                                    \\
+		                                                            & \iff                                                            \\
+		\pr{\fdh}                                                   & \le N \cdot \epsilon + \frac{\mdh \cdot N^2}{\abs{\mathbb{G}}},
 	\end{align*}
 	concluding the proof.
 \end{proof}

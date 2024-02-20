@@ -11,7 +11,9 @@ We will use the following notation throughout:
 		      \item $h^{-1}$ denotes the inverse of $h \in \mathbb{G}$
 		      \item $\log_g(h)$ denotes the unique $x \in [\abs{\mathbb{G}}]$ such that $g^x = h$
 	      \end{itemize}
-	\item We write $\adv \rightarrow b$ to denote the event that a probabilistic polynomial time adversary $\adv$ outputs the bit $b$ when playing a game where it must output a bit in the end.
+	\item We write $\adv \rightarrow b$ to denote the event that a probabilistic polynomial time adversary $\adv$ outputs the bit $b$ when playing a game where it must output a bit in the end
+	\item For $a, b \in \{0, 1\}^n$, $a \oplus b$ denotes the XOR of $a$ and $b$
+	\item For $n \in \mathbb{N} \setminus \{0\}$, $[n] = \{1, \ldots, n\}$
 \end{itemize}
 
 
@@ -21,16 +23,16 @@ The definitions presented in this section were taken from \cite{introduction-to-
 
 \subsection{Encryption schemes}
 
-\subsubsection{Private-key encryption schemes}
+\subsubsection{Private-key encryption}
 
 \question{Ok to copy more or less word for word?}
 
-\begin{definition}
+\begin{definition}[Private-key encryption]
 	A \emph{private-key encryption scheme} $\Pi$ consists of three probabilistic polynomial-time algorithms $(\gen, \enc, \dec)$ such that:
 	\begin{enumerate}[1.]
 		\item The \emph{key-generation algorithm} $\gen$ takes as input $1^n$ (in unary) where $n$ is the security parameter and outputs a key $k$. We will assume the security parameter to be fixed and write $k \from \gen()$.
 		\item The \emph{encryption algorithm} $\enc$ takes as input a key $k$ and a plaintext message $m \in \{0, 1\}^*$ , or $m \in \{0, 1\}^{\le \eta}$ for some $\eta$ if the message space is finite, and outputs a ciphertext $c$. We write this as $c \from \enc_k(m)$.
-		\item The \emph{decryption algorithm} $\dec$ takes as input a key $k$ and a ciphertext $c$, and outputs a message $m$ or $\bot$ (denoting an error). We write this as $m = \dec_sk(c)$.
+		\item The \emph{decryption algorithm} $\dec$ takes as input a key $k$ and a ciphertext $c$, and outputs a message $m$ or $\bot$ (denoting an error). We write this as $m = \dec_{sk}(c)$.
 	\end{enumerate}
 
 	We may also refer to algorithm $X$ by $\Pi.X$ for $X \in \{\gen, \enc, \dec\}$.
@@ -38,9 +40,9 @@ The definitions presented in this section were taken from \cite{introduction-to-
 	It is required that for every $n$, every key $k$ output by $\gen$, and every message $m$, it holds that $\dec_k(\enc_k(m)) = m$.
 \end{definition}
 
-\subsubsection{Public-key encryption schemes}
+\subsubsection{Public-key encryption}
 
-\begin{definition}
+\begin{definition}[Public-key encryption]
 	A \emph{public-key encryption scheme} $\Pi$ consists of three probabilistic polynomial-time algorithms $(\gen, \enc, \dec)$ such that:
 	\begin{enumerate}[1.]
 		\item The \emph{key-generation algorithm} $\gen$ takes as input $1^n$ (in unary) where $n$ is the security parameter and outputs a pair of keys $(pk, sk)$ (a public and private key). We will assume the security parameter to be fixed and write $(pk, sk) \from \gen()$.
@@ -60,7 +62,7 @@ The definitions presented in this section were taken from \cite{introduction-to-
 	\begin{enumerate}[1.]
 		\item A key $k \from \gen()$ is generated.
 		\item The adversary $\adv$ is given oracle access to $\Pi.\enc_k$ and outputs a pair of messages $m_0, m_1$ of the same length.
-		\item A bit $b \from \{0, 1\}$ is sampled and $\adv$ is given the ciphertext $c \from \enc_k(m_b)$. ($\adv$ continues to have oracle access to $\Pi.\enc_k$.)
+		\item A bit $b \from \{0, 1\}$ is sampled and $\adv$ is given a ciphertext $c \from \enc_k(m_b)$. ($\adv$ continues to have oracle access to $\Pi.\enc_k$.)
 		\item $\adv$ outputs a bit $b'$. The output of the game is defined to be $1$ if $b' = b$, and $0$ otherwise.
 	\end{enumerate}
 \end{definition}
@@ -68,18 +70,35 @@ The definitions presented in this section were taken from \cite{introduction-to-
 \begin{definition}[IND-CPA security]
 	A private-key encryption scheme $\Pi$ is \emph{$(t, \epsilon, q)$-IND-CPA secure} if for any adversary $\adv$ running in time $t$ we have
 	\begin{align*}
-		\mathrm{Adv}_{\Pi}^{\mathrm{MI-EAV}}(\adv) \coloneqq 2 \cdot \abs*{\pr{\mathrm{Game}_{\adv, \Pi}^{\mathrm{MI-EAV}} = 1} - \frac{1}{2}} \le \epsilon.
+		\mathrm{Adv}_{\Pi}^{\mathrm{IND-CPA}}(\adv) \coloneqq 2 \cdot \abs*{\pr{\mathrm{Game}_{\adv, \Pi}^{\mathrm{IND-CPA}} = 1} - \frac{1}{2}} \le \epsilon.
 	\end{align*}
 \end{definition}
 
-We will make use a slightly weaker form of security called indistinguishability in the presence of an eavesdropper and will refer to it as EAV security. It is identical to IND-CPA security with the sole exception that the adversary does not have access to an encryption oracle.
+The following fact will be applied several times throughout without reference.
+
+\begin{lemma}
+	Let $X$ a Bernoulli random variable and $b \from \{0, 1\}$, where $X$ and $b$ may not be independent. Then for $x \in \{0, 1\}$
+	\[
+		2 \cdot \abs*{\pr{X = b} - \frac{1}{2}} = \abs*{\pr{X = x \mid b = 1} - \pr{X = x \mid b = 0}}.
+	\]
+	In particular, if $\adv$ is an adversary with output in $\{0, 1\}$ playing a game where a bit $b \from \{0, 1\}$ is sampled, then for $x \in \{0, 1\}$
+	\[
+		2 \cdot \abs*{\pr{\adv \rightarrow b} - \frac{1}{2}} = \abs*{\pr{\adv \rightarrow x \mid b = 1} - \pr{\adv \rightarrow x \mid b = 0}}.
+	\]
+\end{lemma}
+\begin{proof}
+	\todo{Verify statement and prove it.}
+\end{proof}
+
+
+We will make use of a weaker form of security called ``indistinguishability in the presence of an eavesdropper'' (\cite{introduction-to-modern-cryptography}) and will refer to it as ``EAV security''. It is identical to IND-CPA security with the sole exception that the adversary does not have access to an encryption oracle.
 
 \begin{definition}[The EAV game]
 	Let $\Pi$ a private-key encryption scheme. Define the game $\mathrm{Game}_{\adv, \Pi}^{\mathrm{EAV}}$ for an adversary $\adv$:
 	\begin{enumerate}[1.]
 		\item A key $k \from \gen()$ is generated.
 		\item The adversary $\adv$ outputs a pair of messages $m_0, m_1$ of the same length.
-		\item A bit $b \from \{0, 1\}$ is sampled and $\adv$ is given the ciphertext $c \from \enc_k(m_b)$.
+		\item A bit $b \from \{0, 1\}$ is sampled and $\adv$ is given a ciphertext $c \from \enc_k(m_b)$.
 		\item $\adv$ outputs a bit $b'$. The output of the game is defined to be $1$ if $b' = b$, and $0$ otherwise.
 	\end{enumerate}
 \end{definition}
