@@ -4,20 +4,25 @@
 
 \todo{Motivate GSD}
 
-Following the general approach used in \cite{ttkem} to prove the security of (a variant of) TreeKEM in the ROM, we first prove a result on the GSD security of an IND-CPA secure encryption scheme. We do this specifically for the DHIES scheme. Moreover, we will make some notable modifications to the public-key GSD game defined in \cite{ttkem}, to allow for the results to be applied to TreeKEM more directly. We motivate the modifications made later in Section~\vref{sec:application-to-treekem}.
+Following the general approach used in \cite{ttkem} to prove the security of (a variant of) TreeKEM in the ROM, we first prove a result on the GSD security of an IND-CPA secure encryption scheme. We do this specifically for the DHIES scheme. Moreover, we will make some notable modifications to the public-key GSD game defined in \cite{ttkem}, to allow for the result to be applied to TreeKEM more directly and thus simplify the proof of Theorem .... We motivate the modifications made later in Section~\vref{sec:application-to-treekem}.
 
 \section{Seeded GSD with Dependencies}
 
 We call our adaptation of GSD security \emph{Seeded GSD with Dependencies} (SD-GSD).
 
 \todo{Explain definition in words.}
+
 \todo{Motivate restrictions to the adversary.}
+
 \todo{Do not allow cycles in $(V, E \cup D)$ either.}
+
 \todo{Add remark that cycles are (maybe) ok in the ROM.}
+
+\todo{Allow adversary to adaptively create nodes and seed dependencies. Also adapt proofs to guess from $[N]$ as opposed to $[n]$.}
 
 \begin{definition}[The SD-GSD game]
 
-	Let $\lambda \in \N$ a security parameter. \question{Where to define $\lambda$?} Let $\Pi = (\mathrm{Gen}, \mathrm{Enc}, \mathrm{Dec})$ a public-key encryption scheme. Let $H_{\mathrm{gen}}, H_{\mathrm{dep}} \colon \{0, 1\}^\lambda \to \{0, 1\}^\lambda$ two KDFs. Define the game $\mathrm{Game}_{\adv, \Pi}^{\mathrm{SD-GSD}}$ for an adversary $\adv$:
+	Let $\lambda \in \N$ a security parameter. \question{Where to define $\lambda$?} Let $\Pi = (\mathrm{Gen}, \mathrm{Enc}, \mathrm{Dec})$ a public-key encryption scheme. Let $H_{\mathrm{gen}}, H_{\mathrm{dep}} \colon \{0, 1\}^\lambda \to \{0, 1\}^\lambda$ two functions. Define the game $\mathrm{Game}_{\adv, \Pi}^{\mathrm{SD-GSD}}$ for an adversary $\adv$:
 	\begin{enumerate}[1.]
 		\item \label{def:sd-gsd-game-step-1} The adversary $\adv$ outputs $n \in \N$ and a list of dependencies $D = \{(a_{i}, b_{i})\}_{i=1}^m \in [n]^2$. For each $v \in [n]$:
 		      \begin{enumerate}[(i)]
@@ -48,11 +53,11 @@ We call our adaptation of GSD security \emph{Seeded GSD with Dependencies} (SD-G
 
 	We require an adversary playing the above game to adhere to the following:
 	\begin{itemize}
-		\item The challenge node always remains a sink.
-		\item The challenge node is safe.
-		\item $\mathrm{reveal}$ is never queried on the challenge node.
-		\item The graphs $(V, E)$ and $(V, D)$ always remain acyclic and without self-loops.
-		\item All paths in the graph $(V, D)$ are vertex disjoint. \todo{This avoids multiple sources for single target.}
+		\item The challenge node always remains a sink
+		\item The challenge node is safe
+		\item $\mathrm{reveal}$ is never queried on the challenge node
+		\item The graphs $(V, E)$ and $(V, D)$ always remain acyclic and without self-loops
+		\item All paths in the graph $(V, D)$ are vertex disjoint \todo{This avoids multiple sources for single target.}
 	\end{itemize}
 \end{definition}
 
@@ -274,6 +279,8 @@ The adversary $\adv'$ simulates $H_{i - 1}$ or $H_{i}$ to $\adv$ depending on wh
 
 \paragraph{Intuition} By Lemma~\vref{lemma:mi-eav-from-eav} we know that $\Pi_s$ is MI-EAV secure. Continuing the high-level argument before the proof of Theorem~\ref{theorem:sdgsd-security}, consider the first moment that $\adv$ triggers $\qs \land \overline{\fdh}$ by querying the seed of some safe node $w$.  As intended, it follows from the definition of the event $\fdh$ that from $\adv$'s perspective all DHIES ciphertexts it got from queries $\mathrm{encrypt}(u, w)$ for any $u$ contain encryptions of $s_w$ under independent, uniformly random keys using $\Pi_s$. Moreover, as already argued once, $\adv$ has learned nothing from a potential seed dependency $(p, w)$, so these encryptions are everything $\adv$ had at its proposal to learn $s_w$.
 
+\todo{Add plot.}
+
 We can use $\adv$'s ability to compute the seed $s_w$ of a safe node $w$ from encryptions of $s_w$ to construct an MI-EAV adversary: We first guess a node $z$ whose seed $\adv$ may query. Next we give the MI-EAV challenger $s_z$ and some other independent seed $s$, and embed the encryptions we get back into the SD-GSD game when answering queries of the form $\mathrm{encrypt}(u, z)$ for any $u$. Now consider the behavior of $\adv$ depending on which seed the challenger chooses to encrypt:
 \begin{itemize}
 	\item If the challenger chooses to encrypt $s_z$, then $\adv$ will trigger the event $\qs \land \overline{\fdh}$ with the same probability as before and if we guessed $z$ correctly (i.e. $z = w$) we can detect whether $\qs \land \overline{\fdh}$ gets triggered (by checking if $\hgen(s_z)$ or $\hdep(s_z)$ was queried by $\adv$ during the simulation).
@@ -492,6 +499,9 @@ By assuming a key-rerandomizable encryption scheme and applying Lemma~\vref{lemm
 
 \paragraph{Intuition} We will bound the simpler event $\fdh$. This event tells us that there is some safe node $a$ in the GSD graph with encryption edges to nodes $u_1, \ldots, u_d$, where the query $\mathrm{encrypt}(a, u_i)$ returned the ciphertext $\langle g^{y_i}, \enc_{k_i}(s_{u_i}) \rangle$ with $k_i = \hdh(g^{sk_{a} \cdot y_i})$, such that $g^{sk_a \cdot y_j}$ was the first hidden Diffie-Hellman key queried by $\adv$ for some $j$.
 Moreover, at the instance $g^{sk_a \cdot y_j}$ was queried, no hidden seed had yet been queried by $\adv$, implying that $\adv$ had not queried $\hgen(s_a)$ and thus had no information about $sk_a$ (recall that $(pk_a, sk_a) = \gen(\hgen(s_a))$).
+
+\todo{Add plot.}
+
 It is interesting to note that our approach does not require that $\adv$ has not queried $\hdep$ for a hidden seed (i.e. that $\qdep$ was not triggered) as is implied by the event $\fdh$, because knowing $\hgen(s_a)$ is the only way to learn about $sk_a$. Regardless, we still want to have our definition of $\fdh$ include this information, as the bound on $\pr{\qs \land \overline{\fdh} \,}$ in Lemma~\vref{lemma:eav-reduction} relies on the fact that in the event of $\qs \land \overline{\fdh}$ happening,  $\qdh$ was not yet triggered when the event $\qs$ was triggered, i.e. when either the event $\qgen$ \emph{or} the event $\qdep$ was triggered.
 
 The intuition is clear that this means that $\adv$ solved the Diffie-Hellman challenge $(g^{sk_a}, g^{y_j})$. What is not immediately clear is how to embed a \emph{given} Diffie-Hellman challenge $(g^x, g^y)$  from an instance of the DDH game and use $\adv$ to tell whether the key $k$ chosen by the challenger is the real key $g^{x \cdot y}$ or a uniformly random group element.
