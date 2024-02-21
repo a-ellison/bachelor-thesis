@@ -1,11 +1,118 @@
 \chapter{Application to TreeKEM} \label{sec:application-to-treekem}
 
+\section{Continuous Group Key Agreement}
+
+\subsection{Syntax}
+
+\todo{Explain model:
+	\begin{itemize}
+		\item users are honest nodes running the protocol algorithms and maintaining local state
+		\item delivery server has a reliable and authenticated communication channel (message passing) to each individual user.
+		\item users can also communicate directly (this is done for welcome messages).
+	\end{itemize}
+}
+
+\question{What assumptions are needed about the delivery server?
+	\begin{itemize}
+		\item cannot forge messages
+		\item can choose not to deliver some messages
+	\end{itemize}
+}
+
+\question{Some kind of correctness condition in definition? E.g. all group members that have processed the same commits see the same group key.}
+
+\begin{definition}[CGKA]
+	A \emph{CGKA scheme} $\Sigma$ consists of the following:
+	\begin{enumerate}[1.]
+		\item[] \textsc{Initialization:}
+			\begin{itemize}
+				\item An algorithm $\gen$. Before joining any group, a user generates pair of keys $(pk, sk) \from \gen()$, a public and private key. The public key is used to invite the user to the group and should therefore be made public. The value $sk$ is kept secret.
+				\item An algorithm $\operatorname{CreateGroup}$. A user runs $\sigma \from \operatorname{CreateGroup}()$ to locally initialize a group with themselves as the only member with the state of the group stored in $\sigma$.
+			\end{itemize}
+		\item[] \textsc{Proposal:}
+			\begin{itemize}
+				\item An algorithm $\operatorname{ProposeUpdate}$. If a member of a group with state $\sigma$ wishes update their key material, they may run $(\sigma, p) \from \operatorname{ProposeUpdate}(\sigma)$ to create an \emph{update proposal} $p$ to be shared with other members of the group and update their state such that they have processed $p$.
+				\item An algorithm $\operatorname{ProposeAdd}$. If a member of a group with state $\sigma$ wishes to add a new user with public key $pk_{\mathrm{new}}$ to the group, they may run $(\sigma, p) \from \operatorname{ProposeAdd}(\sigma, pk_{\mathrm{new}})$ to create an \emph{add proposal} $p$ to be shared with other members of the group and update their state such that they have processed $p$.
+				\item An algorithm $\operatorname{ProposeRemove}$. If a member of a group with state $\sigma$ wishes to remove another member identified by a value $v$ from the group, they may run $(\sigma, p) \from \operatorname{ProposeAdd}(\sigma, v)$ to create a \emph{remove proposal} $p$ to be shared with other members of the group and update their state such that they have processed $p$. The value $v$ may be the other member's public key or some value which identifies the other member in the current group state.
+			\end{itemize}
+		\item[] \textsc{Commit:}
+			\begin{itemize}
+				\item An algorithm $\operatorname{CreateCommit}$. To apply a set of proposals $\pi$ to the group state, a member with state $\sigma$ may run $(\sigma', c, w_{_1}, \ldots, w_{_k}) \from \operatorname{CreateCommit}(\sigma, \pi)$, where $c$ is a \emph{commit} to be shared with other members, $\sigma'$ would be the new state of the member after applying the commit and each $w_{i}$ is a \emph{welcome message}, one for each new user added to the group in the commit with a corresponding add proposal in $\pi$. Welcome message $w_i$ contains a public key $pk_i$ and $w_i$ should be shared with the user with public key $pk_i$ such that they can join the group. The member may keep both $\sigma$ and $\sigma'$ until the group agrees on whether to apply the commit $c$ or not. If the commit is to be applied the member sets $\sigma = \sigma'$. Otherwise it discards $\sigma'$.
+			\end{itemize}
+		\item[] \textsc{Process:}
+			\begin{itemize}
+				\item An algorithm $\operatorname{ProcessProposal}$. Upon receiving a proposal $p$ a member with state $\sigma$ can set $\sigma \from \operatorname{ProcessProposal}(\sigma, p)$ to process $p$.
+				\item An algorithm $\operatorname{ProcessCommit}$. Upon receiving a commit $c$ a member with state $\sigma$ can set $\sigma \from \operatorname{ProcessCommit}(\sigma, c)$ to apply $c$.
+				\item An algorithm $\operatorname{ProcessWelcome}$. Upon receving a welcome message $w$ for a user with public key $pk$, the user with this public key can set $\sigma \from \operatorname{ProcessWelcome}(pk, sk, w)$, where $sk$ is the corresponding secret key output by $\gen$.
+			\end{itemize}
+		\item[] \textsc{Compute the group key:}
+			\begin{itemize}
+				\item A set of possible group keys $\mathcal{K}$.
+				\item An algorithm $\operatorname{Key}$. At any point in time, a member of a group with state $\sigma$ can compute the current group key $k \from \operatorname{Key}(\sigma)$ with $k \in \mathcal{K}$. All group members in a consistent state (where the meaning of ``consistent'' depends on the protocol) must compute the same key $k$.
+			\end{itemize}
+	\end{enumerate}
+	For any object $X$ above we will refer to it as $\Sigma.X$.
+\end{definition}
+
+\subsection{Security}
+
+\question{Is it ok to assume that a commit sent out by user $u$ is processed by $u$ immediately, for simplicity? (We do not wish to model how nodes agree on what commit to process (this could happen through a consensus algorithm between the nodes or through the delivery server) and it is easier to assume that there is never any conflict between commits, implying that a commit created by a node will never get rejected.) Or is it necessary to introduce a query so that the adversary can decideto confirm/reject commits. There is after all a security hazard if a user is corrupted at a time when it knows both commit secrets. But again, this is not a type of attack we are interested in for our analysis.}
+
+\begin{definition}[The CGKA game]
+	Let $\Sigma$ a CGKA scheme. Define the game $\mathrm{Game}_{\adv, \Sigma}^{\mathrm{CGKA}}$ for an adversary $\adv$:
+	\begin{enumerate}[1.]
+		\item \label{def:cgka-game-step-1} The adversary $\adv$ outputs $u \in \mathbb{N}$. For each $i \in [u]$, initialize user $i$ by running $(pk_i, sk_i) \from \Sigma.\gen()$. $\adv$ is given $pk_1, \ldots, pk_u$.
+
+		      Set $P = C = W = 0$, where $P$ denotes the number of proposals, $C$ the number of commits and $W$ the number of welcome messages created by $\adv$.
+		\item $\adv$ may adaptively do the following queries:
+		      \begin{itemize}
+			      \item $\operatorname{create-group}(i)$ for $i \in [u]$: set $\sigma_i \from \operatorname{CreateGroup}()$.
+			      \item $\operatorname{propose-update}(i)$ for $i \in [u]$: run $(\sigma_i, p_{P + 1}) \from \operatorname{ProposeUpdate}(\sigma_i)$ to update user $i$'s state and get a proposal $p_{P + 1}$. $\adv$ is given $p_{P + 1}$. Set $P = P + 1$.
+			      \item $\operatorname{propose-add}(i, j)$ for $i, j \in [u]$: run $(\sigma_i, p_{P + 1}) \from \operatorname{ProposeAdd}(\sigma_i, j)$ to update user $i$'s state and get a proposal $p_{P + 1}$. $\adv$ is given $p_{P + 1}$. Set $P = P + 1$.
+			      \item $\operatorname{propose-remove}(i, j)$ for $i, j \in [u]$: run $(\sigma_i, p_{P + 1}) \from \operatorname{ProposeRemove}(\sigma_i, j)$ to update user $i$'s state and get a proposal $p_{P + 1}$. $\adv$ is given $p_{P + 1}$. Set $P = P + 1$.
+			      \item $\operatorname{commit}(i, I)$ for $I \subseteq [P]$: run $(\sigma_i, c_{C + 1}, w_{W + 1}, \ldots, w_{W + k}) \from \operatorname{CreateCommit}(\sigma_i, \{p_j \mid j \in I\})$ to update user $i$'s state, create commit $c_{C + 1}$ and corresponding welcome messages. $\adv$ is given $c_{C + 1}$ and $w_{W + 1}, \ldots, w_{W + k}$. Set $C = C + 1$ and $W = W + k$.
+			      \item $\operatorname{deliver-proposal}(i, j)$ for $i \in [u], j \in [P]$: set $\sigma_i \from \operatorname{ProcessProposal}(\sigma_i, p_j)$.
+			      \item $\operatorname{deliver-commit}(i, j)$ for $i \in [u], j \in [C]$: set $\sigma_i \from \operatorname{ProcessCommit}(\sigma_i, c_j)$.
+			      \item $\operatorname{deliver-welcome}(i, j)$ for $i \in [u], j \in [W]$: set $\sigma_i \from \operatorname{ProcessWelcome}(w_j)$.
+			      \item $\operatorname{corrupt}(i)$: $\adv$ is given $\sigma_i$.
+		      \end{itemize}
+		\item $\adv$ picks $i \in \{0\} \cup [C]$. \question{Rephrase the following?} We call the epoch introduced by the $i$-th commit the \emph{challenge epoch}, where the $0$-th commit refers to the initial $\mathrm{CreateGroup}$ operation. Let $\sigma_u'$ the state of node $u$ after it processed the $i$-th commit. A bit $b \from \{0, 1\}$ is sampled and $\adv$ is given
+		      \[
+			      k = \begin{cases}
+				      \Sigma.\mathrm{Key}(\sigma'_u) & b = 0 \\
+				      \tilde{k}                      & b = 1
+			      \end{cases},
+		      \]
+		      where $\tilde{k} \from \Sigma.\mathcal{K}$. $\adv$ may continue to do queries as before.
+		\item $\adv$ outputs a bit $b'$. The output of the game is defined to be $1$ if $b' = b$, and $0$ otherwise.
+	\end{enumerate}
+
+	We require an adversary playing the above game to adhere to the following:
+	\begin{itemize}
+		\item The challenge epoch is safe \todo{Either rename safe predicate or (un)safe nodes in GSD game.}
+		\item $\operatorname{create-group}$ is only queried once
+	\end{itemize}
+\end{definition}
+
+\todo{Define what commits are safe.}
+
+\begin{definition}[CGKA security]
+	A CGKA scheme is \emph{$(t, \epsilon, q, u)$-CGKA secure} if for any adversary $\adv$ making at most $q$ queries to $\mathrm{commit}$ and asking for at most $u$ users in step \ref{def:cgka-game-step-1} we have
+	\begin{align*}
+		\mathrm{Adv}_{\Sigma}^{\mathrm{CGKA}}(\adv) \coloneqq 2 \cdot \abs*{\pr{\mathrm{Game}_{\adv, \Sigma}^{\mathrm{CGKA}} = 1} - \frac{1}{2}} \le \epsilon.
+	\end{align*}
+\end{definition}
+
 \section{The TreeKEM Protocol}
+
+\todo{Define TreeKEM as a CGKA.}
 
 \question{How much detail to provide on TreeKEM details?}
 
-\section{Proving security for TreeKEM from SD-GSD security}
-
-\todo{Find the right CGKA definition.}
+\section{TreeKEM security from SD-GSD security}
 
 \todo{Reduce TreeKEM security to GSD security.}
+
+\begin{theorem}
+	\todo{State and prove CGKA security of TreeKEM by applying Lemma~\ref{theorem:sdgsd-security}.}
+\end{theorem}
