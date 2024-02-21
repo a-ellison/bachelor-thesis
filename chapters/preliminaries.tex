@@ -25,9 +25,7 @@ The definitions presented in this section were taken from \cite{introduction-to-
 
 \subsubsection{Private-key encryption}
 
-\question{Ok to copy more or less word for word?}
-
-\begin{definition}[Private-key encryption]
+\begin{definition}[Private-key encryption {\cite[Definition 3.7]{introduction-to-modern-cryptography}}]
 	A \emph{private-key encryption scheme} $\Pi$ consists of three probabilistic polynomial-time algorithms $(\gen, \enc, \dec)$ such that:
 	\begin{enumerate}[1.]
 		\item The \emph{key-generation algorithm} $\gen$ takes as input $1^n$ (in unary) where $n$ is the security parameter and outputs a key $k$. We will assume the security parameter to be fixed and write $k \from \gen()$.
@@ -42,7 +40,7 @@ The definitions presented in this section were taken from \cite{introduction-to-
 
 \subsubsection{Public-key encryption}
 
-\begin{definition}[Public-key encryption]
+\begin{definition}[Public-key encryption {\cite[Definition 12.1]{introduction-to-modern-cryptography}}]
 	A \emph{public-key encryption scheme} $\Pi$ consists of three probabilistic polynomial-time algorithms $(\gen, \enc, \dec)$ such that:
 	\begin{enumerate}[1.]
 		\item The \emph{key-generation algorithm} $\gen$ takes as input $1^n$ (in unary) where $n$ is the security parameter and outputs a pair of keys $(pk, sk)$ (a public and private key). We will assume the security parameter to be fixed and write $(pk, sk) \from \gen()$.
@@ -67,7 +65,7 @@ The definitions presented in this section were taken from \cite{introduction-to-
 	\end{enumerate}
 \end{definition}
 
-\begin{definition}[IND-CPA security]
+\begin{definition}[IND-CPA security {\cite[Definition 3.21]{introduction-to-modern-cryptography}}]
 	A private-key encryption scheme $\Pi$ is \emph{$(t, \epsilon, q)$-IND-CPA secure} if for any adversary $\adv$ running in time $t$ we have
 	\begin{align*}
 		\mathrm{Adv}_{\Pi}^{\mathrm{IND-CPA}}(\adv) \coloneqq 2 \cdot \abs*{\pr{\mathrm{Game}_{\adv, \Pi}^{\mathrm{IND-CPA}} = 1} - \frac{1}{2}} \le \epsilon.
@@ -103,7 +101,7 @@ We will make use of a weaker form of security called ``indistinguishability in t
 	\end{enumerate}
 \end{definition}
 
-\begin{definition}[EAV security]
+\begin{definition}[EAV security {\cite[Definition 3.8]{introduction-to-modern-cryptography}}]
 	A private-key encryption scheme $\Pi$ is \emph{$(t, \epsilon)$-EAV secure} if for any adversary $\adv$ running in time $t$ we have
 	\begin{align*}
 		\mathrm{Adv}_{\Pi}^{\mathrm{EAV}}(\adv) \coloneqq 2 \cdot \abs*{\pr{\mathrm{Game}_{\adv, \Pi}^{\mathrm{EAV}} = 1} - \frac{1}{2}} \le \epsilon.
@@ -134,12 +132,14 @@ We will make use of a weaker form of security called ``indistinguishability in t
 	\end{enumerate}
 \end{definition}
 
-\begin{definition}[Hardness of the DDH problem]
+\begin{definition}[Hardness of the DDH problem {\cite[Definition 9.64]{introduction-to-modern-cryptography}}]
 	The DDH problem is \emph{$(t, \epsilon)$-hard in} $\mathbb{G}$ with the generator $g$ if for any adversary $\adv$ running in time $t$ we have
 	\begin{align*}
 		\mathrm{Adv}_{(\mathbb{G}, g)}^{\mathrm{DDH}}(\adv) \coloneqq 2 \cdot \abs*{\pr{\mathrm{Game}_{\adv, (\mathbb{G}, g)}^{\mathrm{DDH}} = 1} - \frac{1}{2}} \le \epsilon.
 	\end{align*}
 \end{definition}
+
+\todo{Define DHIES.}
 
 \subsection{The Random Oracle Model}
 
