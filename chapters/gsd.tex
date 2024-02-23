@@ -20,6 +20,8 @@ We call our adaptation of GSD security \emph{Seeded GSD with Dependencies} (SD-G
 
 \todo{Allow adversary to adaptively create nodes and seed dependencies. Also adapt proofs to guess from $[N]$ as opposed to $[n]$.}
 
+\todo{Change proofs such that reductions simulate all ROs. Also replace $t_{H} \rightarrow x \cdot t_{\mathrm{sample}}$}
+
 \begin{definition}[The SD-GSD game]
 
 	Let $\lambda \in \N$ a security parameter. \question{Where to define $\lambda$?} Let $\Pi = (\mathrm{Gen}, \mathrm{Enc}, \mathrm{Dec})$ a public-key encryption scheme. Let $H_{\mathrm{gen}}, H_{\mathrm{dep}} \colon \{0, 1\}^\lambda \to \{0, 1\}^\lambda$ two functions. Define the game $\mathrm{Game}_{\adv, \Pi}^{\mathrm{SD-GSD}}$ for an adversary $\adv$:
@@ -53,29 +55,34 @@ We call our adaptation of GSD security \emph{Seeded GSD with Dependencies} (SD-G
 
 	We require an adversary playing the above game to adhere to the following:
 	\begin{itemize}
-		\item The challenge node always remains a sink
+		\item The challenge node always remains a sink \todo{Not necessary?}
 		\item The challenge node is safe
-		\item $\mathrm{reveal}$ is never queried on the challenge node
+		\item $\mathrm{reveal}$ is never queried on the challenge node \todo{Not necessary?}
 		\item The graphs $(V, E)$ and $(V, D)$ always remain acyclic and without self-loops
 		\item All paths in the graph $(V, D)$ are vertex disjoint \todo{This avoids multiple sources for single target.}
 	\end{itemize}
 \end{definition}
 
-Since we are only interested in the security of the SD-GSD game for the case where $\hgen$ and $\hdep$ are random oracles, our definition of security is centered around the choice of the encryption scheme $\Pi$.
 
 \begin{definition}[SD-GSD security]
-	A public-key encryption scheme $\Pi$ is \emph{$(t, \epsilon, N, \delta)$-SD-GSD secure} if there exist instantiations of the KDFs $\hgen$ and $\hdep$ such that (\todo{This formulation with KDFs makes sense?}) for any adversary $\adv$ constructing a GSD graph of size at most $N$ and indegree at most $\delta$ and running in $t$ time we have
+	The triple $(\Pi, \hgen, \hdep)$, where $\Pi$ is a public-key encryption scheme and $\hgen, \hdep$ are functions $\{0, 1\}^\lambda \to \{0, 1\}^\lambda$, is \emph{$(t, \epsilon, N, \delta)$-SD-GSD secure} if for any adversary $\adv$ constructing a GSD graph of size at most $N$ and indegree at most $\delta$ and running in $t$ time we have
 	\begin{align*}
 		\mathrm{Adv}_{\Pi}^{\mathrm{SD-GSD}}(\adv) \coloneqq 2 \cdot \abs*{\pr{\mathrm{Game}_{\adv, \Pi}^{\mathrm{SD-GSD}} = 1} - \frac{1}{2}} \le \epsilon.
 	\end{align*}
 \end{definition}
 
-\section{Proving SD-GSD security for DHIES}
+Since in this work we are interested in SD-GSD security for the case where $\hgen$ and $\hdep$ are modelled as random oracles and our focus is on the encryption scheme being used, we introduce the following definition for convenience.
+
+\begin{definition}[SD-GSD security in the ROM]
+	A public-key encryption scheme $\Pi$ is \emph{$(t, \epsilon, N, \delta)$-SD-GSD secure in the ROM} if the triple $(\Pi, \hgen, \hdep)$ is $(t, \epsilon, N, \delta)$-SD-GSD secure when $\hgen$ and $\hdep$ are modelled as random oracles.
+\end{definition}
+
+\section{Proving SD-GSD security for DHIES in the ROM}
 
 \todo{Comment on switch from IND-CPA security to EAV security.}
 
 \begin{theorem} \label{theorem:sdgsd-security}
-	Let $N, \delta \in \N$ arbitrary with $\delta \le N$. Let $\Pi_{\mathrm{DH}}$ the DHIES scheme instantiated with a private-key encryption scheme $\Pi_s$ where $\Pi_s.\gen$ samples a key uniformly at random from $\{0, 1\}^\kappa$. Let $\hdh$ the KDF and $\mathbb{G}$ the group used in $\dhies$. If $\Pi_s$ is $(t, \epsilon)$-EAV secure, the DDH problem is $(t, \epsilon)$-hard in $\mathbb{G}$ and $\hgen, \hdep$ and $\hdh$ are modelled as random oracles, then $\Pi_{\mathrm{DH}}$ is $(\tilde{t}, \tilde{\epsilon}, N, \delta)$-SD-GSD secure with
+	Let $N, \delta \in \N$ arbitrary with $\delta \le N$. Let $\Pi_{\mathrm{DH}}$ the DHIES scheme instantiated with a private-key encryption scheme $\Pi_s$ where $\Pi_s.\gen$ samples a key uniformly at random from $\{0, 1\}^\kappa$. Let $\hdh$ the KDF and $\mathbb{G}$ the group used in $\dhies$. If $\Pi_s$ is $(t, \epsilon)$-EAV secure, the DDH problem is $(t, \epsilon)$-hard in $\mathbb{G}$ and $\hdh$ is modelled as a random oracle, then $\Pi_{\mathrm{DH}}$ is $(\tilde{t}, \tilde{\epsilon}, N, \delta)$-SD-GSD secure in the ROM with
 	\[
 		\tilde{\epsilon} = 2 \cdot (\delta + 1) \cdot N \cdot \epsilon + \frac{2 \cdot \mdh \cdot N^2}{\abs{\mathbb{G}}} + \frac{\ms \cdot N}{2^{\lambda - 1}},
 	\]
