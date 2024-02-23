@@ -288,12 +288,12 @@ The adversary $\adv'$ simulates $H_{i - 1}$ or $H_{i}$ to $\adv$ depending on wh
 
 \todo{Add plot.}
 
-We can use $\adv$'s ability to compute the seed $s_w$ of a safe node $w$ from encryptions of $s_w$ to construct an MI-EAV adversary: We first guess a node $z$ whose seed $\adv$ may query. Next we give the MI-EAV challenger $s_z$ and some other independent seed $s$, and embed the encryptions we get back into the SD-GSD game when answering queries of the form $\mathrm{encrypt}(u, z)$ for any $u$. Now consider the behavior of $\adv$ depending on which seed the challenger chooses to encrypt:
+We can use $\adv$'s ability to compute the seed $s_w$ of a safe node $w$ from encryptions of $s_w$ to construct an MI-EAV adversary: We first guess a node $w$ whose seed $\adv$ may query. Next we give the MI-EAV challenger $s_w$ and some other independent seed $s$, and embed the encryptions we get back into the SD-GSD game when answering queries of the form $\mathrm{encrypt}(u, w)$ for any $u$. Now consider the behavior of $\adv$ depending on which seed the challenger chooses to encrypt:
 \begin{itemize}
-	\item If the challenger chooses to encrypt $s_z$, then $\adv$ will trigger the event $\qs \land \overline{\fdh}$ with the same probability as before and if we guessed $z$ correctly (i.e. $z = w$) we can detect whether $\qs \land \overline{\fdh}$ gets triggered (by checking if $\hgen(s_z)$ or $\hdep(s_z)$ was queried by $\adv$ during the simulation).
-	\item If the challenger chooses to encrypt $s$, then $\adv$ receives no information about $s_z$ and has negligible probability of querying it.
+	\item If the challenger chooses to encrypt $s_w$, then $\adv$ will trigger the event $\qs \land \overline{\fdh}$ with the same probability as before and if we guessed $w$ correctly we can detect whether $\qs \land \overline{\fdh}$ gets triggered (by checking if $\hgen(s_w)$ or $\hdep(s_w)$ was queried by $\adv$ during the simulation).
+	\item If the challenger chooses to encrypt $s$, then $\adv$ receives no information about $s_w$ and has negligible probability of querying it.
 \end{itemize}
-Thus, the advantage of the adversary is about $\pr{\qs \land \overline{\fdh}\,}/N$, where the factor $1/N$ arises from guessing $z$, and using that $\Pi_s$ is MI-EAV secure we can bound this probability. Since we are only interested in checking whether the event was triggered for $z$, the adversary can abort when this is no longer possible ($z$ is corrupted, some other hidden seed is queried, etc.).
+Thus, the advantage of the adversary is about $\pr{\qs \land \overline{\fdh}\,}/N$, where the factor $1/N$ arises from guessing $w$, and using that $\Pi_s$ is MI-EAV secure we can bound this probability. Since we are only interested in checking whether the event was triggered for $w$, the adversary can abort when this is no longer possible ($w$ is corrupted, some other hidden seed is queried, etc.).
 
 \begin{proof}[of Lemma~\ref{lemma:eav-reduction}]
 	As motivated above we construct an MI-EAV adversary $\adv'$ to derive the bound. $\adv'$ behaves as follows:
