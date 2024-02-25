@@ -68,24 +68,30 @@ The definitions presented in this section were taken from \cite{introduction-to-
 \begin{definition}[IND-CPA security {\cite[Definition 3.21]{introduction-to-modern-cryptography}}]
 	A private-key encryption scheme $\Pi$ is \emph{$(t, \epsilon, q)$-IND-CPA secure} if for any adversary $\adv$ running in time $t$ we have
 	\begin{align*}
-		\mathrm{Adv}_{\Pi}^{\mathrm{IND-CPA}}(\adv) \coloneqq 2 \cdot \abs*{\pr{\mathrm{Game}_{\adv, \Pi}^{\mathrm{IND-CPA}} = 1} - \frac{1}{2}} \le \epsilon.
+		\mathrm{Adv}_{\Pi}^{\mathrm{IND-CPA}}(\adv) \coloneqq 2 \cdot \left(\pr{\mathrm{Game}_{\adv, \Pi}^{\mathrm{IND-CPA}} = 1} - \frac{1}{2}\right) \le \epsilon.
 	\end{align*}
 \end{definition}
 
-The following fact will be applied several times throughout without reference.
+When analyzing the advantage of an adversary we will may make use of the following well known equality.
 
 \begin{lemma}
-	Let $X$ a Bernoulli random variable and $b \from \{0, 1\}$, where $X$ and $b$ may not be independent. Then for $x \in \{0, 1\}$
+	Let $X$ a Bernoulli random variable and $b \from \{0, 1\}$ (where $X$ and $b$ are not necessarily independent). Then for $x \in \{0, 1\}$
 	\[
-		2 \cdot \abs*{\pr{X = b} - \frac{1}{2}} = \abs*{\pr{X = x \mid b = 1} - \pr{X = x \mid b = 0}}.
+		2 \cdot \left(\pr{X = b} - \frac{1}{2}\right) = \pr{X = x \mid b = x} - \pr{X = x \mid b = 1 - x}.
 	\]
 	In particular, if $\adv$ is an adversary with output in $\{0, 1\}$ playing a game where a bit $b \from \{0, 1\}$ is sampled, then for $x \in \{0, 1\}$
-	\[
-		2 \cdot \abs*{\pr{b \from \adv} - \frac{1}{2}} = \abs*{\pr{x \from \adv \mid b = 1} - \pr{x \from \adv \mid b = 0}}.
-	\]
+	\begin{equation} \label{eq:advantage-equality}
+		2 \cdot \left(\pr{b \from \adv} - \frac{1}{2}\right) = \pr{x \from \adv \mid b = x} - \pr{x \from \adv \mid b = 1 - x}.
+	\end{equation}
 \end{lemma}
 \begin{proof}
-	\todo{Verify statement and prove it.}
+	Let $x \in \{0, 1\}$. We have
+	\begin{align*}
+		2 \cdot \left(\pr{X = b} - \frac{1}{2}\right) & = 2 \cdot \left(\pr{X = x \mid b = x} \cdot \frac{1}{2} + \pr{X = 1 - x \mid b = 1 - x} \cdot \frac{1}{2} - \frac{1}{2}\right) \\
+		                                              & = \pr{X = x \mid b = x} + \pr{X = 1 - x \mid b = 1 - x} - 1                                                                    \\
+		                                              & = \pr{X = x \mid b = x} - (1 - \pr{X = 1 - x \mid b = 1 - x})                                                                  \\
+		                                              & = \pr{X = x \mid b = x} - \pr{X = x \mid b = 1 - x}.
+	\end{align*}
 \end{proof}
 
 
@@ -104,7 +110,7 @@ We will make use of a weaker form of security called ``indistinguishability in t
 \begin{definition}[EAV security {\cite[Definition 3.8]{introduction-to-modern-cryptography}}]
 	A private-key encryption scheme $\Pi$ is \emph{$(t, \epsilon)$-EAV secure} if for any adversary $\adv$ running in time $t$ we have
 	\begin{align*}
-		\mathrm{Adv}_{\Pi}^{\mathrm{EAV}}(\adv) \coloneqq 2 \cdot \abs*{\pr{\mathrm{Game}_{\adv, \Pi}^{\mathrm{EAV}} = 1} - \frac{1}{2}} \le \epsilon.
+		\mathrm{Adv}_{\Pi}^{\mathrm{EAV}}(\adv) \coloneqq 2 \cdot \left(\pr{\mathrm{Game}_{\adv, \Pi}^{\mathrm{EAV}} = 1} - \frac{1}{2}\right) \le \epsilon.
 	\end{align*}
 \end{definition}
 
@@ -135,7 +141,7 @@ We will make use of a weaker form of security called ``indistinguishability in t
 \begin{definition}[Hardness of the DDH problem {\cite[Definition 9.64]{introduction-to-modern-cryptography}}]
 	The DDH problem is \emph{$(t, \epsilon)$-hard in} $\mathbb{G}$ with the generator $g$ if for any adversary $\adv$ running in time $t$ we have
 	\begin{align*}
-		\mathrm{Adv}_{(\mathbb{G}, g)}^{\mathrm{DDH}}(\adv) \coloneqq 2 \cdot \abs*{\pr{\mathrm{Game}_{\adv, (\mathbb{G}, g)}^{\mathrm{DDH}} = 1} - \frac{1}{2}} \le \epsilon.
+		\mathrm{Adv}_{(\mathbb{G}, g)}^{\mathrm{DDH}}(\adv) \coloneqq 2 \cdot \left(\pr{\mathrm{Game}_{\adv, (\mathbb{G}, g)}^{\mathrm{DDH}} = 1} - \frac{1}{2}\right) \le \epsilon.
 	\end{align*}
 \end{definition}
 

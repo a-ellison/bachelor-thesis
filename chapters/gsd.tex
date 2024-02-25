@@ -67,7 +67,7 @@ We call our adaptation of GSD security \emph{Seeded GSD with Dependencies} (SD-G
 \begin{definition}[SD-GSD security]
 	The triple $(\Pi, \hgen, \hdep)$, where $\Pi$ is a public-key encryption scheme and $\hgen, \hdep$ are functions $\{0, 1\}^\lambda \to \{0, 1\}^\lambda$, is \emph{$(t, \epsilon, N, \delta)$-SD-GSD secure} if for any adversary $\adv$ constructing a GSD graph of size at most $N$ and indegree at most $\delta$ and running in $t$ time we have
 	\begin{align*}
-		\mathrm{Adv}_{\Pi}^{\mathrm{SD-GSD}}(\adv) \coloneqq 2 \cdot \abs*{\pr{\mathrm{Game}_{\adv, \Pi}^{\mathrm{SD-GSD}} = 1} - \frac{1}{2}} \le \epsilon.
+		\mathrm{Adv}_{\Pi}^{\mathrm{SD-GSD}}(\adv) \coloneqq 2 \cdot \left(\pr{\mathrm{Game}_{\adv, \Pi}^{\mathrm{SD-GSD}} = 1} - \frac{1}{2}\right) \le \epsilon.
 	\end{align*}
 \end{definition}
 
@@ -190,7 +190,7 @@ We bound $\pr{\qs \land \fdh}$ and $\pr{\qs \land \overline{\fdh} \,}$ in Lemma~
 
 \subsection{Reducing to EAV security}
 
-\todo{Motivate MI-EAV security by relating to intuition of Lemma~\ref{theorem:sdgsd-security}.}
+\todo{Motivate MI-EAV security by relating to intuition of Lemma~\ref{theorem:sdgsd-security}, explain what M and I stand for (maybe add S to signify that there is only a single message).}
 
 \begin{definition}[The MI-EAV game]
 	Let $\Pi$ a private-key encryption scheme. Define the game $\mathrm{Game}_{\adv, \Pi}^{\mathrm{MI-EAV}}$ for an adversary $\adv$:
@@ -204,7 +204,7 @@ We bound $\pr{\qs \land \fdh}$ and $\pr{\qs \land \overline{\fdh} \,}$ in Lemma~
 \begin{definition}[MI-EAV security]
 	A private-key encryption scheme $\Pi$ is \emph{$(t, \epsilon, q)$-MI-EAV secure} if for any adversary $\adv$ making at most $q$ queries and running in time $t$ we have
 	\begin{align*}
-		\mathrm{Adv}_{\Pi}^{\mathrm{MI-EAV}}(\adv) \coloneqq 2 \cdot \abs*{\pr{\mathrm{Game}_{\adv, \Pi}^{\mathrm{MI-EAV}} = 1} - \frac{1}{2}} \le \epsilon.
+		\mathrm{Adv}_{\Pi}^{\mathrm{MI-EAV}}(\adv) \coloneqq 2 \cdot \left(\pr{\mathrm{Game}_{\adv, \Pi}^{\mathrm{MI-EAV}} = 1} - \frac{1}{2}\right) \le \epsilon.
 	\end{align*}
 \end{definition}
 
@@ -242,18 +242,18 @@ The adversary $\adv'$ simulates $H_{i - 1}$ or $H_{i}$ to $\adv$ depending on wh
 	\end{enumerate}
 	Now consider the value of the bit $b$ sampled in the EAV game. If $b = 0$, then the first $i - 1$ ciphertexts that $\adv$ received were encryptions of $m_1$ and the remaining ciphertexts were encryptions of $m_0$, where all encryptions were under keys sampled independently with $\Pi.\gen$. Thus, from the view of $\adv$ everything followed the same distribution as in the game $H_{i - 1}$ and
 	\[
-		\pr{\adv' \rightarrow 1 \mid b = 0} = \pr{1 \from \adv \mid H_{i - 1}}.
+		\pr{1 \from \adv' \mid b = 0} = \pr{1 \from \adv \mid H_{i - 1}}.
 	\]
 	Analogously, in the case $b = 1$ the first $i$ ciphertexts received by $\adv$ were encryptions of $m_1$ and the rest encryptions of $m_0$ so
 	\[
-		\pr{\adv' \rightarrow 1 \mid b = 1} = \pr{1 \from \adv \mid H_{i}}.
+		\pr{1 \from \adv' \mid b = 1} = \pr{1 \from \adv \mid H_{i}}.
 	\]
 	Then
 	\begin{align} \label{eq:eav-to-mi-eav-hybrid-distinguisher}
 		\begin{split}
 			\begin{split}
 				| \pr{1 \from \adv \mid H_{i - 1}} - & \pr{1 \from \adv \mid H_{i}} | \\
-				& = \abs*{\pr{\adv' \rightarrow 1 \mid b = 0} - \pr{\adv' \rightarrow 1 \mid b = 1}}
+				& = \abs*{\pr{1 \from \adv' \mid b = 0} - \pr{1 \from \adv' \mid b = 1}}
 			\end{split} \\
 			& = \mathrm{Adv}_{\Pi}^{\mathrm{EAV}}(\adv')                                         \\
 			& \le \epsilon
@@ -269,7 +269,8 @@ The adversary $\adv'$ simulates $H_{i - 1}$ or $H_{i}$ to $\adv$ depending on wh
 	\]
 	Then
 	\begin{align*}
-		\mathrm{Adv}_{\Pi}^{\mathrm{MI-EAV}}(\adv) & = \abs*{\pr{1 \from \adv \mid b = 0} - \pr{1 \from \adv \mid b = 1}}                       \\
+		\mathrm{Adv}_{\Pi}^{\mathrm{MI-EAV}}(\adv) & \le 2 \cdot \abs*{\pr{\mathrm{Game}_{\adv, \Pi}^{\mathrm{MI-EAV}} = 1} - \frac{1}{2}} \\
+							   & \stackrel{\mathclap{\eqref{eq:advantage-equality}}}{=} \quad \abs*{\pr{1 \from \adv \mid b = 0} - \pr{1 \from \adv \mid b = 1}}                       \\
 		                                           & = \abs*{\pr{1 \from \adv \mid H_0} - \pr{1 \from \adv \mid H_q}}                           \\
 		                                           & = \abs*{\sum_{i = 1}^{q} \pr{1 \from \adv \mid H_{i - 1}} - \pr{1 \from \adv \mid H_i}}    \\
 		                                           & \le \sum_{i = 1}^{q} \abs*{\pr{1 \from \adv \mid H_{i - 1}} - \pr{1 \from \adv \mid H_i}}  \\
@@ -304,28 +305,28 @@ Thus, the advantage of the adversary is about $\pr{\qs \land \overline{\fdh}\,}/
 
 		      During the simulation $\adv'$ also pays attention to the following:
 		      \begin{itemize}
-			      \item If any of the following events occur, $\adv'$ aborts the simulation and outputs 0:
+			      \item If any of the following events occur, $\adv'$ aborts the simulation and outputs 1:
 			            \begin{itemize}
 				            \item $\adv$ queries $\hdh$ for a hidden Diffie-Hellman key
 				            \item $\adv$ queries $\hgen$ or $\hdep$ for a hidden seed that is not $s_w$
 				            \item $\adv$ queries $\mathrm{corrupt}(u)$ for some node $u$ such that $w$ is no longer safe
 			            \end{itemize}
-			      \item If $\adv$ queries $\hgen(s_w)$ or $\hdep(s_w)$, $\adv'$ aborts the simulation and outputs 1. This is the only point at which $\adv'$ outputs 1.
+			      \item If $\adv$ queries $\hgen(s_w)$ or $\hdep(s_w)$, $\adv'$ aborts the simulation and outputs 0. This is the only point at which $\adv'$ outputs 0.
 		      \end{itemize}
 
-		      If the simulation arrives to the point where $\adv$ outputs its guess (step \ref{def:sd-gsd-game-step-4} of the SD-GSD game), then $\adv'$ outputs 0.
+		      If the simulation arrives to the point where $\adv$ outputs its guess (step \ref{def:sd-gsd-game-step-4} of the SD-GSD game), then $\adv'$ outputs 1.
 	\end{enumerate}
 
 	The advantage of $\adv'$ is given by
 	\begin{equation} \label{eq:lemma-eav-reduction-advantage}
-		\mathrm{Adv}_{\Pi}^{\mathrm{MI-EAV}}(\adv') = \abs*{\pr{\adv' \to 1 \mid b = 0} - \pr{\adv' \to 1 \mid b = 1}},
+		\mathrm{Adv}_{\Pi}^{\mathrm{MI-EAV}}(\adv') \stackrel{\eqref{eq:advantage-equality}}{=}  \pr{0 \from \adv' \mid b = 0} - \pr{0 \from \adv' \mid b = 1},
 	\end{equation}
 	where $b$ is the bit sampled by the MI-EAV challenger.
 
 
 	First, we will show that
 	\begin{equation} \label{eq:lemma-eav-reduction-b=0}
-		\pr{\adv' \to 1 \mid b = 0} \ge \frac{\pr{\qs \land \overline{\fdh}\,}}{N}.
+		\pr{0 \from \adv' \mid b = 0} \ge \frac{\pr{\qs \land \overline{\fdh}\,}}{N}.
 	\end{equation}
 	Let $E = \qs \land \overline{\fdh}$ and let $E'$ the same event in the SD-GSD game simulated to $\adv$ during an execution of $\mathrm{Game}_{\adv', \Pi_s}^{\mathrm{MI-EAV}}$ with $b = 0$. In the following while showing \eqref{eq:lemma-eav-reduction-b=0} we will implicitly assume that $b = 0$ when referring to the game simulated to $\adv$ by $\adv'$.
 	On a high level \eqref{eq:lemma-eav-reduction-b=0} holds due to the fact that as long as the game has not been aborted the encryptions $\adv$ receives from $\adv'$ are indistinguishable from what it would get in the real SD-GSD game and we get a factor $\frac{1}{N}$ from guessing the node that triggered $E$. However, showing this requires a few steps.
@@ -383,7 +384,7 @@ Thus, the advantage of the adversary is about $\pr{\qs \land \overline{\fdh}\,}/
 
 	Finally, notice that if the event $W' = w$ occurred, then $\adv'$ outputs $1$. Then we have
 	\begin{align*}
-		\pr{\adv' \to 1 \mid b = 0} & \ge \pr{W' = w}                                                              \\
+		\pr{1 \from \adv' \mid b = 0} & \ge \pr{W' = w}                                                              \\
 		                            & \stackrel{\eqref{eq:lemma-eav-reduction-G2-vs-simulation}}{=} \pr{W_2 = w_2} \\
 		                            & \stackrel{\eqref{eq:lemma-eav-reduction-G1-vs-G2}}{=}  \pr{W_1 = w_1}        \\
 		                            & \stackrel{\eqref{eq:lemma-eav-reduction-detect-E1-G1}}{\ge} \frac{\pr{E}}{N} \\
@@ -391,7 +392,7 @@ Thus, the advantage of the adversary is about $\pr{\qs \land \overline{\fdh}\,}/
 	\end{align*}
 	as promised.
 
-	Second, returning to \eqref{eq:lemma-eav-reduction-advantage}, we can more easily show that $\pr{\adv' \to 1 \mid b = 1}$ is negligible. In the SD-GSD game simulated to $\adv$ during an execution of $\mathrm{Game}_{\adv', \Pi_s}^{\mathrm{MI-EAV}}$ with $b = 1$, the seed $s_w$ is a random variable independent of any information given to $\adv$:
+	Second, returning to \eqref{eq:lemma-eav-reduction-advantage}, we can more easily show that $\pr{0 \from \adv' \mid b = 1}$ is negligible. In the SD-GSD game simulated to $\adv$ during an execution of $\mathrm{Game}_{\adv', \Pi_s}^{\mathrm{MI-EAV}}$ with $b = 1$, the seed $s_w$ is a random variable independent of any information given to $\adv$:
 	\begin{itemize}
 		\item the game aborts when $w$ becomes unsafe, so $s_w$ cannot be learned by querying $\mathrm{corrupt}(w)$ or by querying $\hdep(s_p)$ for an unsafe node $p$ where $(p, w)$ is a seed dependency
 		\item querying $\hdep(s_p)$ for a safe node $p$ where $(p, w)$ is a seed dependency results in the game being aborted and by virtue of $\hdep$ being a random oracle, from $\adv$'s perspective $s_w$ follows the same distribution regardless of whether there is a seed dependency $(p, w)$ or not
@@ -403,13 +404,13 @@ Thus, the advantage of the adversary is about $\pr{\qs \land \overline{\fdh}\,}/
 	\]
 	Thus, by a union bound we have
 	\begin{equation} \label{eq:lemma-eav-reduction-b=1}
-		\pr{\adv' \to 1 \mid b = 1} \le \frac{\ms}{2^\lambda}.
+		\pr{0 \from \adv' \mid b = 1} \le \frac{\ms}{2^\lambda}.
 	\end{equation}
 
 	Combining \eqref{eq:lemma-eav-reduction-advantage}, \eqref{eq:lemma-eav-reduction-b=0} and \eqref{eq:lemma-eav-reduction-b=1} we get
 	\begin{align} \label{eq:lemma-eav-reduction-advantage-lower-bound}
 		\begin{split}
-			\mathrm{Adv}_{\Pi}^{\mathrm{MI-EAV}}(\adv') & \ge \pr{\adv' \to 1 \mid b = 0} - \pr{\adv' \to 1 \mid b = 1}           \\
+			\mathrm{Adv}_{\Pi}^{\mathrm{MI-EAV}}(\adv') & = \pr{0 \from \adv' \mid b = 0} - \pr{0 \from \adv' \mid b = 1}           \\
 			& \ge \frac{\pr{\qs \land \overline{\fdh}\,}}{N} - \frac{\ms}{2^\lambda}.
 		\end{split}
 	\end{align}
@@ -534,27 +535,27 @@ Now to determine whether $k$ is the real Diffie-Hellman key, we check whether $q
 
 		      During the simulation $\adv'$ also pays attention to the following:
 		      \begin{itemize}
-			      \item If any of the following events occur, $\adv'$ aborts the simulation and outputs 0:
+			      \item If any of the following events occur, $\adv'$ aborts the simulation and outputs 1:
 			            \begin{itemize}
 				            \item $\adv$ queries $\hdh$ for a hidden Diffie-Hellman key on an encryption edge $(u, v) \in E$ with $u \neq a$
 				            \item $\adv$ queries $\hgen$ or $\hdep$ for a hidden seed
 				            \item $\adv$ queries $\mathrm{corrupt}(u)$ for some node $u$ such that $a$ is no longer safe
 			            \end{itemize}
-			      \item If $\adv$ queries $q_i$ to $\hdh$ such that $q_i \cdot R_j = k$ for some $j$, $\adv'$ aborts the simulation and outputs 1. This is the only point at which $\adv'$ outputs 1.
+			      \item If $\adv$ queries $q_i$ to $\hdh$ such that $q_i \cdot R_j = k$ for some $j$, $\adv'$ aborts the simulation and outputs 0. This is the only point at which $\adv'$ outputs 0.
 		      \end{itemize}
 
-		      If the simulation arrives to the point where $\adv$ outputs its guess (step \ref{def:sd-gsd-game-step-4} of the SD-GSD game), then $\adv'$ outputs 0.
+		      If the simulation arrives to the point where $\adv$ outputs its guess (step \ref{def:sd-gsd-game-step-4} of the SD-GSD game), then $\adv'$ outputs 1.
 	\end{enumerate}
 
 	The advantage of $\adv'$ is given by
 	\begin{equation} \label{eq:lemma-dh-reduction-advantage}
-		\mathrm{Adv}_{(\mathbb{G}, g)}^{\mathrm{DDH}}(\adv') = \abs*{\pr{\adv' \to 1 \mid b = 0} - \pr{\adv' \to 1 \mid b = 1}},
+		\mathrm{Adv}_{(\mathbb{G}, g)}^{\mathrm{DDH}}(\adv') \stackrel{\eqref{eq:advantage-equality}}{=} \pr{0 \from \adv' \mid b = 0} - \pr{0 \from \adv' \mid b = 1},
 	\end{equation}
 	where $b$ is the bit sampled by the DDH challenger.
 
 	First, we will show that
 	\begin{equation} \label{eq:lemma-dh-reduction-b=0}
-		\pr{\adv' \rightarrow 1 \mid b = 0} \ge \frac{\pr{\fdh}}{N}.
+		\pr{0 \from \adv' \mid b = 0} \ge \frac{\pr{\fdh}}{N}.
 	\end{equation}
 	This part of the proof proceeds very similarly to the proof of Lemma~\vref{lemma:eav-reduction} and we will be a bit more concise. We focus on executions of $\mathrm{Game}_{\adv, (\mathbb{G}, g)}^{\mathrm{DDH}}$ with $b = 0$. Let the games $G_1, G_2$ be defined as in Lemma~\ref{lemma:eav-reduction}, where we denote the node sampled at the beginning of each game by $a_1, a_2$, respectively (as opposed to $w_1, w_2$). Let $E = \fdh$ and let $E_1, E_2$ and $E'$ be the analogous events in $G_1, G_2$ and the game simulated by $\adv'$ (note that in this latter game, the group elements $pk_a^{\log_g(h_2) + r_j}$ are also hidden Diffie-Hellman keys). Finally, we introduce the random variable
 	\[
@@ -613,20 +614,20 @@ Now to determine whether $k$ is the real Diffie-Hellman key, we check whether $q
 
 	Now, again analogous to Lemma~\ref{lemma:eav-reduction} if the event $A' = a$ occurred, then $\adv'$ outputs $1$ and
 	\begin{align*}
-		\pr{\adv' \to 1 \mid b = 0} & \ge \pr{A' = a}                                                             \\
-		                            & \stackrel{\eqref{eq:lemma-dh-reduction-G2-vs-simulation}}{=} \pr{A_2 = a_2} \\
-		                            & \stackrel{\eqref{eq:lemma-dh-reduction-G1-vs-G2}}{=}  \pr{A_1 = a_1}        \\
-		                            & \stackrel{\eqref{eq:lemma-dh-reduction-detect-E1-G1}}{\ge} \frac{\pr{E}}{N} \\
-		                            & = \frac{\pr{\fdh}}{N},
+		\pr{1 \from \adv' \mid b = 0} & \ge \pr{A' = a}                                                             \\
+		                            & \stackrel{\mathclap{\eqref{eq:lemma-dh-reduction-G2-vs-simulation}}}{=} \;\; \pr{A_2 = a_2} \\
+		                            & \stackrel{\mathclap{\eqref{eq:lemma-dh-reduction-G1-vs-G2}}}{=} \;\; \pr{A_1 = a_1}        \\
+		                            & \stackrel{\mathclap{\eqref{eq:lemma-dh-reduction-detect-E1-G1}}}{\ge} \;\; \frac{\pr{E}}{N} \\
+		                            & = \frac{\pr{\fdh}}{N}.
 	\end{align*}
 
-	Second, we will show that $\pr{\adv' \rightarrow 1 \mid b = 0}$ is negligible. When $b = 1$ in $\mathrm{Game}_{\adv, (\mathbb{G}, g)}^{\mathrm{DDH}}$, $k$ is a uniformly random group element independent of any information given to $\adv$, in particular of $q_i \cdot R_j$ for any $i, j$. Thus for any $i, j$,
+	Second, we will show that $\pr{0 \from \adv' \mid b = 1}$ is negligible. When $b = 1$ in $\mathrm{Game}_{\adv, (\mathbb{G}, g)}^{\mathrm{DDH}}$, $k$ is a uniformly random group element independent of any information given to $\adv$, in particular of $q_i \cdot R_j$ for any $i, j$. Thus for any $i, j$,
 	\[
 		\pr{q_i \cdot R_j = k} = \frac{1}{\abs{\mathbb{G}}}.
 	\]
 	Thus, by a union bound and using that $i \in [\mdh], 1 \le j \le N - 1 \le N$ ($j$ is bounded by the maximum out-degree) we have
 	\begin{equation} \label{eq:lemma-dh-reduction-b=1}
-		\pr{\adv' \rightarrow 1 \mid b = 0} \le \frac{\mdh \cdot N}{\abs{\mathbb{G}}}.
+		\pr{0 \from \adv' \mid b = 1} \le \frac{\mdh \cdot N}{\abs{\mathbb{G}}}.
 	\end{equation}
 
 	Combining \eqref{eq:lemma-dh-reduction-advantage}, \eqref{eq:lemma-dh-reduction-b=0} and \eqref{eq:lemma-dh-reduction-b=1} we get
