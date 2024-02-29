@@ -23,13 +23,12 @@ We call our adaptation of GSD security \emph{Seeded GSD with Dependencies} (SD-G
 \todo{Change proofs such that reductions simulate all ROs. Also replace $t_{H} \rightarrow x \cdot t_{\mathrm{sample}}$}
 
 \begin{definition}[The SD-GSD game]
-
-	Let $\lambda \in \N$ a security parameter. \question{Where to define $\lambda$?} Let $\Pi = (\mathrm{Gen}, \mathrm{Enc}, \mathrm{Dec})$ a public-key encryption scheme. Let $H_{\mathrm{gen}}, H_{\mathrm{dep}} \colon \{0, 1\}^\lambda \to \{0, 1\}^\lambda$ two functions. Define the game $\mathrm{Game}_{\adv, \Pi}^{\mathrm{SD-GSD}}$ for an adversary $\adv$:
+	Let $\lambda \in \N$ a security parameter. \question{Where to define $\lambda$?} Let $\Pi = (\gen, \enc, \dec)$ a public-key encryption scheme. Let $\hgen, \hdep \colon \{0, 1\}^\lambda \to \{0, 1\}^\lambda$ two functions. Define the game $\sdgsdgame{\Pi}$ for an adversary $\adv$:
 	\begin{enumerate}[1.]
 		\item \label{def:sd-gsd-game-step-1} The adversary $\adv$ outputs $n \in \N$ and a list of dependencies $D = \{(a_{i}, b_{i})\}_{i=1}^m \in [n]^2$. For each $v \in [n]$:
 		      \begin{enumerate}[(i)]
 			      \item \begin{itemize}
-				            \item \textbf{Case $v = b_i$ for some $i$ ($v$ is the target of some dependency):} set $s_v = H_{\mathrm{dep}}(s_{a_i})$.
+				            \item \textbf{Case $v = b_i$ for some $i$ ($v$ is the target of some dependency):} set $s_v = \hdep(s_{a_i})$.
 				            \item \textbf{Otherwise:} sample $s_v \from \{0, 1\}^\lambda$.
 			            \end{itemize}
 			            We call $s_v$ the \emph{seed} of the node $v$ and a tuple $(a, b) \in D$ a \emph{seed dependency}.
@@ -39,7 +38,7 @@ We call our adaptation of GSD security \emph{Seeded GSD with Dependencies} (SD-G
 		\item $\adv$ may adaptively do the following queries:
 		      \begin{itemize}
 			      \item $\mathrm{reveal}(v)$ for $v \in [n]$: $\adv$ is given $pk_v$.
-			      \item $\mathrm{encrypt}(u, v)$ for $u, v \in [n], u \neq v, (u, v) \notin E$: $(u, v)$ is added to $E$ and $\adv$ is given $c \from \mathrm{Enc}_{pk_u}(s_v)$.
+			      \item $\mathrm{encrypt}(u, v)$ for $u, v \in [n], u \neq v, (u, v) \notin E$: $(u, v)$ is added to $E$ and $\adv$ is given $c \from \enc_{pk_u}(s_v)$.
 			      \item $\mathrm{corrupt}(v)$ for $v \in [n], v \notin \mathcal{C}$: $\adv$ is given $s_v$ and $v$ is added to $\mathcal{C}$. We call such a node $v \in \mathcal{C}$ \emph{corrupted}. All nodes not reachable from any corrupted node in the graph $([n], E \cup D)$ are \emph{safe} (while all other nodes are \emph{unsafe}) and we call their seeds \emph{hidden} (even if an unsafe node happens to have the same seed).
 		      \end{itemize}
 		\item $\adv$ outputs a node $v \in [n]$. We call $v$ the \emph{challenge node}. A bit $b \from \{0, 1\}$ is sampled and $\adv$ is given
@@ -82,11 +81,11 @@ Since in this work we are interested in SD-GSD security for the case where $\hge
 \todo{Comment on switch from IND-CPA security to EAV security.}
 
 \begin{theorem} \label{theorem:sdgsd-security}
-	Let $N, \delta \in \N$ arbitrary with $\delta \le N$. Let $\Pi_{\mathrm{DH}}$ the DHIES scheme instantiated with a private-key encryption scheme $\Pi_s$ where $\Pi_s.\gen$ samples a key uniformly at random from $\{0, 1\}^\kappa$. Let $\hdh$ the KDF and $\mathbb{G}$ the group used in $\dhies$. If $\Pi_s$ is $(t, \epsilon)$-EAV secure, the DDH problem is $(t, \epsilon)$-hard in $\mathbb{G}$ and $\hdh$ is modelled as a random oracle, then $\Pi_{\mathrm{DH}}$ is $(\tilde{t}, \tilde{\epsilon}, N, \delta)$-SD-GSD secure in the ROM with
+	Let $N, \delta \in \N$ arbitrary with $\delta \le N$. Let $\dhies$ the DHIES scheme instantiated with a private-key encryption scheme $\Pi_s$ where $\Pi_s.\gen$ samples a key uniformly at random from $\{0, 1\}^\kappa$. Let $\hdh$ the KDF and $\mathbb{G}$ the group used in $\dhies$. If $\Pi_s$ is $(t, \epsilon)$-EAV secure, the DDH problem is $(t, \epsilon)$-hard in $\mathbb{G}$ and $\hdh$ is modelled as a random oracle, then $\Pi_{\mathrm{DH}}$ is $(\tilde{t}, \tilde{\epsilon}, N, \delta)$-SD-GSD secure in the ROM with
 	\[
 		\tilde{\epsilon} = 2 \cdot (\delta + 1) \cdot N \cdot \epsilon + \frac{2 \cdot \mdh \cdot N^2}{\abs{\mathbb{G}}} + \frac{\ms \cdot N}{2^{\lambda - 1}},
 	\]
-	where $\ms$ is an upper bound on the number of queries made to either $\hgen$ or $\hdep$ and $\mdh$ is an upper bound on the number of queries made to $\mdh$, and with
+	where $\ms$ is an upper bound on the number of queries made to either $\hgen$ or $\hdep$ and $\mdh$ is an upper bound on the number of queries made to $\hdh$, and with
 	\[
 		\tilde{t} = t \begin{aligned}[t]
 			- & \mathcal{O}
@@ -221,9 +220,9 @@ The adversary $\adv'$ simulates $H_{i - 1}$ or $H_{i}$ to $\adv$ depending on wh
 \question{Move proof to appendix?}
 \begin{proof} Note that since the message space is finite, the time to encrypt a message is bounded. As outlined above the Lemma follows from a simple hybrid argument. Let $q \in \N$ and $\adv$ an arbitrary MI-EAV adversary running in time $\tilde{t}$ and making at most $q$ queries. Define the sequence of hybrid games $H_0, \ldots, H_q$ where in the game $H_i$ the first $i$ encryptions given to the adversary encrypt $m_1$ and all remaining encryptions encrypt $m_0$. We will write
 	\[
-		\pr{1 \from \adv \mid H_i}
+		\pr{0 \from \adv \mid H_i}
 	\]
-	for the probability of $\adv$ outputting $1$ when playing the hybrid game $H_i$.
+	for the probability of $\adv$ outputting $0$ when playing the hybrid game $H_i$.
 
 	Let $i \in [q]$. Construct an EAV adversary $\adv'$ that behaves as follows:
 	\begin{enumerate}[1.]
@@ -242,38 +241,38 @@ The adversary $\adv'$ simulates $H_{i - 1}$ or $H_{i}$ to $\adv$ depending on wh
 	\end{enumerate}
 	Now consider the value of the bit $b$ sampled in the EAV game. If $b = 0$, then the first $i - 1$ ciphertexts that $\adv$ received were encryptions of $m_1$ and the remaining ciphertexts were encryptions of $m_0$, where all encryptions were under keys sampled independently with $\Pi.\gen$. Thus, from the view of $\adv$ everything followed the same distribution as in the game $H_{i - 1}$ and
 	\[
-		\pr{1 \from \adv' \mid b = 0} = \pr{1 \from \adv \mid H_{i - 1}}.
+		\pr{0 \from \adv' \mid b = 0} = \pr{0 \from \adv \mid H_{i - 1}}.
 	\]
 	Analogously, in the case $b = 1$ the first $i$ ciphertexts received by $\adv$ were encryptions of $m_1$ and the rest encryptions of $m_0$ so
 	\[
-		\pr{1 \from \adv' \mid b = 1} = \pr{1 \from \adv \mid H_{i}}.
+		\pr{0 \from \adv' \mid b = 1} = \pr{0 \from \adv \mid H_{i}}.
 	\]
 	Then
 	\begin{align} \label{eq:eav-to-mi-eav-hybrid-distinguisher}
 		\begin{split}
 			\begin{split}
-				| \pr{1 \from \adv \mid H_{i - 1}} - & \pr{1 \from \adv \mid H_{i}} | \\
-				& = \abs*{\pr{1 \from \adv' \mid b = 0} - \pr{1 \from \adv' \mid b = 1}}
+				\pr{0 \from \adv \mid H_{i - 1}} - & \pr{0 \from \adv \mid H_{i}} \\
+				& = \pr{0 \from \adv' \mid b = 0} - \pr{0 \from \adv' \mid b = 1}
 			\end{split} \\
-			& = \mathrm{Adv}_{\Pi}^{\mathrm{EAV}}(\adv')                                         \\
+			& \stackrel{\mathclap{\eqref{eq:advantage-equality}}}{=}  \mathrm{Adv}_{\Pi}^{\mathrm{EAV}}(\adv')                                         \\
 			& \le \epsilon
 		\end{split}
 	\end{align}
-	by $(t, \epsilon)$-EAV security of $\Pi$ since $\adv'$ runs in time $\tilde{t} + \mathcal{O}(q \cdot (t_\gen + t_\enc)) = t$. Now let $b$ be the bit sampled in the MI-EAV game. Notice that
+	by $(t, \epsilon)$-EAV security of $\Pi$ since $\adv'$ runs in time $\tilde{t} + \mathcal{O}(q \cdot (t_{\gen} + t_{\enc})) = t$.
+
+	Now let $b$ be the bit sampled in the MI-EAV game. Notice that
 	\[
-		\pr{1 \from \adv \mid b = 0} = \pr{1 \from \adv \mid H_0}
+		\pr{0 \from \adv \mid b = 0} = \pr{0 \from \adv \mid H_0}
 	\]
 	and
 	\[
-		\pr{1 \from \adv \mid b = 1} = \pr{1 \from \adv \mid H_q}.
+		\pr{0 \from \adv \mid b = 1} = \pr{0 \from \adv \mid H_q}.
 	\]
 	Then
 	\begin{align*}
-		\mathrm{Adv}_{\Pi}^{\mathrm{MI-EAV}}(\adv) & \le 2 \cdot \abs*{\pr{\mathrm{Game}_{\adv, \Pi}^{\mathrm{MI-EAV}} = 1} - \frac{1}{2}} \\
-							   & \stackrel{\mathclap{\eqref{eq:advantage-equality}}}{=} \quad \abs*{\pr{1 \from \adv \mid b = 0} - \pr{1 \from \adv \mid b = 1}}                       \\
-		                                           & = \abs*{\pr{1 \from \adv \mid H_0} - \pr{1 \from \adv \mid H_q}}                           \\
-		                                           & = \abs*{\sum_{i = 1}^{q} \pr{1 \from \adv \mid H_{i - 1}} - \pr{1 \from \adv \mid H_i}}    \\
-		                                           & \le \sum_{i = 1}^{q} \abs*{\pr{1 \from \adv \mid H_{i - 1}} - \pr{1 \from \adv \mid H_i}}  \\
+		\mathrm{Adv}_{\Pi}^{\mathrm{MI-EAV}}(\adv) & \stackrel{\mathclap{\eqref{eq:advantage-equality}}}{=} \; \pr{0 \from \adv \mid b = 0} - \pr{0 \from \adv \mid b = 1} \\
+		                                           & = \pr{0 \from \adv \mid H_0} - \pr{0 \from \adv \mid H_q}                                                             \\
+		                                           & = \sum_{i = 1}^{q} \pr{0 \from \adv \mid H_{i - 1}} - \pr{0 \from \adv \mid H_i}                                      \\
 		                                           & \stackrel{\mathclap{\eqref{eq:eav-to-mi-eav-hybrid-distinguisher}}}{\le} q \cdot \epsilon.
 	\end{align*}
 \end{proof}
@@ -385,10 +384,10 @@ Thus, the advantage of the adversary is about $\pr{\qs \land \overline{\fdh}\,}/
 	Finally, notice that if the event $W' = w$ occurred, then $\adv'$ outputs $1$. Then we have
 	\begin{align*}
 		\pr{1 \from \adv' \mid b = 0} & \ge \pr{W' = w}                                                              \\
-		                            & \stackrel{\eqref{eq:lemma-eav-reduction-G2-vs-simulation}}{=} \pr{W_2 = w_2} \\
-		                            & \stackrel{\eqref{eq:lemma-eav-reduction-G1-vs-G2}}{=}  \pr{W_1 = w_1}        \\
-		                            & \stackrel{\eqref{eq:lemma-eav-reduction-detect-E1-G1}}{\ge} \frac{\pr{E}}{N} \\
-		                            & = \frac{\pr{\qs \land \overline{\fdh}\,}}{N},
+		                              & \stackrel{\eqref{eq:lemma-eav-reduction-G2-vs-simulation}}{=} \pr{W_2 = w_2} \\
+		                              & \stackrel{\eqref{eq:lemma-eav-reduction-G1-vs-G2}}{=}  \pr{W_1 = w_1}        \\
+		                              & \stackrel{\eqref{eq:lemma-eav-reduction-detect-E1-G1}}{\ge} \frac{\pr{E}}{N} \\
+		                              & = \frac{\pr{\qs \land \overline{\fdh}\,}}{N},
 	\end{align*}
 	as promised.
 
@@ -614,11 +613,11 @@ Now to determine whether $k$ is the real Diffie-Hellman key, we check whether $q
 
 	Now, again analogous to Lemma~\ref{lemma:eav-reduction} if the event $A' = a$ occurred, then $\adv'$ outputs $1$ and
 	\begin{align*}
-		\pr{1 \from \adv' \mid b = 0} & \ge \pr{A' = a}                                                             \\
-		                            & \stackrel{\mathclap{\eqref{eq:lemma-dh-reduction-G2-vs-simulation}}}{=} \;\; \pr{A_2 = a_2} \\
-		                            & \stackrel{\mathclap{\eqref{eq:lemma-dh-reduction-G1-vs-G2}}}{=} \;\; \pr{A_1 = a_1}        \\
-		                            & \stackrel{\mathclap{\eqref{eq:lemma-dh-reduction-detect-E1-G1}}}{\ge} \;\; \frac{\pr{E}}{N} \\
-		                            & = \frac{\pr{\fdh}}{N}.
+		\pr{1 \from \adv' \mid b = 0} & \ge \pr{A' = a}                                                                             \\
+		                              & \stackrel{\mathclap{\eqref{eq:lemma-dh-reduction-G2-vs-simulation}}}{=} \;\; \pr{A_2 = a_2} \\
+		                              & \stackrel{\mathclap{\eqref{eq:lemma-dh-reduction-G1-vs-G2}}}{=} \;\; \pr{A_1 = a_1}         \\
+		                              & \stackrel{\mathclap{\eqref{eq:lemma-dh-reduction-detect-E1-G1}}}{\ge} \;\; \frac{\pr{E}}{N} \\
+		                              & = \frac{\pr{\fdh}}{N}.
 	\end{align*}
 
 	Second, we will show that $\pr{0 \from \adv' \mid b = 1}$ is negligible. When $b = 1$ in $\mathrm{Game}_{\adv, (\mathbb{G}, g)}^{\mathrm{DDH}}$, $k$ is a uniformly random group element independent of any information given to $\adv$, in particular of $q_i \cdot R_j$ for any $i, j$. Thus for any $i, j$,
