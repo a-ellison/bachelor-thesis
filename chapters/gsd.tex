@@ -130,17 +130,17 @@ where $(u_1, w), \ldots, (u_d, w)$ are edges in the GSD graph (obtained through 
 
 The proof in \cite{ttkem} simply argued that this is not too likely if these encryptions were made with an IND-CPA secure scheme. In the context of the DHIES scheme we can say more about these encryptions and achieve a better reduction loss.
 Let $x_i = \log_g(pk_{u_i})$ (where $g$ is the generator of $\mathbb{G}$ being used in $\dhies$). Each encryption $c_i$ is a tuple of the form $\langle g^{y_i}, \Pi_s.\enc_{k_i}(s_w) \rangle$ where $y_i \from [\abs{\mathbb{G}}], k_i = \hdh\left(g^{x_i \cdot y_i}\right)$. Now we can again do a case distinction on whether $\hdh$ was queried for some group element $g^{x_j \cdot y_j}$ or not:
-\begin{itemize}
-	\item If such a query was made, then $\adv$ solved the Diffie-Hellman challenge $(g^{x_j}, g^{y_j})$. (Remember that we assumed that $w$ is the first node for which $\qs$ is triggered and as before if $w$ is safe, then so are the nodes $u_i$. Thus the adversary has not learned the exponent $x_i$ through querying $\hgen(s_{u_i})$ for any $i$.)
+\begin{enumerate}[(i)]
+	\item \label{qs-triggered-case-1} If such a query was made, then $\adv$ solved the Diffie-Hellman challenge $(g^{x_j}, g^{y_j})$. (Remember that we assumed that $w$ is the first node for which $\qs$ is triggered and as before if $w$ is safe, then so are the nodes $u_i$. Thus the adversary has not learned the exponent $x_i$ through querying $\hgen(s_{u_i})$ for any $i$.)
 	\item If no such query was made, then from $\adv$'s perspective all the $k_i$ are independent, uniformly random keys and it still was able to learn $s_w$ from the EAV secure encryptions $\Pi_s.\enc_{k_1}(s_w), \ldots, \Pi_s.\enc_{k_d}(s_w)$.
-\end{itemize}
+\end{enumerate}
 We can bound the probability of either of these events occurring using hardness of the DDH problem in $\mathbb{G}$ and EAV security of $\Pi_s$, respectively.
 
-To this end, we call a group element $k \in \mathbb{G}$ a \emph{hidden Diffie-Hellman key} if $k = pk_u^{y_{u, v}}$, where $(u, v)$ is an edge in the GSD graph, $u$ is safe and $y_{u, v}$ is the exponent chosen in the DHIES encryption of $s_v$ (i.e. $\adv$ was given a ciphertext of the form $\langle g^{y_{u, v}}, \ldots\rangle$ when it queried $\mathrm{encrypt}(u, v)$). Now analogously to above let $\qdh$ the event that $\adv$ queries $\hdh$ on a hidden Diffie-Hellman key and let $\fdh$ the event that $\adv$ triggers $\qdh$ \emph{before} having triggered $\qs$. Then we can split the event $\qs$ into two cases as motivated above:
+To this end, we call a group element $h \in \mathbb{G}$ a \emph{hidden Diffie-Hellman key} if $h = pk_u^{y_{u, v}}$, where $(u, v)$ is an edge in the GSD graph, $u$ is safe and $y_{u, v}$ is the exponent chosen in the DHIES encryption of $s_v$ (i.e. $\adv$ was given a ciphertext of the form $\langle g^{y_{u, v}}, \ldots\rangle$ when it queried $\mathrm{encrypt}(u, v)$). Now analogously to above let $\qdh$ the event that $\adv$ queries $\hdh$ on a hidden Diffie-Hellman key and let $\fdh$ the event that $\adv$ triggers $\qdh$ \emph{before} having triggered $\qs$. Then we can split the event $\qs$ into two cases as motivated above:
 \begin{align*}
 	\pr{\qs} & = \pr{\qs \land \fdh} + \pr{\qs \land \overline{\fdh}\,}.
 \end{align*}
-We bound $\pr{\qs \land \fdh}$ and $\pr{\qs \land \overline{\fdh} \,}$ in Lemma~\ref{lemma:dh-reduction} and Lemma~\ref{lemma:eav-reduction}, respectively. Overall this gives us a bound on the advantage of $\adv$ using \eqref{eq:theorem-sd-gsd-security-win-cases}. (To be precise, the event $\qs \land \fdh$ is a superset of the first scenario described further above. However, the argument applied in Lemma~\ref{lemma:dh-reduction} gives the same bound for either event and this more general event has the advantage of being simpler.)
+We bound $\pr{\qs \land \fdh}$ and $\pr{\qs \land \overline{\fdh} \,}$ in Lemma~\ref{lemma:dh-reduction} and Lemma~\ref{lemma:eav-reduction}, respectively. Overall this gives us a bound on the advantage of $\adv$ using \eqref{eq:theorem-sd-gsd-security-win-cases}. (To be precise, the event $\qs \land \fdh$ is a superset of case (\ref{qs-triggered-case-1}) above. However, the argument applied in Lemma~\ref{lemma:dh-reduction} gives the same bound for either event and this more general event has the advantage of being simpler.)
 
 \begin{proof}[of Theorem~\ref{theorem:sdgsd-security}]
 	Let $\adv$ an arbitrary SD-GSD adversary running in time $\tilde{t}$. We will use the events defined above. We first justify step $(\dagger)$ in \eqref{eq:theorem-sd-gsd-security-win-cases}. Note that by the rules imposed on the adversary in the SD-GSD game, the challenge node $v$ is safe and its seed $s_v$ thus indeed hidden. If $\qdep$ does not hold, then $\adv$ has not queried $\hdep$ for $s_v$ and, by virtue of $\hdep$ being a random oracle, $\hdep(s_v)$ is a uniformly distributed value in $\{0, 1\}^\lambda$ from $\adv$'s perspective. The value $s$ follows the same distribution. Thus, $\adv$ behaves the same when given either $r = s$ or $r = \hdep(s_v)$ and
@@ -207,7 +207,7 @@ We bound $\pr{\qs \land \fdh}$ and $\pr{\qs \land \overline{\fdh} \,}$ in Lemma~
 	\end{align*}
 \end{definition}
 
-Similar to how IND-CPA security for a single encryption query implies IND-CPA security for $q$ queries with a security loss of $q$ by a standard hybrid argument, we can show that EAV security implies MI-EAV security with the same loss. Given the well known result for IND-CPA security, it is clear that one should be able to use an analogous hybrid argument to show MI-EAV security from IND-CPA security. To see why we can make do with EAV security, recall the hybrid argument for IND-CPA security: We define the sequence of hybrid games $H_0, \ldots, H_q$ where in the game $H_i$ the first $i$ encryption queries encrypt the second message and the remaining $q - i$ queries encrypt the first message. Then given an IND-CPA adversary $\adv$ for multiple encryptions, an IND-CPA adversary $\adv'$ is constructed to bound
+Similar to how IND-CPA security for a single encryption query implies IND-CPA security for $q$ queries with a security loss of $q$ by a standard hybrid argument, one can show that EAV security implies MI-EAV security with the same loss. To see why, recall the hybrid argument for IND-CPA security (as discussed in e.g. \cite[Theorem 12.6]{introduction-to-modern-cryptography}): We define the sequence of hybrid games $H_0, \ldots, H_q$ where in the game $H_i$ the first $i$ encryption queries encrypt the second message and the remaining $q - i$ queries encrypt the first message. Then given an IND-CPA adversary $\adv$ for multiple encryptions, an IND-CPA adversary $\adv'$ is constructed to bound
 \[
 	\abs*{\pr{\adv \text{ outputs } 1 \text{ in game } H_{i - 1}} - \pr{\adv \text{ outputs } 1 \text{ in game } H_{i}}}
 \]
@@ -217,65 +217,8 @@ The adversary $\adv'$ simulates $H_{i - 1}$ or $H_{i}$ to $\adv$ depending on wh
 \begin{lemma} \label{lemma:mi-eav-from-eav}
 	Let $\Pi$ a private-key encryption scheme with finite message space. Let $t_{\gen}, t_{\enc}$ upper bounds for the runtime of $\Pi.\gen$ and $\Pi.\enc$, respectively. If $\Pi$ is $(t, \epsilon)$-EAV secure, then for all $q \in \N$, $\Pi$ is $(\tilde{t}, q \cdot \epsilon, q)$-MI-EAV secure with $\tilde{t} = t - \mathcal{O}(q \cdot (t_\gen + t_\enc))$.
 \end{lemma}
-\question{Move proof to appendix?}
-\begin{proof} Note that since the message space is finite, the time to encrypt a message is bounded. As outlined above the Lemma follows from a simple hybrid argument. Let $q \in \N$ and $\adv$ an arbitrary MI-EAV adversary running in time $\tilde{t}$ and making at most $q$ queries. Define the sequence of hybrid games $H_0, \ldots, H_q$ where in the game $H_i$ the first $i$ encryptions given to the adversary encrypt $m_1$ and all remaining encryptions encrypt $m_0$. We will write
-	\[
-		\pr{0 \from \adv \mid H_i}
-	\]
-	for the probability of $\adv$ outputting $0$ when playing the hybrid game $H_i$.
 
-	Let $i \in [q]$. Construct an EAV adversary $\adv'$ that behaves as follows:
-	\begin{enumerate}[1.]
-		\item $\adv'$ runs $\adv$ and gets $q, m_0, m_1$.
-		\item $\adv'$ outputs the messages $m_0, m_1$ and gets a ciphertext $c$ from the challenger.
-		\item $\adv'$ gives the ciphertexts $c_1, \ldots, c_q$ to $\adv$ where
-		      \[
-			      c_j = \begin{cases}
-				      \Pi.\enc_{k_j}(m_1) & i < j \\
-				      c                   & i = j \\
-				      \Pi.\enc_{k_j}(m_0) & i > j
-			      \end{cases}
-		      \]
-		      and $k_j \from \Pi.\gen() \; \forall j$.
-		\item $\adv'$ outputs whatever bit $\adv$ outputs.
-	\end{enumerate}
-	Now consider the value of the bit $b$ sampled in the EAV game. If $b = 0$, then the first $i - 1$ ciphertexts that $\adv$ received were encryptions of $m_1$ and the remaining ciphertexts were encryptions of $m_0$, where all encryptions were under keys sampled independently with $\Pi.\gen$. Thus, from the view of $\adv$ everything followed the same distribution as in the game $H_{i - 1}$ and
-	\[
-		\pr{0 \from \adv' \mid b = 0} = \pr{0 \from \adv \mid H_{i - 1}}.
-	\]
-	Analogously, in the case $b = 1$ the first $i$ ciphertexts received by $\adv$ were encryptions of $m_1$ and the rest encryptions of $m_0$ so
-	\[
-		\pr{0 \from \adv' \mid b = 1} = \pr{0 \from \adv \mid H_{i}}.
-	\]
-	Then
-	\begin{align} \label{eq:eav-to-mi-eav-hybrid-distinguisher}
-		\begin{split}
-			\begin{split}
-				\pr{0 \from \adv \mid H_{i - 1}} - & \pr{0 \from \adv \mid H_{i}} \\
-				& = \pr{0 \from \adv' \mid b = 0} - \pr{0 \from \adv' \mid b = 1}
-			\end{split} \\
-			& \stackrel{\mathclap{\eqref{eq:advantage-equality}}}{=}  \mathrm{Adv}_{\Pi}^{\mathrm{EAV}}(\adv')                                         \\
-			& \le \epsilon
-		\end{split}
-	\end{align}
-	by $(t, \epsilon)$-EAV security of $\Pi$ since $\adv'$ runs in time $\tilde{t} + \mathcal{O}(q \cdot (t_{\gen} + t_{\enc})) = t$.
-
-	Now let $b$ be the bit sampled in the MI-EAV game. Notice that
-	\[
-		\pr{0 \from \adv \mid b = 0} = \pr{0 \from \adv \mid H_0}
-	\]
-	and
-	\[
-		\pr{0 \from \adv \mid b = 1} = \pr{0 \from \adv \mid H_q}.
-	\]
-	Then
-	\begin{align*}
-		\mathrm{Adv}_{\Pi}^{\mathrm{MI-EAV}}(\adv) & \stackrel{\mathclap{\eqref{eq:advantage-equality}}}{=} \; \pr{0 \from \adv \mid b = 0} - \pr{0 \from \adv \mid b = 1} \\
-		                                           & = \pr{0 \from \adv \mid H_0} - \pr{0 \from \adv \mid H_q}                                                             \\
-		                                           & = \sum_{i = 1}^{q} \pr{0 \from \adv \mid H_{i - 1}} - \pr{0 \from \adv \mid H_i}                                      \\
-		                                           & \stackrel{\mathclap{\eqref{eq:eav-to-mi-eav-hybrid-distinguisher}}}{\le} q \cdot \epsilon.
-	\end{align*}
-\end{proof}
+The details of the proof can be found in Section~\ref{sec:mi-eav-from-eav-proof} of the appendix.
 
 \begin{lemma} \label{lemma:eav-reduction}
 	Recall the assumptions, variables and events from the statement and proof of Theorem~\ref{theorem:sdgsd-security}. In particular, assume that $\Pi_s$ is $(t, \epsilon)$-EAV secure. Let $\adv$ an SD-GSD adversary running in time $\tilde{t}$, making at most $\ms$ queries to $\hgen$ or $\hdep$ and at most $\mdh$ queries to $\hdh$. Then
