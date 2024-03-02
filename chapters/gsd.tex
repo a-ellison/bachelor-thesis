@@ -189,10 +189,12 @@ We bound $\pr{\qs \land \fdh}$ and $\pr{\qs \land \overline{\fdh} \,}$ in Lemma~
 
 \subsection{Reducing to EAV security}
 
-\todo{Motivate MI-EAV security by relating to intuition of Lemma~\ref{theorem:sdgsd-security}, explain what M and I stand for (maybe add S to signify that there is only a single message).}
+Recall case (\ref{qs-triggered-case-2}) in the high-level discussion of Theorem~\ref{theorem:sdgsd-security}: the adversary $\adv$ was able to learn the seed $s_w$ given the EAV secure encryptions $\Pi_s.\enc_{k_1}(s_w), \ldots, \Pi_s.\enc_{k_d}(s_w)$. We can see $\adv$ as an adversary against a security game where $\adv$ is given $d$ EAV secure encryptions $c_1 \from \Pi_s.\enc_{k_1}(m), \ldots, c_d \from \Pi_s.\enc_{k_d}(m)$ of a message $m$ with $k_i \from \Pi_s.\gen()$ and must compute $m$. If we can prove that beating such a game is hard, then we can bound the probability of $\adv$ actually learning $s_w$ in this way.
 
-\begin{definition}[The MI-EAV game]
-	Let $\Pi$ a private-key encryption scheme. Define the game $\mathrm{Game}_{\adv, \Pi}^{\mathrm{MI-EAV}}$ for an adversary $\adv$:
+This is exactly how we proceed in this section. Instead of asking the adversary to compute an encrypted message $m$, we turn to a more familiar decisional formulation as in the IND-CPA game (where the adversary may choose a pair $m_0, m_1$ and must distinguish whether the $d$ ciphertexts encrypt $m_0$ or $m_1$). We call this security notion \emph{EAV security under multiple (M) independent (I) encryptions of a single (S) pair of messages} (MIS-EAV).
+
+\begin{definition}[The MIS-EAV game]
+	Let $\Pi$ a private-key encryption scheme. Define the game $\mathrm{Game}_{\adv, \Pi}^{\mathrm{MIS-EAV}}$ for an adversary $\adv$:
 	\begin{enumerate}[1.]
 		\item The adversary $\adv$ outputs $q \in \N$ and a pair of messages $m_0, m_1$ of the same length. We refer to $q$ as the number of \emph{queries} made by $\adv$.
 		\item A bit $b \from \{0, 1\}$ is sampled. For each $i \in [q]$, $\adv$ is given an encryption $c_i \from \Pi.\enc_{k_i}(m_b)$ where $k_i \from \Pi.\gen()$ is generated independently of the other keys.
@@ -200,25 +202,27 @@ We bound $\pr{\qs \land \fdh}$ and $\pr{\qs \land \overline{\fdh} \,}$ in Lemma~
 	\end{enumerate}
 \end{definition}
 
-\begin{definition}[MI-EAV security]
-	A private-key encryption scheme $\Pi$ is \emph{$(t, \epsilon, q)$-MI-EAV secure} if for any adversary $\adv$ making at most $q$ queries and running in time $t$ we have
+\begin{definition}[MIS-EAV security]
+	A private-key encryption scheme $\Pi$ is \emph{$(t, \epsilon, q)$-MIS-EAV secure} if for any adversary $\adv$ making at most $q$ queries and running in time $t$ we have
 	\begin{align*}
-		\mathrm{Adv}_{\Pi}^{\mathrm{MI-EAV}}(\adv) \coloneqq 2 \cdot \left(\pr{\mathrm{Game}_{\adv, \Pi}^{\mathrm{MI-EAV}} = 1} - \frac{1}{2}\right) \le \epsilon.
+		\mathrm{Adv}_{\Pi}^{\mathrm{MIS-EAV}}(\adv) \coloneqq 2 \cdot \left(\pr{\mathrm{Game}_{\adv, \Pi}^{\mathrm{MIS-EAV}} = 1} - \frac{1}{2}\right) \le \epsilon.
 	\end{align*}
 \end{definition}
 
-Similar to how IND-CPA security for a single encryption query implies IND-CPA security for $q$ queries with a security loss of $q$ by a standard hybrid argument, one can show that EAV security implies MI-EAV security with the same loss. To see why, recall the hybrid argument for IND-CPA security (as discussed in e.g. \cite[Theorem 12.6]{introduction-to-modern-cryptography}): We define the sequence of hybrid games $H_0, \ldots, H_q$ where in the game $H_i$ the first $i$ encryption queries encrypt the second message and the remaining $q - i$ queries encrypt the first message. Then given an IND-CPA adversary $\adv$ for multiple encryptions, an IND-CPA adversary $\adv'$ is constructed to bound
+Similar to how IND-CPA security for a single encryption query implies IND-CPA security for $q$ queries with a security loss of $q$ by a standard hybrid argument, one can show that EAV security implies MIS-EAV security with the same loss. To see why, recall the hybrid argument for IND-CPA security (as discussed in e.g. \cite[Theorem 12.6]{introduction-to-modern-cryptography}): We define the sequence of hybrid games $H_0, \ldots, H_q$ where in the game $H_i$ the first $i$ encryption queries encrypt the second message and the remaining $q - i$ queries encrypt the first message. Then given an IND-CPA adversary $\adv$ for multiple encryptions, an IND-CPA adversary $\adv'$ is constructed to bound
 \[
-	\abs*{\pr{\adv \text{ outputs } 1 \text{ in game } H_{i - 1}} - \pr{\adv \text{ outputs } 1 \text{ in game } H_{i}}}
+	\abs*{\pr{\adv \text{ outputs } 0 \text{ in game } H_{i - 1}} - \pr{\adv \text{ outputs } 0 \text{ in game } H_{i}}}
 \]
 for arbitrary $i$.
-The adversary $\adv'$ simulates $H_{i - 1}$ or $H_{i}$ to $\adv$ depending on whether the ciphertext received from the (single-query) IND-CPA challenger, which gets passed on as the response to the $i$-th query, encrypts the first or the second message from the $i$-th pair of messages. $\adv'$ then uses the encryption oracle to pass on the right encryptions to $\adv$ for all other queries. Now notice that if we wanted to simulate to an MI-EAV adversary we wouldn't need access to an encryption oracle since for the MI-EAV security game all the other encryptions can easily be generated by $\adv'$ sampling the new keys itself.
+The adversary $\adv'$ simulates $H_{i - 1}$ or $H_{i}$ to $\adv$ depending on whether the ciphertext received from the (single-query) IND-CPA challenger, which gets passed on as the response to the $i$-th query, encrypts the first or the second message from the $i$-th pair of messages. $\adv'$ then uses the encryption oracle to pass on the right encryptions to $\adv$ for all other queries. Now notice that if we wanted to simulate to an MIS-EAV adversary we wouldn't need access to an encryption oracle since for the MIS-EAV security game all the other encryptions can easily be generated by $\adv'$ sampling the new keys itself.
 
-\begin{lemma} \label{lemma:mi-eav-from-eav}
-	Let $\Pi$ a private-key encryption scheme with finite message space. Let $t_{\gen}, t_{\enc}$ upper bounds for the runtime of $\Pi.\gen$ and $\Pi.\enc$, respectively. If $\Pi$ is $(t, \epsilon)$-EAV secure, then for all $q \in \N$, $\Pi$ is $(\tilde{t}, q \cdot \epsilon, q)$-MI-EAV secure with $\tilde{t} = t - \mathcal{O}(q \cdot (t_\gen + t_\enc))$.
+The argument would of course also work without restricting the adversary to a single pair of messages (which we could call MI-EAV security). However, we will make use of this restriction to provide a tighter reduction for a certain class of schemes at the end of this section.
+
+\begin{lemma} \label{lemma:mis-eav-from-eav}
+	Let $\Pi$ a private-key encryption scheme with finite message space. Let $t_{\gen}, t_{\enc}$ upper bounds for the runtime of $\Pi.\gen$ and $\Pi.\enc$, respectively. If $\Pi$ is $(t, \epsilon)$-EAV secure, then for all $q \in \N$, $\Pi$ is $(\tilde{t}, q \cdot \epsilon, q)$-MIS-EAV secure with $\tilde{t} = t - \mathcal{O}(q \cdot (t_\gen + t_\enc))$.
 \end{lemma}
 
-The details of the proof can be found in Section~\ref{sec:mi-eav-from-eav-proof} of the appendix.
+The details of the proof can be found in Section~\ref{sec:mis-eav-from-eav-proof} of the appendix.
 
 \begin{lemma} \label{lemma:eav-reduction}
 	Recall the assumptions, variables and events from the statement and proof of Theorem~\ref{theorem:sdgsd-security}. In particular, assume that $\Pi_s$ is $(t, \epsilon)$-EAV secure. Let $\adv$ an SD-GSD adversary running in time $\tilde{t}$, making at most $\ms$ queries to $\hgen$ or $\hdep$ and at most $\mdh$ queries to $\hdh$. Then
@@ -227,19 +231,19 @@ The details of the proof can be found in Section~\ref{sec:mi-eav-from-eav-proof}
 	\]
 \end{lemma}
 
-\paragraph{Intuition} By Lemma~\vref{lemma:mi-eav-from-eav} we know that $\Pi_s$ is MI-EAV secure. Continuing the high-level argument before the proof of Theorem~\ref{theorem:sdgsd-security}, consider the first moment that $\adv$ triggers $\qs \land \overline{\fdh}$ by querying the seed of some safe node $w$.  As intended, it follows from the definition of the event $\fdh$ that from $\adv$'s perspective all DHIES ciphertexts it got from queries $\mathrm{encrypt}(u, w)$ for any $u$ contain encryptions of $s_w$ under independent, uniformly random keys using $\Pi_s$. Moreover, as already argued once, $\adv$ has learned nothing from a potential seed dependency $(p, w)$, so these encryptions are everything $\adv$ had at its proposal to learn $s_w$.
+\paragraph{Intuition} By Lemma~\vref{lemma:mis-eav-from-eav} we know that $\Pi_s$ is MIS-EAV secure. Continuing the high-level argument before the proof of Theorem~\ref{theorem:sdgsd-security}, consider the first moment that $\adv$ triggers $\qs \land \overline{\fdh}$ by querying the seed of some safe node $w$.  As intended, it follows from the definition of the event $\fdh$ that from $\adv$'s perspective all DHIES ciphertexts it got from queries $\mathrm{encrypt}(u, w)$ for any $u$ contain encryptions of $s_w$ under independent, uniformly random keys using $\Pi_s$. Moreover, as already argued once, $\adv$ has learned nothing from a potential seed dependency $(p, w)$, so these encryptions are everything $\adv$ had at its proposal to learn $s_w$.
 
 \todo{Add plot.}
 
-We can use $\adv$'s ability to compute the seed $s_w$ of a safe node $w$ from encryptions of $s_w$ to construct an MI-EAV adversary: We first guess a node $w$ whose seed $\adv$ may query. Next we give the MI-EAV challenger $s_w$ and some other independent seed $s$, and embed the encryptions we get back into the SD-GSD game when answering queries of the form $\mathrm{encrypt}(u, w)$ for any $u$. Now consider the behavior of $\adv$ depending on which seed the challenger chooses to encrypt:
+We can use $\adv$'s ability to compute the seed $s_w$ of a safe node $w$ from encryptions of $s_w$ to construct an MIS-EAV adversary: We first guess a node $w$ whose seed $\adv$ may query. Next we give the MIS-EAV challenger $s_w$ and some other independent seed $s$, and embed the encryptions we get back into the SD-GSD game when answering queries of the form $\mathrm{encrypt}(u, w)$ for any $u$. Now consider the behavior of $\adv$ depending on which seed the challenger chooses to encrypt:
 \begin{itemize}
 	\item If the challenger chooses to encrypt $s_w$, then $\adv$ will trigger the event $\qs \land \overline{\fdh}$ with the same probability as before and if we guessed $w$ correctly we can detect whether $\qs \land \overline{\fdh}$ gets triggered (by checking if $\hgen(s_w)$ or $\hdep(s_w)$ was queried by $\adv$ during the simulation).
 	\item If the challenger chooses to encrypt $s$, then $\adv$ receives no information about $s_w$ and has negligible probability of querying it.
 \end{itemize}
-Thus, the advantage of the adversary is about $\pr{\qs \land \overline{\fdh}\,}/N$, where the factor $1/N$ arises from guessing $w$, and using that $\Pi_s$ is MI-EAV secure we can bound this probability. Since we are only interested in checking whether the event was triggered for $w$, the adversary can abort when this is no longer possible ($w$ is corrupted, some other hidden seed is queried, etc.).
+Thus, the advantage of the adversary is about $\pr{\qs \land \overline{\fdh}\,}/N$, where the factor $1/N$ arises from guessing $w$, and using that $\Pi_s$ is MIS-EAV secure we can bound this probability. Since we are only interested in checking whether the event was triggered for $w$, the adversary can abort when this is no longer possible ($w$ is corrupted, some other hidden seed is queried, etc.).
 
 \begin{proof}[of Lemma~\ref{lemma:eav-reduction}]
-	As motivated above we construct an MI-EAV adversary $\adv'$ to derive the bound. $\adv'$ behaves as follows:
+	As motivated above we construct an MIS-EAV adversary $\adv'$ to derive the bound. $\adv'$ behaves as follows:
 	\begin{enumerate}[1.]
 		\item $\adv'$ runs $\adv$ to get $n$ and $D$ and initializes the GSD graph, seeds and the set of edges and corrupted nodes as in step \ref{def:sd-gsd-game-step-1} of the SD-GSD game.
 		\item $\adv'$ samples $w \from [n], s \from \{0, 1\}^\lambda$ and gives $\delta$ and the messages $s_w, s$ to the challenger. Let $c_1, \ldots, c_\delta$ the encryptions it gets back.
@@ -261,16 +265,16 @@ Thus, the advantage of the adversary is about $\pr{\qs \land \overline{\fdh}\,}/
 
 	The advantage of $\adv'$ is given by
 	\begin{equation} \label{eq:lemma-eav-reduction-advantage}
-		\mathrm{Adv}_{\Pi}^{\mathrm{MI-EAV}}(\adv') \stackrel{\eqref{eq:advantage-equality}}{=}  \pr{0 \from \adv' \mid b = 0} - \pr{0 \from \adv' \mid b = 1},
+		\mathrm{Adv}_{\Pi}^{\mathrm{MIS-EAV}}(\adv') \stackrel{\eqref{eq:advantage-equality}}{=}  \pr{0 \from \adv' \mid b = 0} - \pr{0 \from \adv' \mid b = 1},
 	\end{equation}
-	where $b$ is the bit sampled by the MI-EAV challenger.
+	where $b$ is the bit sampled by the MIS-EAV challenger.
 
 
 	First, we will show that
 	\begin{equation} \label{eq:lemma-eav-reduction-b=0}
 		\pr{0 \from \adv' \mid b = 0} \ge \frac{\pr{\qs \land \overline{\fdh}\,}}{N}.
 	\end{equation}
-	Let $E = \qs \land \overline{\fdh}$ and let $E'$ the same event in the SD-GSD game simulated to $\adv$ during an execution of $\mathrm{Game}_{\adv', \Pi_s}^{\mathrm{MI-EAV}}$ with $b = 0$. In the following while showing \eqref{eq:lemma-eav-reduction-b=0} we will implicitly assume that $b = 0$ when referring to the game simulated to $\adv$ by $\adv'$.
+	Let $E = \qs \land \overline{\fdh}$ and let $E'$ the same event in the SD-GSD game simulated to $\adv$ during an execution of $\mathrm{Game}_{\adv', \Pi_s}^{\mathrm{MIS-EAV}}$ with $b = 0$. In the following while showing \eqref{eq:lemma-eav-reduction-b=0} we will implicitly assume that $b = 0$ when referring to the game simulated to $\adv$ by $\adv'$.
 	On a high level \eqref{eq:lemma-eav-reduction-b=0} holds due to the fact that as long as the game has not been aborted the encryptions $\adv$ receives from $\adv'$ are indistinguishable from what it would get in the real SD-GSD game and we get a factor $\frac{1}{N}$ from guessing the node that triggered $E$. However, showing this requires a few steps.
 
 	Consider a modification of the SD-GSD game $G_1$ where the game is aborted whenever one of the following events occurs, where for all these events $\adv'$ would also abort the simulation:
@@ -334,7 +338,7 @@ Thus, the advantage of the adversary is about $\pr{\qs \land \overline{\fdh}\,}/
 	\end{align*}
 	as promised.
 
-	Second, returning to \eqref{eq:lemma-eav-reduction-advantage}, we can more easily show that $\pr{0 \from \adv' \mid b = 1}$ is negligible. In the SD-GSD game simulated to $\adv$ during an execution of $\mathrm{Game}_{\adv', \Pi_s}^{\mathrm{MI-EAV}}$ with $b = 1$, the seed $s_w$ is a random variable independent of any information given to $\adv$:
+	Second, returning to \eqref{eq:lemma-eav-reduction-advantage}, we can more easily show that $\pr{0 \from \adv' \mid b = 1}$ is negligible. In the SD-GSD game simulated to $\adv$ during an execution of $\mathrm{Game}_{\adv', \Pi_s}^{\mathrm{MIS-EAV}}$ with $b = 1$, the seed $s_w$ is a random variable independent of any information given to $\adv$:
 	\begin{itemize}
 		\item the game aborts when $w$ becomes unsafe, so $s_w$ cannot be learned by querying $\mathrm{corrupt}(w)$ or by querying $\hdep(s_p)$ for an unsafe node $p$ where $(p, w)$ is a seed dependency
 		\item querying $\hdep(s_p)$ for a safe node $p$ where $(p, w)$ is a seed dependency results in the game being aborted and by virtue of $\hdep$ being a random oracle, from $\adv$'s perspective $s_w$ follows the same distribution regardless of whether there is a seed dependency $(p, w)$ or not
@@ -352,7 +356,7 @@ Thus, the advantage of the adversary is about $\pr{\qs \land \overline{\fdh}\,}/
 	Combining \eqref{eq:lemma-eav-reduction-advantage}, \eqref{eq:lemma-eav-reduction-b=0} and \eqref{eq:lemma-eav-reduction-b=1} we get
 	\begin{align} \label{eq:lemma-eav-reduction-advantage-lower-bound}
 		\begin{split}
-			\mathrm{Adv}_{\Pi}^{\mathrm{MI-EAV}}(\adv') & = \pr{0 \from \adv' \mid b = 0} - \pr{0 \from \adv' \mid b = 1}           \\
+			\mathrm{Adv}_{\Pi}^{\mathrm{MIS-EAV}}(\adv') & = \pr{0 \from \adv' \mid b = 0} - \pr{0 \from \adv' \mid b = 1}           \\
 			& \ge \frac{\pr{\qs \land \overline{\fdh}\,}}{N} - \frac{\ms}{2^\lambda}.
 		\end{split}
 	\end{align}
@@ -370,9 +374,9 @@ Thus, the advantage of the adversary is about $\pr{\qs \land \overline{\fdh}\,}/
 		t_{\adv'} \le t - \mathcal{O}(\delta \cdot (t_{\Pi_s.\gen} + t_{\Pi_s.\enc})).
 	\]
 
-	By Lemma~\ref{lemma:mi-eav-from-eav} $\Pi_s$ is $(t - \mathcal{O}(\delta \cdot (t_{\Pi_s.\gen} + \Pi_s.\enc)), \delta \cdot \epsilon, \delta)$-MI-EAV secure, so
+	By Lemma~\ref{lemma:mis-eav-from-eav} $\Pi_s$ is $(t - \mathcal{O}(\delta \cdot (t_{\Pi_s.\gen} + \Pi_s.\enc)), \delta \cdot \epsilon, \delta)$-MIS-EAV secure, so
 	\begin{equation} \label{eq:lemma-eav-reduction-advantage-upper-bound}
-		\mathrm{Adv}_{\Pi}^{\mathrm{MI-EAV}}(\adv') \le \delta \cdot \epsilon.
+		\mathrm{Adv}_{\Pi}^{\mathrm{MIS-EAV}}(\adv') \le \delta \cdot \epsilon.
 	\end{equation}
 
 	Finally, if we now combine \eqref{eq:lemma-eav-reduction-advantage-lower-bound} and \eqref{eq:lemma-eav-reduction-advantage-upper-bound} we get
@@ -384,9 +388,9 @@ Thus, the advantage of the adversary is about $\pr{\qs \land \overline{\fdh}\,}/
 	as was to prove.
 \end{proof}
 
-\subsubsection{Tighter MI-EAV security for certain schemes}
+\subsubsection{Tighter MIS-EAV security for certain schemes} \label{sec:tighter-mis-eav-security}
 
-In our reduction from MI-EAV security to EAV security (Lemma~\ref{lemma:mi-eav-from-eav}) we applied a general hybrid argument. It is also tempting to try a more direct approach. The EAV and MI-EAV games seem less far apart than IND-CPA for single and multiple encryptions: All additional encryptions in the MI-EAV game encrypt the same message, with the only difference being that each encryption is performed using a fresh key. If only we could take a single encryption $c \from \enc_k(m)$ and from it produce several encryptions $c_i \from \enc_{k_i}(m)$ for $k_i \from \gen()$ (without knowing $k$ or $m$), then the additional encryptions would leak no new information to the adversary, and we would have a tight bound on MI-EAV security from EAV security. There is a simple EAV secure scheme that achieves the above property: the one-time pad. Given an encryption $c = k \oplus m$, we can just sample $k' \from \{0, 1\}^\kappa$ and compute the ciphertext $c' = c \oplus k' = (k \oplus k') \oplus m$, an encryption of $m$ under the uniformly random key $k \oplus k'$. In the following, we formalize this property of a private-key encryption scheme and use it to prove the desired bound on MI-EAV security.
+In our reduction from MIS-EAV security to EAV security (Lemma~\ref{lemma:mis-eav-from-eav}) we applied a general hybrid argument. It is also tempting to try a more direct approach. The EAV and MIS-EAV games seem less far apart than IND-CPA for single and multiple encryptions: All additional encryptions in the MIS-EAV game encrypt the same message, with the only difference being that each encryption is performed using a fresh key. If only we could take a single encryption $c \from \enc_k(m)$ and from it produce several encryptions $c_i \from \enc_{k_i}(m)$ for $k_i \from \gen()$ (without knowing $k$ or $m$), then the additional encryptions would leak no new information to the adversary, and we would have a tight bound on MIS-EAV security from EAV security. There is a simple EAV secure scheme that achieves the above property: the one-time pad. Given an encryption $c = k \oplus m$, we can just sample $k' \from \{0, 1\}^\kappa$ and compute the ciphertext $c' = c \oplus k' = (k \oplus k') \oplus m$, an encryption of $m$ under the uniformly random key $k \oplus k'$. In the following, we formalize this property of a private-key encryption scheme and use it to prove the desired bound on MIS-EAV security.
 
 \begin{definition}[Key-rerandomizability] \label{def:key-rerandomizability}
 	Let $\Pi$ a private-key encryption scheme with security parameter $\kappa$. $\Pi$ is \emph{key-rerandomizable} if there exists a probabilistic polynomial time algorithm $\mathrm{ReRan}$ achieving the following: Given $c \from \enc_k(m)$ for any fixed message $m$ in the message space and $k \from \gen()$, the output $c' \from \mathrm{ReRan}(c)$ follows the same distribution as the process of sampling $k' \from \gen()$ and computing a ciphertext $\enc_{k'}(m)$. The runtime must be polynomial in $\kappa$ and the length of the ciphertext $c$.
@@ -398,12 +402,12 @@ In our reduction from MI-EAV security to EAV security (Lemma~\ref{lemma:mi-eav-f
 
 The key idea underlying the proof of the following Lemma was already provided at the beginning of this section.
 
-\begin{lemma} \label{lemma:mi-eav-from-eav-with-key-rerandomizability}
-	Let $\Pi$ a key-rerandomizable private-key encryption scheme with finite message space. Let $\mathrm{ReRan}$ the corresponding algorithm to rerandomize ciphertexts and $t_{\mathrm{ReRan}}$ an upper bound for the runtime of $\mathrm{ReRan}$. If $\Pi$ is $(t, \epsilon)$-EAV secure, then for all $q \in \N$, $\Pi$ is $(\tilde{t}, \epsilon, q)$-MI-EAV secure with $\tilde{t} = t - \mathcal{O}(q \cdot t_{\mathrm{ReRan}})$.
+\begin{lemma} \label{lemma:mis-eav-from-eav-with-key-rerandomizability}
+	Let $\Pi$ a key-rerandomizable private-key encryption scheme with finite message space. Let $\mathrm{ReRan}$ the corresponding algorithm to rerandomize ciphertexts and $t_{\mathrm{ReRan}}$ an upper bound for the runtime of $\mathrm{ReRan}$. If $\Pi$ is $(t, \epsilon)$-EAV secure, then for all $q \in \N$, $\Pi$ is $(\tilde{t}, \epsilon, q)$-MIS-EAV secure with $\tilde{t} = t - \mathcal{O}(q \cdot t_{\mathrm{ReRan}})$.
 \end{lemma}
 
 \begin{proof}
-	Note that since the message space and thus the ciphertext space is finite, the runtime of $\mathrm{ReRan}$ is indeed bounded. Let $\adv$ an MI-EAV adversary running in time $\tilde{t}$ and making at most $q$ queries. We construct an EAV adversary $\adv'$ that behaves as follows:
+	Note that since the message space and thus the ciphertext space is finite, the runtime of $\mathrm{ReRan}$ is indeed bounded. Let $\adv$ an MIS-EAV adversary running in time $\tilde{t}$ and making at most $q$ queries. We construct an EAV adversary $\adv'$ that behaves as follows:
 	\begin{enumerate}[1.]
 		\item $\adv'$ runs $\adv$ to get the number of queries $q$ and messages $m_0, m_1$.
 		\item $\adv'$ gives $m_0, m_1$ to the challenger and receives. Let $c_1$ the ciphertext it gets back.
@@ -411,9 +415,9 @@ The key idea underlying the proof of the following Lemma was already provided at
 		\item $\adv'$ gives the ciphertexts $c_1, \ldots, c_q$ to $\adv$.
 		\item $\adv'$ outputs whatever bit $\adv$ outputs.
 	\end{enumerate}
-	We apply the properties of $\mathrm{ReRan}$ given in Definition~\ref{def:key-rerandomizability} to show that the game simulated to $\adv$ is distributed identically to the MI-EAV game. For this we need only show that the ciphertexts $c_1, \ldots, c_q$ given to $\adv$ in the simulation are distributed identically to the ciphertexts $c_1', \ldots, c_q'$ that $\adv$ would get in the real MI-EAV game. It is immediate that $c_1$ is distributed identically to $c_1'$. Now let $i \in \{2, \ldots, q\}$. By Definition~\ref{def:key-rerandomizability} $\mathrm{ReRan}(c)$ outputs a ciphertext encrypting $m_b$ (where $b$ is the bit chosen by the EAV challenger) distributed identically to a ciphertext encrypting $m_b$ output by the MI-EAV challenger. Thus, indeed for any $i$, $c_i$ is distributed identically to $c_i'$ and the claim holds. Therefore
+	We apply the properties of $\mathrm{ReRan}$ given in Definition~\ref{def:key-rerandomizability} to show that the game simulated to $\adv$ is distributed identically to the MIS-EAV game. For this we need only show that the ciphertexts $c_1, \ldots, c_q$ given to $\adv$ in the simulation are distributed identically to the ciphertexts $c_1', \ldots, c_q'$ that $\adv$ would get in the real MIS-EAV game. It is immediate that $c_1$ is distributed identically to $c_1'$. Now let $i \in \{2, \ldots, q\}$. By Definition~\ref{def:key-rerandomizability} $\mathrm{ReRan}(c)$ outputs a ciphertext encrypting $m_b$ (where $b$ is the bit chosen by the EAV challenger) distributed identically to a ciphertext encrypting $m_b$ output by the MIS-EAV challenger. Thus, indeed for any $i$, $c_i$ is distributed identically to $c_i'$ and the claim holds. Therefore
 	\begin{equation} \label{eq:lemma-key-rerandomizability-advantage-same}
-		\mathrm{Adv}_{\Pi}^{\mathrm{MI-EAV}}(\adv) = \mathrm{Adv}_{\Pi}^{\mathrm{EAV}}(\adv').
+		\mathrm{Adv}_{\Pi}^{\mathrm{MIS-EAV}}(\adv) = \mathrm{Adv}_{\Pi}^{\mathrm{EAV}}(\adv').
 	\end{equation}
 
 	Because $\adv'$ is an EAV adversary running in time $\tilde{t} + \mathcal{O}(q \cdot t_{\mathrm{ReRan}}) = t$ we know that
@@ -423,7 +427,7 @@ The key idea underlying the proof of the following Lemma was already provided at
 	which together with \eqref{eq:lemma-key-rerandomizability-advantage-same} concludes the proof.
 \end{proof}
 
-By assuming a key-rerandomizable encryption scheme and applying Lemma~\vref{lemma:mi-eav-from-eav-with-key-rerandomizability} instead of the hybrid argument (Lemma~\ref{lemma:mi-eav-from-eav}) in the proof of Lemma~\ref{lemma:eav-reduction}, we can drop the $\delta$ factor in the bound. This also allows us to drop the $\delta$ factor in Theorem~\vref{theorem:sdgsd-security}.
+By assuming a key-rerandomizable encryption scheme and applying Lemma~\vref{lemma:mis-eav-from-eav-with-key-rerandomizability} instead of the hybrid argument (Lemma~\ref{lemma:mis-eav-from-eav}) in the proof of Lemma~\ref{lemma:eav-reduction}, we can drop the $\delta$ factor in the bound. This also allows us to drop the $\delta$ factor in Theorem~\vref{theorem:sdgsd-security}.
 
 \begin{corollary}
 	Recall the setting of Theorem~\ref{theorem:sdgsd-security}. If the private-key encryption scheme $\Pi_s$ is additionally key-rerandomizable, then the bound in Lemma~\ref{lemma:eav-reduction} can be improved to
