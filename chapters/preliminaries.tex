@@ -5,15 +5,18 @@
 We will use the following notation throughout:
 \begin{itemize}
 	\item We write $x \from S$ to say that $x$ is sampled uniformly at random from the finite set $S$
+	\item For $n \in \mathbb{N} \setminus \{0\}$, $[n] = \{1, \ldots, n\}$
 	\item If $\mathbb{G}$ is a cyclic group and $g$ a generator, then
 	      \begin{itemize}
 		      \item We write the group operation in $\mathbb{G}$ multiplicatively
 		      \item $h^{-1}$ denotes the inverse of $h \in \mathbb{G}$
 		      \item $\log_g(h)$ denotes the unique $x \in [\abs{\mathbb{G}}]$ such that $g^x = h$
 	      \end{itemize}
-	\item We write $b \from \adv$ to denote the event that a probabilistic polynomial time adversary $\adv$ outputs the bit $b$ when playing a game where it must output a bit in the end
+	\item We write $b \from \adv$ to denote the event that an adversary $\adv$ outputs the bit $b$ when playing a game where it must output a bit in the end
 	\item For $a, b \in \{0, 1\}^n$, $a \oplus b$ denotes the XOR of $a$ and $b$
-	\item For $n \in \mathbb{N} \setminus \{0\}$, $[n] = \{1, \ldots, n\}$
+	\item $\log$ is short for $\log_2$
+	\item When will stick to using $\kappa$ as the security parameter of a private-key encryption scheme and $\eta$ as the parameter of a public-key encryption scheme
+	\item $\{0, 1\}^{\le l} = \bigcup_{i = 1}^{l} \{0, 1\}^i $
 \end{itemize}
 
 
