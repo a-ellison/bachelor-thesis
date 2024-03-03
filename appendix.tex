@@ -1,8 +1,8 @@
 \chapter{Appendix}
 
-\section{Proof of Lemma~\ref{lemma:mi-eav-from-eav}} \label{sec:mi-eav-from-eav-proof}
+\section{Proof of Lemma~\ref{lemma:mis-eav-from-eav}} \label{sec:mis-eav-from-eav-proof}
 
-\begin{proof}[of Lemma~\ref{lemma:mi-eav-from-eav}] Note that since the message space is finite, the time to encrypt a message is bounded. As outlined above the Lemma follows from a simple hybrid argument. Let $q \in \N$ and $\adv$ an arbitrary MI-EAV adversary running in time $\tilde{t}$ and making at most $q$ queries. Define the sequence of hybrid games $H_0, \ldots, H_q$ where in the game $H_i$ the first $i$ encryptions given to the adversary encrypt $m_1$ and all remaining encryptions encrypt $m_0$. We will write
+\begin{proof}[of Lemma~\ref{lemma:mis-eav-from-eav}] Note that since the message space is finite, the time to encrypt a message is bounded. As outlined above the Lemma follows from a simple hybrid argument. Let $q \in \N$ and $\adv$ an arbitrary MIS-EAV adversary running in time $\tilde{t}$ and making at most $q$ queries. Define the sequence of hybrid games $H_0, \ldots, H_q$ where in the game $H_i$ the first $i$ encryptions given to the adversary encrypt $m_1$ and all remaining encryptions encrypt $m_0$. We will write
 	\[
 		\pr{0 \from \adv \mid H_i}
 	\]
@@ -32,7 +32,7 @@
 		\pr{0 \from \adv' \mid b = 1} = \pr{0 \from \adv \mid H_{i}}.
 	\]
 	Then
-	\begin{align} \label{eq:eav-to-mi-eav-hybrid-distinguisher}
+	\begin{align} \label{eq:eav-to-mis-eav-hybrid-distinguisher}
 		\begin{split}
 			\begin{split}
 				\pr{0 \from \adv \mid H_{i - 1}} - & \pr{0 \from \adv \mid H_{i}} \\
@@ -44,7 +44,7 @@
 	\end{align}
 	by $(t, \epsilon)$-EAV security of $\Pi$ since $\adv'$ runs in time $\tilde{t} + \mathcal{O}(q \cdot (t_{\gen} + t_{\enc})) = t$.
 
-	Now let $b$ be the bit sampled in the MI-EAV game. Notice that
+	Now let $b$ be the bit sampled in the MIS-EAV game. Notice that
 	\[
 		\pr{0 \from \adv \mid b = 0} = \pr{0 \from \adv \mid H_0}
 	\]
@@ -54,9 +54,9 @@
 	\]
 	Then
 	\begin{align*}
-		\mathrm{Adv}_{\Pi}^{\mathrm{MI-EAV}}(\adv) & \stackrel{\mathclap{\eqref{eq:advantage-equality}}}{=} \; \pr{0 \from \adv \mid b = 0} - \pr{0 \from \adv \mid b = 1} \\
-		                                           & = \pr{0 \from \adv \mid H_0} - \pr{0 \from \adv \mid H_q}                                                             \\
-		                                           & = \sum_{i = 1}^{q} \pr{0 \from \adv \mid H_{i - 1}} - \pr{0 \from \adv \mid H_i}                                      \\
-		                                           & \stackrel{\mathclap{\eqref{eq:eav-to-mi-eav-hybrid-distinguisher}}}{\le} q \cdot \epsilon.
+		\mathrm{Adv}_{\Pi}^{\mathrm{MIS-EAV}}(\adv) & \stackrel{\mathclap{\eqref{eq:advantage-equality}}}{=} \; \pr{0 \from \adv \mid b = 0} - \pr{0 \from \adv \mid b = 1} \\
+		                                            & = \pr{0 \from \adv \mid H_0} - \pr{0 \from \adv \mid H_q}                                                             \\
+		                                            & = \sum_{i = 1}^{q} \pr{0 \from \adv \mid H_{i - 1}} - \pr{0 \from \adv \mid H_i}                                      \\
+		                                            & \stackrel{\mathclap{\eqref{eq:eav-to-mis-eav-hybrid-distinguisher}}}{\le} q \cdot \epsilon.
 	\end{align*}
 \end{proof}
