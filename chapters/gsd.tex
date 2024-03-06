@@ -10,6 +10,8 @@ We call our adaptation of GSD security \emph{Seeded GSD with Dependencies} (SD-G
 
 \todo{Explain definition by highlighting difference to public-key GSD game.}
 
+\todo{Also highlight difference to definition from Alwen et al.}
+
 \todo{Motivate restrictions to the adversary.}
 
 \todo{Do not allow cycles in $(V, E \cup D)$ either.}
@@ -23,14 +25,15 @@ We call our adaptation of GSD security \emph{Seeded GSD with Dependencies} (SD-G
 \begin{definition}[The SD-GSD game]
 	Let $\lambda \in \N$ a security parameter. \question{Where to define $\lambda$?} Let $\Pi = (\gen, \enc, \dec)$ a public-key encryption scheme. Let $\hgen, \hdep \colon \{0, 1\}^\lambda \to \{0, 1\}^\lambda$ two functions. Define the game $\sdgsdgame{\Pi}$ for an adversary $\adv$:
 	\begin{enumerate}[1.]
-		\item \label{def:sd-gsd-game-step-1} The adversary $\adv$ outputs $n \in \N$ and a list of dependencies $D = \{(a_{i}, b_{i})\}_{i=1}^m \in [n]^2$. For each $v \in [n]$:
+		\item $\adv$ is given $1^\eta$.
+		\item \label{def:sd-gsd-game-step-init} The adversary $\adv$ is given $1^\eta$, and outputs $n \in \N$ and a list of dependencies $D = \{(a_{i}, b_{i})\}_{i=1}^m \in [n]^2$. For each $v \in [n]$:
 		      \begin{enumerate}[(i)]
 			      \item \begin{itemize}
 				            \item \textbf{Case $v = b_i$ for some $i$ ($v$ is the target of some dependency):} set $s_v = \hdep(s_{a_i})$.
 				            \item \textbf{Otherwise:} sample $s_v \from \{0, 1\}^\lambda$.
 			            \end{itemize}
 			            We call $s_v$ the \emph{seed} of the node $v$ and a tuple $(a, b) \in D$ a \emph{seed dependency}.
-			      \item Compute $(sk_v, pk_v) = \gen(\hgen(s_v))$. \todo{Define what RHS means.}
+			      \item Compute $(pk_v, sk_v) = \gen(1^\eta, \hgen(s_v))$.
 		      \end{enumerate}
 		      Set $\mathcal{C} = E = \varnothing$. We call the directed graph $([n], E)$ a \emph{GSD graph} of \emph{size} $n$.
 		\item $\adv$ may adaptively do the following queries:
@@ -46,8 +49,8 @@ We call our adaptation of GSD security \emph{Seeded GSD with Dependencies} (SD-G
 				      s          & b = 1
 			      \end{cases},
 		      \]
-		      where $s \from \{0, 1\}^\lambda$. $\adv$ may continue to do queries as before.
-		\item \label{def:sd-gsd-game-step-4} $\adv$ outputs a bit $b'$. The output of the game is defined to be $1$ if $b' = b$, and $0$ otherwise.
+		      where $s \from \{0, 1\}^\lambda$. \todo{Make it clear that $r$ is not a seed of a node and thus also not a hidden seed.} $\adv$ may continue to do queries as before.
+		\item \label{def:sd-gsd-game-step-output} $\adv$ outputs a bit $b'$. The output of the game is defined to be $1$ if $b' = b$, and $0$ otherwise.
 	\end{enumerate}
 
 	We require an adversary playing the above game to adhere to the following:
@@ -71,34 +74,31 @@ We call our adaptation of GSD security \emph{Seeded GSD with Dependencies} (SD-G
 Since in this work we are interested in SD-GSD security for the case where $\hgen$ and $\hdep$ are modelled as random oracles and our focus is on the encryption scheme being used, we introduce the following definition for convenience.
 
 \begin{definition}[SD-GSD security in the ROM]
-	A public-key encryption scheme $\Pi$ is \emph{$(t, \epsilon, N, \delta)$-SD-GSD secure in the ROM} if the triple $(\Pi, \hgen, \hdep)$ is $(t, \epsilon, N, \delta)$-SD-GSD secure when $\hgen$ and $\hdep$ are modelled as random oracles.
+	A public-key encryption scheme $\Pi$ is \emph{$(t, \epsilon, N, \delta)$-SD-GSD-secure in the ROM} if the triple $(\Pi, \hgen, \hdep)$ is $(t, \epsilon, N, \delta)$-SD-GSD-secure when $\hgen$ and $\hdep$ are modelled as random oracles.
 \end{definition}
 
 \section{Proving SD-GSD security for DHIES in the ROM}
 
-\todo{Comment on switch from IND-CPA security to EAV security.}
-
 \begin{theorem} \label{theorem:sdgsd-security}
-	Let $N, \delta \in \N$ arbitrary with $\delta \le N$. Let $\dhies$ the DHIES scheme instantiated with a private-key encryption scheme $\Pi_s$ where $\Pi_s.\gen$ samples a key uniformly at random from $\{0, 1\}^\kappa$. Let $\hdh$ the KDF and $\mathbb{G}$ the group used in $\dhies$. If $\Pi_s$ is $(t, \epsilon)$-EAV secure, the DDH problem is $(t, \epsilon)$-hard in $\mathbb{G}$ and $\hdh$ is modelled as a random oracle, then $\Pi_{\mathrm{DH}}$ is $(\tilde{t}, \tilde{\epsilon}, N, \delta)$-SD-GSD secure in the ROM with
+	Let the security parameters $\lambda$ and $\eta$ be arbitrary but fixed.
+	Let $\dhies$ the DHIES scheme instantiated with a group-generation algorithm $\mathcal{G}$ where $(\mathbb{G}, q, g) \from \mathcal{G}(1^\eta)$, a private-key encryption scheme $\Pi_s$ where $\kappa = \kappa(\eta)$ and a KDF $\hdh \colon \mathbb{G} \to \{0, 1\}^\kappa$. Let $\delta, N \in \N$ arbitrary with $\delta \le N$. If $\Pi_s$ is $(t, \epsilon)$-EAV-secure, the DDH problem is $(t, \epsilon)$-hard relative to $\mathcal{G}$ and $\hdh$ is modelled as a random oracle, then $\dhies$ is $(\tilde{t}, \tilde{\epsilon}, N, \delta)$-SD-GSD-secure in the ROM with
 	\[
-		\tilde{\epsilon} = 2 \cdot (\delta + 1) \cdot N \cdot \epsilon + \frac{2 \cdot \mdh \cdot N^2}{\abs{\mathbb{G}}} + \frac{\ms \cdot N}{2^{\lambda - 1}},
+		\tilde{\epsilon} = 2 \cdot (\delta + 1) \cdot N \cdot \epsilon + \frac{2 \cdot \mdh \cdot N^2}{q} + \frac{\ms \cdot N}{2^{\lambda - 1}},
 	\]
 	where $\ms$ is an upper bound on the number of queries made to either $\hgen$ or $\hdep$ and $\mdh$ is an upper bound on the number of queries made to $\hdh$, and with
 	\[
 		\tilde{t} = t \begin{aligned}[t]
 			- & \mathcal{O}
 			\begin{aligned}[t]
-				\big(  \lambda & \cdot \ms \\ + & N \cdot (t_{\hgen} + t_{\hdep} + (\lambda + \kappa) \cdot t_{\mathrm{sample}} + \mdh \cdot t_{\mathrm{op}} + t_{\dhies.\gen})  \\ + & N^2 \cdot t_{\dhies.\enc}\big), \\
+				\big(  \lambda & \cdot \ms \\ + & N \cdot ((\lambda + \kappa) \cdot t_{\mathrm{sample}} + \mdh \cdot t_{\mathrm{op}} + t_{\dhies.\gen})  \\ + & N^2 \cdot t_{\dhies.\enc}\big), \\
 			\end{aligned}
 		\end{aligned}
 	\]
 	where the various variables denote the following
 	\begin{itemize}
-		\item $t_{\hgen}$: time to evaluate $\hgen$ on $s \in \{0, 1\}^\lambda$
-		\item $t_{\hdep}$: time to evaluate $\hdep$ on $s \in \{0, 1\}^\lambda$
-		\item $t_{\mathrm{sample}}$: time to sample a bit
+		\item $t_{\mathrm{sample}}$: time to sample a uniform bit
 		\item $t_{\dhies.\enc}$: time to encrypt $s \in \{0, 1\}^\lambda$ with $\dhies$
-		\item $t_{\dhies.\gen}$: runtime of $\dhies.\gen$
+		\item $t_{\dhies.\gen}$: runtime of $\dhies.\gen(1^\eta)$ (which is strictly greater than the runtime of $\dhies.\gen(1^\eta, s)$ for input randomness $s$)
 		\item $t_{\mathrm{op}}$: time to perform the group operation in $\mathbb{G}$
 		\item $\gamma$: length of encoding of a group element $\mathbb{G}$ (used in Lemma~\ref{lemma:eav-reduction})
 	\end{itemize}
@@ -134,7 +134,7 @@ Without having queried $\hdep(s_p)$, by virtue of $\hdep$ being a random oracle 
 \end{figure}
 
 The proof in \cite{ttkem} simply argued that this is not too likely if these encryptions were made with an IND-CPA secure scheme. In the context of the DHIES scheme we can say more about these encryptions and achieve a better reduction loss.
-Let $x_i = \log_g(pk_{u_i})$ (where $g$ is the generator of $\mathbb{G}$ being used in $\dhies$). Each encryption $c_i$ is a tuple of the form $\langle g^{y_i}, \Pi_s.\enc_{k_i}(s_w) \rangle$ where $y_i \from [\abs{\mathbb{G}}], k_i = \hdh\left(g^{x_i \cdot y_i}\right)$. Now we can again do a case distinction on whether $\hdh$ was queried for some group element $g^{x_j \cdot y_j}$ or not:
+Let $x_i = \log_g(pk_{u_i})$. Each encryption $c_i$ is a tuple of the form $\langle g^{y_i}, \Pi_s.\enc_{k_i}(s_w) \rangle$ where $y_i \from [q], k_i = \hdh\left(g^{x_i \cdot y_i}\right)$. Now we can again do a case distinction on whether $\hdh$ was queried for some group element $g^{x_j \cdot y_j}$ or not:
 \begin{enumerate}[(i)]
 	\item \label{qs-triggered-case-1} If such a query was made, then $\adv$ solved the Diffie-Hellman challenge $(g^{x_j}, g^{y_j})$. (Remember that we assumed that $w$ is the first node for which $\qs$ is triggered and as before if $w$ is safe, then so are the nodes $u_i$. Thus the adversary has not learned the exponent $x_i$ through querying $\hgen(s_{u_i})$ for any $i$.)
 	\item \label{qs-triggered-case-2} If no such query was made, then from $\adv$'s perspective all the $k_i$ are independent, uniformly random keys and it still was able to learn $s_w$ from the EAV secure encryptions $\Pi_s.\enc_{k_1}(s_w), \ldots, \Pi_s.\enc_{k_d}(s_w)$.
@@ -171,7 +171,7 @@ We bound $\pr{\qs \land \fdh}$ and $\pr{\qs \land \overline{\fdh} \,}$ in Lemma~
 
 	By Lemma~\vref{lemma:dh-reduction} we have
 	\[
-		\pr{\qs \land \fdh} \le N \cdot \epsilon + \frac{\mdh \cdot N^2}{\abs{\mathbb{G}}}.
+		\pr{\qs \land \fdh} \le N \cdot \epsilon + \frac{\mdh \cdot N^2}{q}.
 	\]
 	and by Lemma~\vref{lemma:eav-reduction} we have
 	\[
@@ -179,14 +179,14 @@ We bound $\pr{\qs \land \fdh}$ and $\pr{\qs \land \overline{\fdh} \,}$ in Lemma~
 	\]
 	so we know that
 	\[
-		\pr{\qs} \le (\delta + 1) \cdot N \cdot \epsilon + \frac{\mdh \cdot N^2}{\abs{\mathbb{G}}} + \frac{\ms \cdot N}{2^\lambda}.
+		\pr{\qs} \le (\delta + 1) \cdot N \cdot \epsilon + \frac{\mdh \cdot N^2}{q} + \frac{\ms \cdot N}{2^\lambda}.
 	\]
 	Then by \eqref{eq:theorem-sd-gsd-security-win-cases}
 	\[
-		\pr{\wins} \le (\delta + 1) \cdot N \cdot \epsilon + \frac{\mdh \cdot N^2}{\abs{\mathbb{G}}} + \frac{\ms \cdot N}{2^\lambda} + \frac{1}{2},
+		\pr{\wins} \le (\delta + 1) \cdot N \cdot \epsilon + \frac{\mdh \cdot N^2}{q} + \frac{\ms \cdot N}{2^\lambda} + \frac{1}{2},
 	\] so
 	\[
-		\mathrm{Adv}_{\Pi}^{\mathrm{SD-GSD}}(\adv) \le 2 \cdot \left((\delta + 1) \cdot N \cdot \epsilon + \frac{\mdh \cdot N^2}{\abs{\mathbb{G}}} + \frac{\ms \cdot N}{2^\lambda}\right) = \tilde{\epsilon}.
+		\mathrm{Adv}_{\Pi}^{\mathrm{SD-GSD}}(\adv) \le 2 \cdot \left((\delta + 1) \cdot N \cdot \epsilon + \frac{\mdh \cdot N^2}{q} + \frac{\ms \cdot N}{2^\lambda}\right) = \tilde{\epsilon}.
 	\]
 \end{proof}
 
@@ -194,7 +194,7 @@ We bound $\pr{\qs \land \fdh}$ and $\pr{\qs \land \overline{\fdh} \,}$ in Lemma~
 
 \subsection{Reducing to EAV security}
 
-Recall case (\ref{qs-triggered-case-2}) in the high-level discussion of Theorem~\ref{theorem:sdgsd-security}: the adversary $\adv$ was able to learn the seed $s_w$ given the EAV secure encryptions $\Pi_s.\enc_{k_1}(s_w), \ldots, \Pi_s.\enc_{k_d}(s_w)$. We can see $\adv$ as an adversary against a security game where $\adv$ is given $d$ EAV secure encryptions $c_1 \from \Pi_s.\enc_{k_1}(m), \ldots, c_d \from \Pi_s.\enc_{k_d}(m)$ of a message $m$ with $k_i \from \Pi_s.\gen()$ and must compute $m$. If we can prove that beating such a game is hard, then we can bound the probability of $\adv$ actually learning $s_w$ in this way.
+Recall case (\ref{qs-triggered-case-2}) in the high-level discussion of Theorem~\ref{theorem:sdgsd-security}: the adversary $\adv$ was able to learn the seed $s_w$ given the EAV secure encryptions $\Pi_s.\enc_{k_1}(s_w), \ldots, \Pi_s.\enc_{k_d}(s_w)$. We can see $\adv$ as an adversary against a security game where $\adv$ is given $d$ EAV secure encryptions $c_1 \from \Pi_s.\enc_{k_1}(m), \ldots, c_d \from \Pi_s.\enc_{k_d}(m)$ of a message $m$ with $k_i \from \Pi_s.\gen(1^\kappa)$ and must compute $m$. If we can prove that beating such a game is hard, then we can bound the probability of $\adv$ actually learning $s_w$ in this way.
 
 This is exactly how we proceed in this section. Instead of asking the adversary to compute an encrypted message $m$, we turn to a more familiar decisional formulation as in the IND-CPA game (where the adversary may choose a pair $m_0, m_1$ and must distinguish whether the $d$ ciphertexts encrypt $m_0$ or $m_1$). We call this security notion \emph{EAV security under multiple (M) independent (I) encryptions of a single (S) pair of messages} (MIS-EAV).
 
@@ -224,13 +224,13 @@ The adversary $\adv'$ simulates $H_{i - 1}$ or $H_{i}$ to $\adv$ depending on wh
 The argument would of course also work without restricting the adversary to a single pair of messages (which we could call MI-EAV security). However, we will make use of this restriction to provide a tighter reduction for a certain class of schemes at the end of this section.
 
 \begin{lemma} \label{lemma:mis-eav-from-eav}
-	Let $\Pi$ a private-key encryption scheme with finite message space. Let $t_{\gen}, t_{\enc}$ upper bounds for the runtime of $\Pi.\gen$ and $\Pi.\enc$, respectively. If $\Pi$ is $(t, \epsilon)$-EAV secure, then for all $q \in \N$, $\Pi$ is $(\tilde{t}, q \cdot \epsilon, q)$-MIS-EAV secure with $\tilde{t} = t - \mathcal{O}(q \cdot (t_\gen + t_\enc))$.
+	Let $\Pi$ a private-key encryption scheme with finite message space. Let $t_{\gen}, t_{\enc}$ upper bounds for the runtime of $\Pi.\gen$ and $\Pi.\enc$, respectively. If $\Pi$ is $(t, \epsilon)$-EAV-secure, then for all $q \in \N$, $\Pi$ is $(\tilde{t}, q \cdot \epsilon, q)$-MIS-EAV-secure with $\tilde{t} = t - \mathcal{O}(q \cdot (t_\gen + t_\enc))$.
 \end{lemma}
 
 The details of the proof can be found in Section~\ref{sec:mis-eav-from-eav-proof} of the appendix.
 
 \begin{lemma} \label{lemma:eav-reduction}
-	Recall the assumptions, variables and events from the statement and proof of Theorem~\ref{theorem:sdgsd-security}. In particular, assume that $\Pi_s$ is $(t, \epsilon)$-EAV secure. Let $\adv$ an SD-GSD adversary running in time $\tilde{t}$, making at most $\ms$ queries to $\hgen$ or $\hdep$ and at most $\mdh$ queries to $\hdh$. Then
+	Recall the assumptions, variables and events from the statement and proof of Theorem~\ref{theorem:sdgsd-security}. In particular, assume that $\Pi_s$ is $(t, \epsilon)$-EAV-secure. Let $\adv$ an SD-GSD adversary constructing a GSD graph of size at most $N$ and indegree at most $\delta$, making at most $\ms$ queries to $\hgen$ or $\hdep$ and at most $\mdh$ queries to $\hdh$, and running in time $\tilde{t}$. Then
 	\[
 		\pr{\qs \land \overline{\fdh}\,} \le \delta \cdot N \cdot \epsilon + \frac{\ms \cdot N}{2^\lambda}.
 	\]
@@ -250,9 +250,11 @@ Thus, the advantage of the adversary is about $\pr{\qs \land \overline{\fdh}\,}/
 \begin{proof}[of Lemma~\ref{lemma:eav-reduction}]
 	As motivated above we construct an MIS-EAV adversary $\adv'$ to derive the bound. $\adv'$ behaves as follows:
 	\begin{enumerate}[1.]
-		\item $\adv'$ runs $\adv$ to get $n$ and $D$ and initializes the GSD graph, seeds and the set of edges and corrupted nodes as in step \ref{def:sd-gsd-game-step-1} of the SD-GSD game.
-		\item $\adv'$ samples $w \from [n], s \from \{0, 1\}^\lambda$ and gives $\delta$ and the messages $s_w, s$ to the challenger. Let $c_1, \ldots, c_\delta$ the encryptions it gets back.
-		\item $\adv'$ faithfully simulates the SD-GSD game to $\adv$ with the following exception: Whenever $\adv$ makes a query of the form $\mathrm{encrypt}(u, w)$ for any $u$, $\adv'$ replies with $\langle g^x, c_i \rangle$ where $x \from [\abs{\mathbb{G}}]$ and $i$ is the index of the next ciphertext (from step 2) not yet used.
+		\item $\adv'$ runs $\adv$ to get $n$ and $D$ and initializes the GSD graph, seeds and the set of edges and corrupted nodes as in step \ref{def:sd-gsd-game-step-init} of the SD-GSD game.
+		\item \label{eav-reduction-mis-eav-adversary-step-2} $\adv'$ samples $w \from [n], s \from \{0, 1\}^\lambda$ and gives $\delta$ and the messages $s_w, s$ to the challenger. Let $c_1, \ldots, c_\delta$ the encryptions it gets back.
+		\item $\adv'$ faithfully simulates the SD-GSD game to $\adv$ with the following exception: Whenever $\adv$ makes a query of the form $\mathrm{encrypt}(u, w)$ for any $u$, $\adv'$ replies with $\langle g^x, c_i \rangle$ where $x \from [q]$ and $i$ is the index of the next ciphertext (from step \ref{eav-reduction-mis-eav-adversary-step-2}) not yet used.
+
+		      All random oracles queries are simulated by sampling the output of the oracle u.a.r.
 
 		      During the simulation $\adv'$ also pays attention to the following:
 		      \begin{itemize}
@@ -265,7 +267,7 @@ Thus, the advantage of the adversary is about $\pr{\qs \land \overline{\fdh}\,}/
 			      \item If $\adv$ queries $\hgen(s_w)$ or $\hdep(s_w)$, $\adv'$ aborts the simulation and outputs 0. This is the only point at which $\adv'$ outputs 0.
 		      \end{itemize}
 
-		      If the simulation arrives to the point where $\adv$ outputs its guess (step \ref{def:sd-gsd-game-step-4} of the SD-GSD game), then $\adv'$ outputs 1.
+		      If the simulation arrives to the point where $\adv$ outputs its guess (step \ref{def:sd-gsd-game-step-output} of the SD-GSD game), then $\adv'$ outputs 1.
 	\end{enumerate}
 
 	The advantage of $\adv'$ is given by
@@ -331,7 +333,7 @@ Thus, the advantage of the adversary is about $\pr{\qs \land \overline{\fdh}\,}/
 	\begin{equation} \label{eq:lemma-eav-reduction-G2-vs-simulation}
 		\pr{W_2 = w_2} = \pr{W' = w}.
 	\end{equation}
-	Consider how $G_2$ differs from the game simulated by $\adv'$. Both games abort at exactly the same events (verify this! \question{Ok to add such a note for the reader?}). They only differ in how $\adv'$ answers queries $\mathrm{encrypt}(u, w)$ for any $u$. In $G_2$ such a query is answered with a ciphertext $\langle g^x, c \rangle$ where $x \from [\abs{\mathbb{G}}], c \from \Pi_s.\enc_k(s_w)$ and $k = \hdh(pk_u^x)$. $\adv'$ answers such a query with $\langle g^{x'}, c' \rangle$ where $x' \from [\abs{\mathbb{G}}], c' \from \Pi_s.\enc_{k'}(s_w)$ and $k' \from \{0, 1\}^\kappa$. Now notice that as long as the game $G_2$ is ongoing, $pk_u^{x}$ is a hidden Diffie-Hellman key and $\adv$ has not queried $pk_u^{x}$ to $\hdh$. If it had, then the game would have already aborted. Therefore, from $\adv$'s view $k$ follows the same distribution as $k'$. Thus, overall the game $G_2$ and the game simulated by $\adv'$ are indistinguishable to $\adv$ and \eqref{eq:lemma-eav-reduction-G2-vs-simulation} holds.
+	Consider how $G_2$ differs from the game simulated by $\adv'$. Both games abort at exactly the same events (verify this! \question{Ok to add such a note for the reader?}). They only differ in how $\adv'$ answers queries $\mathrm{encrypt}(u, w)$ for any $u$. In $G_2$ such a query is answered with a ciphertext $\langle g^x, c \rangle$ where $x \from [q], c \from \Pi_s.\enc_k(s_w)$ and $k = \hdh(pk_u^x)$. $\adv'$ answers such a query with $\langle g^{x'}, c' \rangle$ where $x' \from [q], c' \from \Pi_s.\enc_{k'}(s_w)$ and $k' \from \{0, 1\}^\kappa$. Now notice that as long as the game $G_2$ is ongoing, $pk_u^{x}$ is a hidden Diffie-Hellman key and $\adv$ has not queried $pk_u^{x}$ to $\hdh$. If it had, then the game would have already aborted. Therefore, from $\adv$'s view $k$ follows the same distribution as $k'$. Thus, overall the game $G_2$ and the game simulated by $\adv'$ are indistinguishable to $\adv$ and \eqref{eq:lemma-eav-reduction-G2-vs-simulation} holds.
 
 	Finally, notice that if the event $W' = w$ occurred, then $\adv'$ outputs $1$. Then we have
 	\begin{align*}
@@ -369,7 +371,7 @@ Thus, the advantage of the adversary is about $\pr{\qs \land \overline{\fdh}\,}/
 	\begin{align*}
 		\begin{split}
 			t_{\adv'} \coloneqq \tilde{t} + \mathcal{O}\big(\lambda \cdot \ms & +  \gamma \cdot \mdh  \\
-			& + N \cdot (t_{\hgen} + t_{\hdep} + \lambda \cdot t_{\mathrm{sample}} + t_{\dhies.\gen})  \\
+			& + N \cdot (\lambda \cdot t_{\mathrm{sample}} + t_{\dhies.\gen})  \\
 			& +  N^2 \cdot t_{\dhies.\enc}\big)
 		\end{split}
 	\end{align*}
@@ -379,7 +381,7 @@ Thus, the advantage of the adversary is about $\pr{\qs \land \overline{\fdh}\,}/
 		t_{\adv'} \le t - \mathcal{O}(\delta \cdot (t_{\Pi_s.\gen} + t_{\Pi_s.\enc})).
 	\]
 
-	By Lemma~\ref{lemma:mis-eav-from-eav} $\Pi_s$ is $(t - \mathcal{O}(\delta \cdot (t_{\Pi_s.\gen} + \Pi_s.\enc)), \delta \cdot \epsilon, \delta)$-MIS-EAV secure, so
+	By Lemma~\ref{lemma:mis-eav-from-eav} $\Pi_s$ is $(t - \mathcal{O}(\delta \cdot (t_{\Pi_s.\gen} + \Pi_s.\enc)), \delta \cdot \epsilon, \delta)$-MIS-EAV-secure, so
 	\begin{equation} \label{eq:lemma-eav-reduction-advantage-upper-bound}
 		\mathrm{Adv}_{\Pi}^{\mathrm{MIS-EAV}}(\adv') \le \delta \cdot \epsilon.
 	\end{equation}
@@ -395,10 +397,10 @@ Thus, the advantage of the adversary is about $\pr{\qs \land \overline{\fdh}\,}/
 
 \subsubsection{Tighter MIS-EAV security for certain schemes} \label{sec:tighter-mis-eav-security}
 
-In our reduction from MIS-EAV security to EAV security (Lemma~\ref{lemma:mis-eav-from-eav}) we applied a general hybrid argument. It is also tempting to try a more direct approach. The EAV and MIS-EAV games seem less far apart than IND-CPA for single and multiple encryptions: All additional encryptions in the MIS-EAV game encrypt the same message, with the only difference being that each encryption is performed using a fresh key. If only we could take a single encryption $c \from \enc_k(m)$ and from it produce several encryptions $c_i \from \enc_{k_i}(m)$ for $k_i \from \gen()$ (without knowing $k$ or $m$), then the additional encryptions would leak no new information to the adversary, and we would have a tight bound on MIS-EAV security from EAV security. There is a simple EAV secure scheme that achieves the above property: the one-time pad. Given an encryption $c = k \oplus m$, we can just sample $k' \from \{0, 1\}^\kappa$ and compute the ciphertext $c' = c \oplus k' = (k \oplus k') \oplus m$, an encryption of $m$ under the uniformly random key $k \oplus k'$. In the following, we formalize this property of a private-key encryption scheme and use it to prove the desired bound on MIS-EAV security.
+In our reduction from MIS-EAV security to EAV security (Lemma~\ref{lemma:mis-eav-from-eav}) we applied a general hybrid argument. It is also tempting to try a more direct approach. The EAV and MIS-EAV games seem less far apart than IND-CPA for single and multiple encryptions: All additional encryptions in the MIS-EAV game encrypt the same message, with the only difference being that each encryption is performed using a fresh key. If only we could take a single encryption $c \from \enc_k(m)$ and from it produce several encryptions $c_i \from \enc_{k_i}(m)$ for $k_i \from \gen(1^\kappa)$ (without knowing $k$ or $m$), then the additional encryptions would leak no new information to the adversary, and we would have a tight bound on MIS-EAV security from EAV security. There is a simple EAV secure scheme that achieves the above property: the one-time pad. Given an encryption $c = k \oplus m$, we can just sample $k' \from \{0, 1\}^\kappa$ and compute the ciphertext $c' = c \oplus k' = (k \oplus k') \oplus m$, an encryption of $m$ under the uniformly random key $k \oplus k'$. In the following, we formalize this property of a private-key encryption scheme and use it to prove the desired bound on MIS-EAV security.
 
 \begin{definition}[Key-rerandomizability] \label{def:key-rerandomizability}
-	Let $\Pi$ a private-key encryption scheme with security parameter $\kappa$. $\Pi$ is \emph{key-rerandomizable} if there exists a probabilistic polynomial time algorithm $\mathrm{ReRan}$ achieving the following: Given $c \from \enc_k(m)$ for any fixed message $m$ in the message space and $k \from \gen()$, the output $c' \from \mathrm{ReRan}(c)$ follows the same distribution as the process of sampling $k' \from \gen()$ and computing a ciphertext $\enc_{k'}(m)$. The runtime must be polynomial in $\kappa$ and the length of the ciphertext $c$.
+	Let $\kappa$ the security parameter and $\Pi$ a private-key encryption scheme. $\Pi$ is \emph{key-rerandomizable} if there exists a probabilistic polynomial-time algorithm $\operatorname{ReRan}$ achieving the following: Given $1^\kappa$ and $c \from \enc_k(m)$ for any fixed message $m$ in the message space and $k \from \gen(1^\kappa)$, the output $c' \from \operatorname{ReRan}(1^\kappa, c)$ follows the same distribution as the process of sampling $k' \from \gen(1^\kappa)$ and computing a ciphertext $\enc_{k'}(m)$.
 \end{definition}
 
 \paragraph{Example} As outlined above, the one-time pad is an example of a key-rerandomizable encryption scheme.
@@ -408,24 +410,24 @@ In our reduction from MIS-EAV security to EAV security (Lemma~\ref{lemma:mis-eav
 The key idea underlying the proof of the following Lemma was already provided at the beginning of this section.
 
 \begin{lemma} \label{lemma:mis-eav-from-eav-with-key-rerandomizability}
-	Let $\Pi$ a key-rerandomizable private-key encryption scheme with finite message space. Let $\mathrm{ReRan}$ the corresponding algorithm to rerandomize ciphertexts and $t_{\mathrm{ReRan}}$ an upper bound for the runtime of $\mathrm{ReRan}$. If $\Pi$ is $(t, \epsilon)$-EAV secure, then for all $q \in \N$, $\Pi$ is $(\tilde{t}, \epsilon, q)$-MIS-EAV secure with $\tilde{t} = t - \mathcal{O}(q \cdot t_{\mathrm{ReRan}})$.
+	Let $\Pi$ a key-rerandomizable private-key encryption scheme with finite message space. Let $\operatorname{ReRan}$ the corresponding algorithm to rerandomize ciphertexts and $t_{\operatorname{ReRan}}$ an upper bound for the runtime of $\operatorname{ReRan}$. If $\Pi$ is $(t, \epsilon)$-EAV-secure, then for all $q \in \N$, $\Pi$ is $(\tilde{t}, \epsilon, q)$-MIS-EAV-secure with $\tilde{t} = t - \mathcal{O}(q \cdot t_{\operatorname{ReRan}})$.
 \end{lemma}
 
 \begin{proof}
-	Note that since the message space and thus the ciphertext space is finite, the runtime of $\mathrm{ReRan}$ is indeed bounded. Let $\adv$ an MIS-EAV adversary running in time $\tilde{t}$ and making at most $q$ queries. We construct an EAV adversary $\adv'$ that behaves as follows:
+	Note that since the message space and thus the ciphertext space is finite, the runtime of $\operatorname{ReRan}$ is indeed bounded. Let $\adv$ an MIS-EAV adversary running in time $\tilde{t}$ and making at most $q$ queries. We construct an EAV adversary $\adv'$ that behaves as follows:
 	\begin{enumerate}[1.]
 		\item $\adv'$ runs $\adv$ to get the number of queries $q$ and messages $m_0, m_1$.
 		\item $\adv'$ gives $m_0, m_1$ to the challenger and receives. Let $c_1$ the ciphertext it gets back.
-		\item $\adv'$ computes ciphertexts $c_2 \from \mathrm{ReRan}(c_1), \ldots, c_q \from \mathrm{ReRan}(c_1)$ (with independent runs of $\mathrm{ReRan}$).
+		\item $\adv'$ computes ciphertexts $c_2 \from \operatorname{ReRan}(c_1), \ldots, c_q \from \operatorname{ReRan}(c_1)$ (with independent runs of $\operatorname{ReRan}$).
 		\item $\adv'$ gives the ciphertexts $c_1, \ldots, c_q$ to $\adv$.
 		\item $\adv'$ outputs whatever bit $\adv$ outputs.
 	\end{enumerate}
-	We apply the properties of $\mathrm{ReRan}$ given in Definition~\ref{def:key-rerandomizability} to show that the game simulated to $\adv$ is distributed identically to the MIS-EAV game. For this we need only show that the ciphertexts $c_1, \ldots, c_q$ given to $\adv$ in the simulation are distributed identically to the ciphertexts $c_1', \ldots, c_q'$ that $\adv$ would get in the real MIS-EAV game. It is immediate that $c_1$ is distributed identically to $c_1'$. Now let $i \in \{2, \ldots, q\}$. By Definition~\ref{def:key-rerandomizability} $\mathrm{ReRan}(c)$ outputs a ciphertext encrypting $m_b$ (where $b$ is the bit chosen by the EAV challenger) distributed identically to a ciphertext encrypting $m_b$ output by the MIS-EAV challenger. Thus, indeed for any $i$, $c_i$ is distributed identically to $c_i'$ and the claim holds. Therefore
+	We apply the properties of $\operatorname{ReRan}$ given in Definition~\ref{def:key-rerandomizability} to show that the game simulated to $\adv$ is distributed identically to the MIS-EAV game. For this we need only show that the ciphertexts $c_1, \ldots, c_q$ given to $\adv$ in the simulation are distributed identically to the ciphertexts $c_1', \ldots, c_q'$ that $\adv$ would get in the real MIS-EAV game. It is immediate that $c_1$ is distributed identically to $c_1'$. Now let $i \in \{2, \ldots, q\}$. By Definition~\ref{def:key-rerandomizability} $\operatorname{ReRan}(c)$ outputs a ciphertext encrypting $m_b$ (where $b$ is the bit chosen by the EAV challenger) distributed identically to a ciphertext encrypting $m_b$ output by the MIS-EAV challenger. Thus, indeed for any $i$, $c_i$ is distributed identically to $c_i'$ and the claim holds. Therefore
 	\begin{equation} \label{eq:lemma-key-rerandomizability-advantage-same}
 		\mathrm{Adv}_{\Pi}^{\mathrm{MIS-EAV}}(\adv) = \mathrm{Adv}_{\Pi}^{\mathrm{EAV}}(\adv').
 	\end{equation}
 
-	Because $\adv'$ is an EAV adversary running in time $\tilde{t} + \mathcal{O}(q \cdot t_{\mathrm{ReRan}}) = t$ we know that
+	Because $\adv'$ is an EAV adversary running in time $\tilde{t} + \mathcal{O}(q \cdot t_{\operatorname{ReRan}}) = t$ we know that
 	\[
 		\mathrm{Adv}_{\Pi}^{\mathrm{EAV}}(\adv') \le \epsilon,
 	\]
@@ -441,7 +443,7 @@ By assuming a key-rerandomizable encryption scheme and applying Lemma~\vref{lemm
 	\]
 	and the bound $\tilde{\epsilon}$ on the success probability of an SD-GSD adversary thus improved to
 	\[
-		\tilde{\epsilon} = 4 \cdot N \cdot \epsilon + \frac{2 \cdot \mdh \cdot N^2}{\abs{\mathbb{G}}} + \frac{\ms \cdot N}{2^{\lambda - 1}}
+		\tilde{\epsilon} = 4 \cdot N \cdot \epsilon + \frac{2 \cdot \mdh \cdot N^2}{q} + \frac{\ms \cdot N}{2^{\lambda - 1}}
 	\]
 	(with appropriate changes to the runtime $\tilde{t}$).
 \end{corollary}
@@ -450,14 +452,14 @@ By assuming a key-rerandomizable encryption scheme and applying Lemma~\vref{lemm
 \subsection{Reducing to the DDH problem}
 
 \begin{lemma} \label{lemma:dh-reduction}
-	Recall the assumptions, variables and events from the statement and proof of Theorem~\ref{theorem:sdgsd-security}. In particular, assume that the DDH problem is $(t, \epsilon)$-hard in $\mathbb{G}$. Let $\adv$ an SD-GSD adversary running in time $\tilde{t}$, making at most $\ms$ queries to $\hgen$ or $\hdep$ and at most $\mdh$ queries to $\hdh$. Then
+	Recall the assumptions, variables and events from the statement and proof of Theorem~\ref{theorem:sdgsd-security}. In particular, assume that the DDH problem is $(t, \epsilon)$-hard relative to $\mathcal{G}$. Let $\adv$ an SD-GSD adversary constructing a GSD graph of size at most $N$ and indegree at most $\delta$, making at most $\ms$ queries to $\hgen$ or $\hdep$ and at most $\mdh$ queries to $\hdh$, and running in time $\tilde{t}$. Then
 	\[
-		\pr{\qs \land \fdh} \le N \cdot \epsilon + \frac{\mdh \cdot N^2}{\abs{\mathbb{G}}}.
+		\pr{\qs \land \fdh} \le N \cdot \epsilon + \frac{\mdh \cdot N^2}{q}.
 	\]
 \end{lemma}
 
-\paragraph{Intuition} We will bound the simpler event $\fdh$. This event tells us that there is some safe node $a$ in the GSD graph with encryption edges to nodes $u_1, \ldots, u_d$, where the query $\mathrm{encrypt}(a, u_i)$ returned the ciphertext $\langle g^{y_i}, \enc_{k_i}(s_{u_i}) \rangle$ with $k_i = \hdh(g^{sk_{a} \cdot y_i})$, such that $g^{sk_a \cdot y_j}$ was the first hidden Diffie-Hellman key queried by $\adv$ for some $j$.
-Moreover, at the instance $g^{sk_a \cdot y_j}$ was queried, no hidden seed had yet been queried by $\adv$, implying that $\adv$ had not queried $\hgen(s_a)$ and thus had no information about $sk_a$ (recall that $(pk_a, sk_a) = \gen(\hgen(s_a))$).
+\paragraph{Intuition} We will bound the simpler event $\fdh$. This event tells us that there is some safe node $a$ in the GSD graph with encryption edges to nodes $u_1, \ldots, u_d$, where the query $\mathrm{encrypt}(a, u_i)$ returned the ciphertext $\langle g^{y_i}, \Pi_s.\enc_{k_i}(s_{u_i}) \rangle$ with $k_i = \hdh(g^{sk_{a} \cdot y_i})$, such that $g^{sk_a \cdot y_j}$ was the first hidden Diffie-Hellman key queried by $\adv$ for some $j$.
+Moreover, at the instance $g^{sk_a \cdot y_j}$ was queried, no hidden seed had yet been queried by $\adv$, implying that $\adv$ had not queried $\hgen(s_a)$ and thus had no information about $sk_a$ (recall that $(pk_a, sk_a) = \dhies.\gen(\hgen(s_a))$).
 
 \todo{Add plot.}
 
@@ -471,7 +473,7 @@ An intuitive strategy would be to embed the challenge by setting $pk_a = g^x$ an
 \end{itemize}
 If we make sure not to change $\adv$'s view of the game in the case $k = g^{x \cdot y}$ in this process, we can achieve an advantage of about $\pr{\fdh} / N^2$, where one factor $1/N$ arises from guessing $a$ and another from guessing $u_j$. Unfortunately, this would yield no improvement over the result from \cite{ttkem}.
 
-\question{How to clarify that this was not my idea?} We can avoid guessing $u_j$ by being more clever about how we embed $g^y$. Instead of embedding $g^y$ into a single encryption edge, we embed it into all encryption edges. To get a uniformly random exponent from $y$ we set $y_j = y + r_j \mod \abs{\mathbb{G}}$ with $r_j \from [\abs{\mathbb{G}}]$. Given $g^{x \cdot y_j}$, we can easily compute $g^{x \cdot y}$:
+\question{How to clarify that this was not my idea?} We can avoid guessing $u_j$ by being more clever about how we embed $g^y$. Instead of embedding $g^y$ into a single encryption edge, we embed it into all encryption edges. To get a uniformly random exponent from $y$ we set $y_j = y + r_j \mod q$ with $r_j \from [q]$. Given $g^{x \cdot y_j}$, we can easily compute $g^{x \cdot y}$:
 \[
 	g^{x \cdot y_j} = g^{x \cdot (y + r_j)} = g^{x \cdot y}	\cdot g^{x \cdot r_j} \iff g^{x \cdot y} = g^{x \cdot y_j} \cdot \underbrace{((g^x)^{r_j})^{-1}}_{\eqqcolon \, R_j}.
 \]
@@ -481,8 +483,10 @@ Now to determine whether $k$ is the real Diffie-Hellman key, we check whether $q
 	As outlined above we use $\adv$ to construct a DDH adversary $\adv'$.
 	\begin{enumerate}[1.]
 		\item $\adv'$ gets $h_1, h_2$ and $k$ from the DDH challenger.
-		\item $\adv'$ runs $\adv$ to get $n$ and $D$, samples $a \from [n]$ and initializes the GSD graph, seeds and the set of edges and corrupted nodes as in step \ref{def:sd-gsd-game-step-1} of the SD-GSD game, with the sole exception that $pk_a = h_1$ (as opposed to setting it to the public key output from $\gen(\hgen(s_a))$).
-		\item $\adv'$ faithfully simulates the SD-GSD game to $\adv$ with the following exception: For the $j$-th query $\mathrm{encrypt}(a, u_j)$ made by $\adv$, $\adv'$ replies with $\langle h_2 \cdot g^{r_j}, \enc_{k_j}(s_{u_j}) \rangle$ where $r_j \from [\abs{\mathbb{G}}]$, $k_j \from \{0, 1\}^\kappa$. $\adv'$ also computes and stores $R_j = \left(pk_a^{r_j}\right)^{-1}$.
+		\item $\adv'$ runs $\adv$ to get $n$ and $D$, samples $a \from [n]$ and initializes the GSD graph, seeds and the set of edges and corrupted nodes as in step \ref{def:sd-gsd-game-step-init} of the SD-GSD game, with the sole exception that $pk_a = h_1$ (as opposed to setting it to the public key output by $\dhies.\gen(1^\eta, \hgen(s_a))$).
+		\item $\adv'$ faithfully simulates the SD-GSD game to $\adv$ with the following exception: For the $j$-th query $\mathrm{encrypt}(a, u_j)$ made by $\adv$, $\adv'$ replies with $\langle h_2 \cdot g^{r_j}, \Pi_s.\enc_{k_j}(s_{u_j}) \rangle$ where $r_j \from [q]$, $k_j \from \{0, 1\}^\kappa$. $\adv'$ also computes and stores $R_j = \left(pk_a^{r_j}\right)^{-1}$.
+
+		      All random oracles queries are simulated by sampling the output of the oracle u.a.r.
 
 		      During the simulation $\adv'$ also pays attention to the following:
 		      \begin{itemize}
@@ -495,12 +499,12 @@ Now to determine whether $k$ is the real Diffie-Hellman key, we check whether $q
 			      \item If $\adv$ queries $q_i$ to $\hdh$ such that $q_i \cdot R_j = k$ for some $j$, $\adv'$ aborts the simulation and outputs 0. This is the only point at which $\adv'$ outputs 0.
 		      \end{itemize}
 
-		      If the simulation arrives to the point where $\adv$ outputs its guess (step \ref{def:sd-gsd-game-step-4} of the SD-GSD game), then $\adv'$ outputs 1.
+		      If the simulation arrives to the point where $\adv$ outputs its guess (step \ref{def:sd-gsd-game-step-output} of the SD-GSD game), then $\adv'$ outputs 1.
 	\end{enumerate}
 
 	The advantage of $\adv'$ is given by
 	\begin{equation} \label{eq:lemma-dh-reduction-advantage}
-		\mathrm{Adv}_{(\mathbb{G}, g)}^{\mathrm{DDH}}(\adv') \stackrel{\eqref{eq:advantage-equality}}{=} \pr{0 \from \adv' \mid b = 0} - \pr{0 \from \adv' \mid b = 1},
+		\mathrm{Adv}_{\mathcal{G}}^{\mathrm{DDH}}(\adv') \stackrel{\eqref{eq:advantage-equality}}{=} \pr{0 \from \adv' \mid b = 0} - \pr{0 \from \adv' \mid b = 1},
 	\end{equation}
 	where $b$ is the bit sampled by the DDH challenger.
 
@@ -508,7 +512,7 @@ Now to determine whether $k$ is the real Diffie-Hellman key, we check whether $q
 	\begin{equation} \label{eq:lemma-dh-reduction-b=0}
 		\pr{0 \from \adv' \mid b = 0} \ge \frac{\pr{\fdh}}{N}.
 	\end{equation}
-	This part of the proof proceeds very similarly to the proof of Lemma~\vref{lemma:eav-reduction} and we will be a bit more concise. We focus on executions of $\mathrm{Game}_{\adv, (\mathbb{G}, g)}^{\mathrm{DDH}}$ with $b = 0$. Let the games $G_1, G_2$ be defined as in Lemma~\ref{lemma:eav-reduction}, where we denote the node sampled at the beginning of each game by $a_1, a_2$, respectively (as opposed to $w_1, w_2$). Let $E = \fdh$ and let $E_1, E_2$ and $E'$ be the analogous events in $G_1, G_2$ and the game simulated by $\adv'$ (note that in this latter game, the group elements $pk_a^{\log_g(h_2) + r_j}$ are also hidden Diffie-Hellman keys). Finally, we introduce the random variable
+	This part of the proof proceeds very similarly to the proof of Lemma~\vref{lemma:eav-reduction} and we will be a bit more concise. We focus on executions of $\mathrm{Game}_{\adv, \mathcal{G}}^{\mathrm{DDH}}$ with $b = 0$. Let the games $G_1, G_2$ be defined as in Lemma~\ref{lemma:eav-reduction}, where we denote the node sampled at the beginning of each game by $a_1, a_2$, respectively (as opposed to $w_1, w_2$). Let $E = \fdh$ and let $E_1, E_2$ and $E'$ be the analogous events in $G_1, G_2$ and the game simulated by $\adv'$ (note that in this latter game, the group elements $pk_a^{\log_g(h_2) + r_j}$ are also hidden Diffie-Hellman keys). Finally, we introduce the random variable
 	\[
 		A = \begin{cases}
 			0 & \overline{\fdh}                                                                    \\
@@ -553,13 +557,13 @@ Now to determine whether $k$ is the real Diffie-Hellman key, we check whether $q
 	\end{equation}
 	Consider how $G_2$ differs from the game simulated by $\adv'$. As in Lemma~\ref{lemma:eav-reduction}, both games abort at exactly the same events (note that if $q_i \cdot R_j = k$ holds and $\adv$ outputs $1$, then $q_i = k \cdot R_j^{-1} = k \cdot pk_a^{r_j} = h_1^{\log_g(h_2)} \cdot pk_a^{r_j} = pk_a^{\log_g(h_2) + r_j}$, a hidden Diffie-Hellman key). The game simulated by $\adv'$ differs in two aspects:
 	\begin{enumerate}[(i)]
-		\item $\adv'$ sets $pk_a = h_1$ and not to the public key output by $\gen(\hgen(s_a))$
+		\item $\adv'$ sets $pk_a = h_1$ and not to the public key output by $\dhies.\gen(\hgen(s_a))$
 		\item $\adv'$ answers queries $\mathrm{encrypt}(a, u)$ differently
 	\end{enumerate}
 	Note that as long as the game $G_2$ is ongoing, $\adv$ has not queried $\hgen$ for $s_a$ or $\hdh$ for a hidden Diffie-Hellman key. Both differences are therefore indistinguishable:
 	\begin{enumerate}[(i)]
-		\item By assumption the stated in $\ldots$ (\todo{state assumption}), running $\gen(r)$ on a random bit string $r \from \{0, 1\}^\lambda$ follows the same distribution as running $\gen()$. The former process is behind the distribution of $pk_a$ as viewed from $\adv$ in $G_2$, as $\adv$ has not queried $\hgen(s_a)$, and the latter process is behind the distribution of $pk_a$ in the game simulated by $\adv'$, as the DDH challenger generates a public key with the same distribution as $\gen()$. Since both processes follow the same distribution, $pk_a$ follows the same in $G_2$ and the game simulated by $\adv'$ from $\adv$'s perspecive.
-		\item In $G_2$ a query $\mathrm{encrypt}(a, u)$ is answered with $\langle g^z, c \rangle$ where $z \from [\abs{\mathbb{G}}], c \from \Pi_s.\enc_k(s_u)$ and $k = \hdh(pk_a^z)$. $\adv'$ answers such a query with $\langle g^{\log_g(h_1) + r}, c' \rangle$ where $r \from [\abs{\mathbb{G}}], c' \from \Pi_s.\enc_{k'}(s_u)$ and $k' \from \{0, 1\}^\kappa$. First, $\log_g(h_1) + r$ follows the same distribution as $z$. Second, $pk_a^z$ is a hidden Diffie-Hellman and from $\adv$'s view $k$ follows the same distribution as $k'$.
+		\item By Definition~\ref{def:public-key-encryption}, the output of $\dhies.\gen(1^\eta, s)$ with $s \from \{0, 1\}^\lambda$ and $\lambda \ge r(\eta)$ follows the same distribution as the output of $\dhies.\gen(1^\eta)$. The former process is behind the distribution of $pk_a$ as viewed from $\adv$ in $G_2$, as $\adv$ has not queried $\hgen(s_a)$, and the latter process is behind the distribution of $pk_a$ in the game simulated by $\adv'$, as the DDH challenger generates a public key with the same distribution as $\dhies.\gen(1^\eta)$. Since both processes follow the same distribution, $pk_a$ follows the same in $G_2$ and the game simulated by $\adv'$ from $\adv$'s perspecive.
+		\item In $G_2$ a query $\mathrm{encrypt}(a, u)$ is answered with $\langle g^z, c \rangle$ where $z \from [q], c \from \Pi_s.\enc_k(s_u)$ and $k = \hdh(pk_a^z)$. $\adv'$ answers such a query with $\langle g^{\log_g(h_1) + r}, c' \rangle$ where $r \from [q], c' \from \Pi_s.\enc_{k'}(s_u)$ and $k' \from \{0, 1\}^\kappa$. First, $\log_g(h_1) + r$ follows the same distribution as $z$. Second, $pk_a^z$ is a hidden Diffie-Hellman key and from $\adv$'s view $k$ follows the same distribution as $k'$.
 	\end{enumerate}
 	Thus \eqref{eq:lemma-dh-reduction-G2-vs-simulation} indeed holds.
 
@@ -572,19 +576,19 @@ Now to determine whether $k$ is the real Diffie-Hellman key, we check whether $q
 		                              & = \frac{\pr{\fdh}}{N}.
 	\end{align*}
 
-	Second, we will show that $\pr{0 \from \adv' \mid b = 1}$ is negligible. When $b = 1$ in $\mathrm{Game}_{\adv, (\mathbb{G}, g)}^{\mathrm{DDH}}$, $k$ is a uniformly random group element independent of any information given to $\adv$, in particular of $q_i \cdot R_j$ for any $i, j$. Thus for any $i, j$,
+	Second, we will show that $\pr{0 \from \adv' \mid b = 1}$ is negligible. When $b = 1$ in $\mathrm{Game}_{\adv, \mathcal{G}}^{\mathrm{DDH}}$, $k$ is a uniformly random group element independent of any information given to $\adv$, in particular of $q_i \cdot R_j$ for any $i, j$. Thus for any $i, j$,
 	\[
-		\pr{q_i \cdot R_j = k} = \frac{1}{\abs{\mathbb{G}}}.
+		\pr{q_i \cdot R_j = k} = \frac{1}{q}.
 	\]
-	Thus, by a union bound and using that $i \in [\mdh], 1 \le j \le N - 1 \le N$ ($j$ is bounded by the maximum out-degree) we have
+	Thus, by a union bound and using that $i \in [\mdh], 1 \le j \le N - 1 \le N$ ($j$ is bounded by the maximum outdegree) we have
 	\begin{equation} \label{eq:lemma-dh-reduction-b=1}
-		\pr{0 \from \adv' \mid b = 1} \le \frac{\mdh \cdot N}{\abs{\mathbb{G}}}.
+		\pr{0 \from \adv' \mid b = 1} \le \frac{\mdh \cdot N}{q}.
 	\end{equation}
 
 	Combining \eqref{eq:lemma-dh-reduction-advantage}, \eqref{eq:lemma-dh-reduction-b=0} and \eqref{eq:lemma-dh-reduction-b=1} we get
 	\begin{align} \label{eq:lemma-dh-reduction-advantage-lower-bound}
 		\begin{split}
-			\mathrm{Adv}_{(\mathbb{G}, g)}^{\mathrm{DDH}}(\adv') \ge \frac{\pr{\fdh}}{N} - \frac{\mdh \cdot N}{\abs{\mathbb{G}}}.
+			\mathrm{Adv}_{\mathcal{G}}^{\mathrm{DDH}}(\adv') \ge \frac{\pr{\fdh}}{N} - \frac{\mdh \cdot N}{q}.
 		\end{split}
 	\end{align}
 
@@ -592,7 +596,7 @@ Now to determine whether $k$ is the real Diffie-Hellman key, we check whether $q
 	\begin{align*}
 		\begin{split}
 			t_{\adv'} \coloneqq \tilde{t} + \mathcal{O}\big(& \lambda \cdot \ms \\
-			& + N \cdot (t_{\hgen} + t_{\hdep} + (\lambda + \kappa) \cdot t_{\mathrm{sample}} + \mdh \cdot t_{\mathrm{op}} + t_{\dhies.\gen})  \\
+			& + N \cdot ((\lambda + \kappa) \cdot t_{\mathrm{sample}} + \mdh \cdot t_{\mathrm{op}} + t_{\dhies.\gen})  \\
 			& +  N^2 \cdot t_{\dhies.\enc}\big)
 		\end{split}
 	\end{align*}
@@ -600,15 +604,15 @@ Now to determine whether $k$ is the real Diffie-Hellman key, we check whether $q
 	\[
 		t_{\adv'} \le t.
 	\]
-	So by virtue of the DDH problem being $(t, \epsilon)$-hard in $\mathbb{G}$
+	So by virtue of the DDH problem being $(t, \epsilon)$-hard relative to $\mathcal{G}$
 	\[
-		\mathrm{Adv}_{(\mathbb{G}, g)}^{\mathrm{DDH}}(\adv') \le \epsilon
+		\mathrm{Adv}_{\mathcal{G}}^{\mathrm{DDH}}(\adv') \le \epsilon
 	\]
 	and if we combine this with \eqref{eq:lemma-dh-reduction-advantage-lower-bound} we get
 	\begin{align*}
-		\frac{\pr{\fdh}}{N} - \frac{\mdh \cdot N}{\abs{\mathbb{G}}} & \le \epsilon                                                    \\
-		                                                            & \iff                                                            \\
-		\pr{\fdh}                                                   & \le N \cdot \epsilon + \frac{\mdh \cdot N^2}{\abs{\mathbb{G}}},
+		\frac{\pr{\fdh}}{N} - \frac{\mdh \cdot N}{q} & \le \epsilon                                     \\
+		                                             & \iff                                             \\
+		\pr{\fdh}                                    & \le N \cdot \epsilon + \frac{\mdh \cdot N^2}{q},
 	\end{align*}
 	concluding the proof.
 \end{proof}

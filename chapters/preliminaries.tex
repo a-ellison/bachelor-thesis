@@ -4,18 +4,19 @@
 
 We will use the following notation throughout:
 \begin{itemize}
-	\item We write $x \from S$ to say that $x$ is sampled uniformly at random from the finite set $S$
+	\item We write ``u.a.r.'' for ``uniformly at random''
+	\item We write $x \from S$ to say that $x$ is sampled u.a.r.\ from the finite set $S$
 	\item For $n \in \mathbb{N} \setminus \{0\}$, $[n] = \{1, \ldots, n\}$
-	\item If $\mathbb{G}$ is a cyclic group and $g$ a generator, then
+	\item If $\mathbb{G}$ is a cyclic group of order $q$ and $g$ a generator, then
 	      \begin{itemize}
 		      \item We write the group operation in $\mathbb{G}$ multiplicatively
 		      \item $h^{-1}$ denotes the inverse of $h \in \mathbb{G}$
-		      \item $\log_g(h)$ denotes the unique $x \in [\abs{\mathbb{G}}]$ such that $g^x = h$
+		      \item $\log_g(h)$ denotes the unique $x \in [q]$ such that $g^x = h$
 	      \end{itemize}
 	\item We write $b \from \adv$ to denote the event that an adversary $\adv$ outputs the bit $b$ when playing a game where it must output a bit in the end
 	\item For $a, b \in \{0, 1\}^n$, $a \oplus b$ denotes the XOR of $a$ and $b$
 	\item $\log$ is short for $\log_2$
-	\item When will stick to using $\kappa$ as the security parameter of a private-key encryption scheme and $\eta$ as the parameter of a public-key encryption scheme
+	\item We will stick to using $\kappa$ as the security parameter of private-key encryption schemes and $\eta$ as the parameter of public-key encryption schemes
 	\item $\{0, 1\}^{\le l} = \bigcup_{i = 1}^{l} \{0, 1\}^i $
 \end{itemize}
 
@@ -29,40 +30,49 @@ The definitions presented in this section were taken from \cite{introduction-to-
 \subsubsection{Private-key encryption}
 
 \begin{definition}[Private-key encryption {\cite[Definition 3.7]{introduction-to-modern-cryptography}}]
-	A \emph{private-key encryption scheme} $\Pi$ consists of three probabilistic polynomial-time algorithms $(\gen, \enc, \dec)$ such that:
+	Let $\kappa$ denote the security parameter. A \emph{private-key encryption scheme} $\Pi$ consists of three probabilistic polynomial-time algorithms $(\gen, \enc, \dec)$ such that:
 	\begin{enumerate}[1.]
-		\item The \emph{key-generation algorithm} $\gen$ takes as input $1^n$ (in unary) where $n$ is the security parameter and outputs a key $k$. We will assume the security parameter to be fixed and write $k \from \gen()$.
-		\item The \emph{encryption algorithm} $\enc$ takes as input a key $k$ and a plaintext message $m \in \{0, 1\}^*$ , or $m \in \{0, 1\}^{\le \eta}$ for some $\eta$ if the message space is finite, and outputs a ciphertext $c$. We write this as $c \from \enc_k(m)$.
-		\item The \emph{decryption algorithm} $\dec$ takes as input a key $k$ and a ciphertext $c$, and outputs a message $m$ or $\bot$ (denoting an error). We write this as $m = \dec_{sk}(c)$.
+		\item The \emph{key-generation algorithm} $\gen$ takes as input $1^\kappa$ (in unary) and outputs a key $k$. We will write $k \from \gen(1^\kappa)$.
+		\item The \emph{encryption algorithm} $\enc$ takes as input a key $k$ and a message $m \in \{0, 1\}^*$ , or $m \in \{0, 1\}^{\le l(\kappa)}$ for some function $l$ if the message space is finite, and outputs a ciphertext $c$. We write this as $c \from \enc_k(m)$.
+		\item The deterministic \emph{decryption algorithm} $\dec$ takes as input a key $k$ and a ciphertext $c$, and outputs a message $m$ or $\bot$ (denoting an error). We write this as $m = \dec_{sk}(c)$.
 	\end{enumerate}
 
 	We may also refer to algorithm $X$ by $\Pi.X$ for $X \in \{\gen, \enc, \dec\}$.
 
-	It is required that for every $n$, every key $k$ output by $\gen$, and every message $m$, it holds that $\dec_k(\enc_k(m)) = m$.
+	It is required that for every $\kappa$, every key $k$ output by $\gen$, and every message $m$, it holds that $\pr{\dec_k(\enc_k(m)) = m} = 1$ (where the probability is over the randomness of $\enc_k$).
 \end{definition}
 
 \subsubsection{Public-key encryption}
 
-\begin{definition}[Public-key encryption {\cite[Definition 12.1]{introduction-to-modern-cryptography}}]
+In the following definition we will be more explicit about the randomness used by the algorithm $\gen$, as we will require a way to provide the randomness as input later.
+
+\begin{definition}[Public-key encryption {\cite[Definition 12.1]{introduction-to-modern-cryptography}}] \label{def:public-key-encryption}
+	Let $\eta$ denote the security parameter.
 	A \emph{public-key encryption scheme} $\Pi$ consists of three probabilistic polynomial-time algorithms $(\gen, \enc, \dec)$ such that:
 	\begin{enumerate}[1.]
-		\item The \emph{key-generation algorithm} $\gen$ takes as input $1^n$ (in unary) where $n$ is the security parameter and outputs a pair of keys $(pk, sk)$ (a public and private key). We will assume the security parameter to be fixed and write $(pk, sk) \from \gen()$.
-		\item The \emph{encryption algorithm} $\enc$ takes as input a public key $pk$ and a plaintext message $m \in \mathcal{M}$ where $\mathcal{M}$ is the message space and outputs a ciphertext $c$. We write this as $c \from \enc_{pk}(m)$.
-		\item The \emph{decryption algorithm} $\dec$ takes as input a private key $sk$ and a ciphertext $c$, and outputs a message $m$ or $\bot$ (denoting an error). We write this as $m = \dec_{sk}(c)$.
+		\item The \emph{key-generation algorithm} $\gen$ takes as input $1^\eta$ (in unary) and outputs a pair of keys $(pk, sk)$ (a public and private key). We will write $(pk, sk) \from \gen(1^\eta)$.
+
+		      The public key defines a message space $\mathcal{M}_{pk}$.
+
+		      The algorithm samples up to $r(\eta)$ uniformly random bits to make randomized decisions for some function $r$ polynomial in $\eta$. The sequence of random bits $s \in \{0, 1\}^n$ with $n \ge r(\eta)$ to be used by the algorithm may also be provided as input. We write this as $(pk, sk) = \gen(1^\eta, s)$ to emphasize the fact that the output is deterministic. The algorithm must still run in time polynomial in $1^\eta$. The distribution over key pairs output by sampling $s \from \{0, 1\}^n$ and running $\gen(1^\eta, s)$ is identical to the distribution over key pairs output by running $\gen(1^\eta)$.
+
+
+		\item The \emph{encryption algorithm} $\enc$ takes as input a public key $pk$ and a message $m \in \mathcal{M}_{pk}$, and outputs a ciphertext $c$. We write this as $c \from \enc_{pk}(m)$.
+		\item The deterministic \emph{decryption algorithm} $\dec$ takes as input a private key $sk$ and a ciphertext $c$, and outputs a message $m$ or $\bot$ (denoting an error). We write this as $m = \dec_{sk}(c)$.
 	\end{enumerate}
 
 	We may also refer to algorithm $X$ by $\Pi.X$ for $X \in \{\gen, \enc, \dec\}$.
 
-	It is required that for every $n$, every key $(pk, sk)$ output by $\gen$, and every message $m$, it holds that $\dec_{sk}(\enc_{pk}(m)) = m$.
+	It is required that for every $\eta$, every key $(pk, sk)$ output by $\gen$, and every message $m$, it holds that $\pr{\dec_{sk}(\enc_{pk}(m)) = m} = 1$ (where the probability is over the randomness of $\enc_pk$).
 \end{definition}
 
 \subsection{Security definitions}
 
 \begin{definition}[The IND-CPA game]
-	Let $\Pi$ a private-key encryption scheme. Define the game $\mathrm{Game}_{\adv, \Pi}^{\mathrm{IND-CPA}}$ for an adversary $\adv$:
+	Let $\kappa$ denote the security parameter and let $\Pi$ a private-key encryption scheme. Define the game $\mathrm{Game}_{\adv, \Pi}^{\mathrm{IND-CPA}}(\kappa)$ for an adversary $\adv$:
 	\begin{enumerate}[1.]
-		\item A key $k \from \gen()$ is generated.
-		\item The adversary $\adv$ is given oracle access to $\Pi.\enc_k$ and outputs a pair of messages $m_0, m_1$ of the same length.
+		\item A key $k \from \gen(1^\kappa)$ is generated.
+		\item The adversary $\adv$ is given $1^\kappa$ and oracle access to $\Pi.\enc_k$, and outputs a pair of messages $m_0, m_1$ of the same length.
 		\item A bit $b \from \{0, 1\}$ is sampled and $\adv$ is given a ciphertext $c \from \enc_k(m_b)$. ($\adv$ continues to have oracle access to $\Pi.\enc_k$.)
 		\item $\adv$ outputs a bit $b'$. The output of the game is defined to be $1$ if $b' = b$, and $0$ otherwise.
 	\end{enumerate}
@@ -75,7 +85,64 @@ The definitions presented in this section were taken from \cite{introduction-to-
 	\end{align*}
 \end{definition}
 
-When analyzing the advantage of an adversary we will may make use of the following well known equality.
+We will make use of a weaker form of security called ``indistinguishability in the presence of an eavesdropper'' (\cite{introduction-to-modern-cryptography}) and will refer to it as ``EAV security''. It is identical to IND-CPA security with the sole exception that the adversary does not have access to an encryption oracle.
+
+\begin{definition}[The EAV game]
+	Let $\kappa$ denote the security parameter and $\Pi$ a private-key encryption scheme. Define the game $\mathrm{Game}_{\adv, \Pi}^{\mathrm{EAV}}$ for an adversary $\adv$:
+	\begin{enumerate}[1.]
+		\item A key $k \from \gen(1^\kappa)$ is generated.
+		\item The adversary $\adv$ is given $1^\kappa$, and outputs a pair of messages $m_0, m_1$ of the same length.
+		\item A bit $b \from \{0, 1\}$ is sampled and $\adv$ is given a ciphertext $c \from \enc_k(m_b)$.
+		\item $\adv$ outputs a bit $b'$. The output of the game is defined to be $1$ if $b' = b$, and $0$ otherwise.
+	\end{enumerate}
+\end{definition}
+
+\begin{definition}[EAV security {\cite[Definition 3.8]{introduction-to-modern-cryptography}}]
+	A private-key encryption scheme $\Pi$ is \emph{$(t, \epsilon)$-EAV secure} if for any adversary $\adv$ running in time $t$ we have
+	\begin{align*}
+		\mathrm{Adv}_{\Pi}^{\mathrm{EAV}}(\adv) \coloneqq 2 \cdot \left(\pr{\mathrm{Game}_{\adv, \Pi}^{\mathrm{EAV}} = 1} - \frac{1}{2}\right) \le \epsilon.
+	\end{align*}
+\end{definition}
+
+
+\begin{lemma}
+	Let $\Pi$ a private-key encryption scheme. If $\Pi$ is $(t, \epsilon)$-IND-CPA-secure, then $\Pi$ is $(t, \epsilon)$-EAV-secure.
+\end{lemma}
+\begin{proof}
+	This follows immediately from the fact that any EAV adversary is also an IND-CPA adversary.
+\end{proof}
+
+\begin{definition}[Group-generation algorithm {\cite[Section 9.3.2]{introduction-to-modern-cryptography}}]
+	Let $\eta$ denote the security parameter. A \emph{group-generation algorithm} $\mathcal{G}$ is a deterministic polynomial-time algorithm that takes as input $1^\eta$ and outputs $(\mathbb{G}, q, g)$, where $\mathbb{G}$ is (a description of) a cyclic group, $q$ is the order of the group with $q \ge 2^\eta$ \todo{require this? probably useful for applying bound later} and $g \in \mathbb{G}$ is a generator. A group element is represented as a bit-string of length at most $\gamma(\eta)$. We write $(\mathbb{G}, q, g) \from \mathcal{G}(1^\eta)$.
+\end{definition}
+
+\begin{definition}[The Decisional Diffie-Hellman (DDH) problem]
+	Let $\eta$ denote the security parameter and let $\mathcal{G}$ a group-generation algorithm.
+	Define the game $\mathrm{Game}_{\adv, \mathcal{G}}^{\mathrm{DDH}}$ for an adversary $\adv$:
+	\begin{enumerate}[1.]
+		\item $\mathcal{G}(1^\eta)$ is run to obtain $(\mathbb{G}, q, g)$, and exponents $x, y \from [q]$ and a bit $b \from \{0, 1\}$ are sampled.
+		\item The adversary $\adv$ is given $\mathbb{G}$, $q$, $g$, $h_1 \coloneqq g^x, h_2 \coloneqq g^y$ and
+		      \[
+			      k = \begin{cases}
+				      g^{x \cdot y} & b = 0 \\
+				      \tilde{k}     & b = 1
+			      \end{cases}
+		      \]
+		      where $\tilde{k} \from \mathbb{G}$.
+		\item $\adv$ outputs a bit $b'$. The output of the game is defined to be $1$ if $b' = b$, and $0$ otherwise.
+	\end{enumerate}
+\end{definition}
+
+\begin{definition}[Hardness of the DDH problem {\cite[Definition 9.64]{introduction-to-modern-cryptography}}]
+	The DDH problem is \emph{$(t, \epsilon)$-hard relative to} $\mathcal{G}$ if for any adversary $\adv$ running in time $t$ we have
+	\begin{align*}
+		\mathrm{Adv}_{\mathcal{G}}^{\mathrm{DDH}}(\adv) \coloneqq 2 \cdot \left(\pr{\mathrm{Game}_{\adv, \mathcal{G}}^{\mathrm{DDH}} = 1} - \frac{1}{2}\right) \le \epsilon.
+	\end{align*}
+\end{definition}
+
+Note that by saying that ``the DDH problem is hard relative to $\mathcal{G}$'', we are simply saying that solving the Diffie-Hellman problem is hard in the (fixed) group $\mathbb{G}$ output by $\mathcal{G}(1^\eta)$. We use this phrasing as opposed to saying something along the lines of ``the DDH problem is hard in $\mathbb{G}$'', which better expresses what we mean, in order to stay closer to the formulation used in the asymptotic setting.
+
+When analyzing the advantage of an adversary we may make use of the following well known equality.
 
 \begin{lemma}
 	Let $X$ a Bernoulli random variable and $b \from \{0, 1\}$ (where $X$ and $b$ are not necessarily independent). Then for $x \in \{0, 1\}$
@@ -97,64 +164,31 @@ When analyzing the advantage of an adversary we will may make use of the followi
 	\end{align*}
 \end{proof}
 
+In the following definition we will refer to ``key-derivation functions''. This is only meant as a hint to the reader. We do not provide a definition here, as we will always model such a function as a random oracle (see Section~\vref{sec:rom}). \question{Good referenc to cite on KDFs?}
 
-We will make use of a weaker form of security called ``indistinguishability in the presence of an eavesdropper'' (\cite{introduction-to-modern-cryptography}) and will refer to it as ``EAV security''. It is identical to IND-CPA security with the sole exception that the adversary does not have access to an encryption oracle.
+\begin{definition}[DHIES {\cite[Construction 12.19]{introduction-to-modern-cryptography}}]
+	Let $\eta$ denote the security parameter. Let $\mathcal{G}$ a group-generation algorithm. Let $\Pi_s$ a private-key encryption scheme where the security parameter $\kappa$ is some function of $\eta$ and $\Pi_s.\gen(1^{\kappa(\eta)})$ samples a key u.a.r.\ from $\{0, 1\}^{\kappa(\eta)}$. Let $\mathcal{H} = \{ H_{\eta} \mid \eta \in \N \}$ a family of key-derivation functions with $H_{\eta} \colon \mathbb{G} \to \{0, 1\}^{\kappa(\eta)}$ where $\mathbb{G}$ is the group output by $\mathcal{G}(1^\eta)$. Define the algorithms $\gen, \enc$ and $\dec$ as follows:
+	\begin{itemize}
+		\item $\gen$: on input $1^\eta$ run $\mathcal{G}(1^\eta)$ to obtain $(\mathbb{G}, q, g)$. Sample $x \from [q]$ and set $h_1 \coloneqq g^x$. Let $H \coloneqq H_{\eta}$. Set $pk \coloneqq \langle \mathbb{G}, q, g, h_1, H \rangle$ and $sk \coloneqq \langle \mathbb{G}, q, g, x, H \rangle$, and output $(pk, sk)$.
 
-\begin{definition}[The EAV game]
-	Let $\Pi$ a private-key encryption scheme. Define the game $\mathrm{Game}_{\adv, \Pi}^{\mathrm{EAV}}$ for an adversary $\adv$:
-	\begin{enumerate}[1.]
-		\item A key $k \from \gen()$ is generated.
-		\item The adversary $\adv$ outputs a pair of messages $m_0, m_1$ of the same length.
-		\item A bit $b \from \{0, 1\}$ is sampled and $\adv$ is given a ciphertext $c \from \enc_k(m_b)$.
-		\item $\adv$ outputs a bit $b'$. The output of the game is defined to be $1$ if $b' = b$, and $0$ otherwise.
-	\end{enumerate}
+		      The message space is the message space of $\Pi_s$ (with the security parameter set to $\kappa(\eta)$).
+		\item $\enc$: on input a public key $\langle \mathbb{G}, q, g, h_1, H \rangle$ and a message $m$, sample $y \from [q]$, set $h_2 \coloneqq g^y, k \coloneqq H(h_1^y)$, compute $c' \from \Pi_s.\enc_k(m)$ and output the ciphertext $\langle h_2, c' \rangle$.
+		\item $\dec$: on input a private key $\langle \mathbb{G}, q, g, x, H \rangle$ and a ciphertext $\langle h_2, c' \rangle$, compute $k \coloneqq H(h_2^x)$ and output $\Pi_s.\dec_k(c')$. If the ciphertext is not of the right form or $\Pi_s.\dec$ outputs $\bot$, output $\bot$.
+	\end{itemize}
+	The public-key encryption scheme $\dhies \coloneqq (\gen, \enc, \dec)$ is called the Diffie-Hellman Integrated Encryption Scheme (DHIES).
+
+	When using the DHIES scheme later on, we will set $pk \coloneqq \langle h \rangle$ and $sk \coloneqq x$ in $\gen$, as the security parameter $\eta$ and thus $\mathbb{G}, q, g$ and $H$ are known in practice.
 \end{definition}
 
-\begin{definition}[EAV security {\cite[Definition 3.8]{introduction-to-modern-cryptography}}]
-	A private-key encryption scheme $\Pi$ is \emph{$(t, \epsilon)$-EAV secure} if for any adversary $\adv$ running in time $t$ we have
-	\begin{align*}
-		\mathrm{Adv}_{\Pi}^{\mathrm{EAV}}(\adv) \coloneqq 2 \cdot \left(\pr{\mathrm{Game}_{\adv, \Pi}^{\mathrm{EAV}} = 1} - \frac{1}{2}\right) \le \epsilon.
-	\end{align*}
-\end{definition}
+The DHIES scheme is an instance of a so-called \emph{key-encapsulation mechanism} (\cite[Definition~12.9]{introduction-to-modern-cryptography}): a scheme that uses a public key to encapsulate a symmetric encryption key in a ciphertext and the corresponding private key to compute the encryption key again from the ciphertext. This can be combined with any arbitrary secure private-key encryption scheme to get a secure and efficient public-key encryption scheme by sending a message encrypted with the private-key encryption scheme along with an encapsulation of the encryption key.
+Under the DDH assumption (i.e. the assumption that the DDH problem is hard relative to $\mathcal{G}$), using DHIES with an EAV secure private-key scheme gives an IND-CPA secure public-key encryption scheme in the ROM (see Section~\vref{sec:rom}), as proven in \cite[Theorem~12.12]{introduction-to-modern-cryptography}. Moreover, under the so-called ``gap-CDH'' assumption, also called the ``Strong Diffie-Hellman'' assumption in \cite{dhies}, using DHIES with an IND-CCA2 secure private-key encryption scheme gives an IND-CCA2 secure public-key encryption scheme (\cite[Theorem~12.22]{introduction-to-modern-cryptography}). (We do not provide defintions for many of the notions mentioned here as we will not make use of them in this work.)
 
 
-\begin{lemma}
-	Let $\Pi$ a private-key encryption scheme. If $\Pi$ is $(t, \epsilon)$-IND-CPA secure, then $\Pi$ is $(t, \epsilon)$-EAV secure.
-\end{lemma}
-\begin{proof}
-	This follows immediately from the fact that any EAV adversary is also an IND-CPA adversary.
-\end{proof}
-
-\begin{definition}[The Decisional Diffie-Hellman (DDH) problem]
-	Let $\mathbb{G}$ a cyclic group and $g$ a generator. Define the game $\mathrm{Game}_{\adv, (\mathbb{G}, g)}^{\mathrm{DDH}}$ for an adversary $\adv$:
-	\begin{enumerate}[1.]
-		\item Exponents $x, y \from [\abs{\mathbb{G}}]$ and a bit $b \from \{0, 1\}$ are sampled.
-		\item The adversary $\adv$ is given $h_1 \coloneqq g^x, h_2 \coloneqq g^y$ and
-		      \[
-			      k = \begin{cases}
-				      g^{x \cdot y} & b = 0 \\
-				      \tilde{k}     & b = 1
-			      \end{cases}
-		      \]
-		      where $\tilde{k} \from \mathbb{G}$.
-		\item $\adv$ outputs a bit $b'$. The output of the game is defined to be $1$ if $b' = b$, and $0$ otherwise.
-	\end{enumerate}
-\end{definition}
-
-\begin{definition}[Hardness of the DDH problem {\cite[Definition 9.64]{introduction-to-modern-cryptography}}]
-	The DDH problem is \emph{$(t, \epsilon)$-hard in} $\mathbb{G}$ with the generator $g$ if for any adversary $\adv$ running in time $t$ we have
-	\begin{align*}
-		\mathrm{Adv}_{(\mathbb{G}, g)}^{\mathrm{DDH}}(\adv) \coloneqq 2 \cdot \left(\pr{\mathrm{Game}_{\adv, (\mathbb{G}, g)}^{\mathrm{DDH}} = 1} - \frac{1}{2}\right) \le \epsilon.
-	\end{align*}
-\end{definition}
-
-\todo{Define DHIES.}
-
-\subsection{The Random Oracle Model}
+\subsection{The Random Oracle Model} \label{sec:rom}
 
 We will work in the commonly used Random Oracle Model (ROM) to prove our results. We refer the reader to \cite[Chapter 6.5]{introduction-to-modern-cryptography} for an informal overview of the ROM and to \cite{rom} for the original work that introduced the model. The ROM introduces the concept of a \emph{random oracle}. If a function $H : A \to B$ is modelled as a random oracle, then certain assumptions are made about what an adversary $\adv$ knows about $H$ and how it interacts with it:
 \begin{itemize}
 	\item From $\adv$'s perspective, $H$ is a black-box function. The only way for $\adv$ to interact with $H$ is for it to provide a value $a \in A$ and get back $H(a)$, and this is the only way for $\adv$ to learn $H(a)$. We say that $\adv$ \emph{queries} $H(a)$ or that $\adv$ \emph{queries $H$ for $a$}. This well-defined interface of $\adv$ to $H$ implies that a reduction can extract the queries that $\adv$ makes to $H$.
-	\item From $\adv$'s perspective, $H$ is a random variable, uniformly sampled from the set of all functions from $A$ to $B$. Thus, if $\adv$ queries $H$ for some $a \in A$ that it has not queried before, the value $H(a)$ is a random variable uniformly distributed in $B$ from $\adv$'s perspective.
+	\item From $\adv$'s perspective, $H$ is a random variable, sampled u.a.r.\ from the set of all functions from $A$ to $B$. Thus, if $\adv$ queries $H$ for some $a \in A$ that it has not queried before, the value $H(a)$ is a random variable uniformly distributed in $B$ from $\adv$'s perspective.
 \end{itemize}
 We do not rely on the property known as ``programmability'' in this work.
