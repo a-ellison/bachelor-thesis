@@ -27,8 +27,8 @@
   author = {Joël Alwen and Margarita Capretto and Miguel Cueto and Chethan
             Kamath and Karen Klein and Ilia Markov and Guillermo Pascual-Perez
             and Krzysztof Pietrzak and Michael Walter and Michelle Yeo},
-  title = {Keep the Dirt: Tainted TreeKEM, Adaptively and Actively Secure
-           Continuous Group Key Agreement},
+  title = {Keep the Dirt: Tainted {TreeKEM}, Adaptively and Actively Secure {
+           Continuous Group Key Agreement}},
   howpublished = {Cryptology ePrint Archive, Paper 2019/1489},
   year = {2019},
   note = {\url{https://eprint.iacr.org/2019/1489}},
@@ -38,12 +38,33 @@
 @misc{rtreekem,
   author = {Joël Alwen and Sandro Coretti and Yevgeniy Dodis and Yiannis
             Tselekounis},
-  title = {Security Analysis and Improvements for the IETF MLS Standard for
+  title = {Security Analysis and Improvements for the {IETF} {MLS} Standard for
            Group Messaging},
   howpublished = {Cryptology ePrint Archive, Paper 2019/1189},
   year = {2019},
   note = {\url{https://eprint.iacr.org/2019/1189}},
   url = {https://eprint.iacr.org/2019/1189},
+}
+
+
+@misc{insider-security,
+  author = {Joël Alwen and Daniel Jost and Marta Mularczyk},
+  title = {On The Insider Security of {MLS}},
+  howpublished = {Cryptology ePrint Archive, Paper 2020/1327},
+  year = {2020},
+  note = {\url{https://eprint.iacr.org/2020/1327}},
+  url = {https://eprint.iacr.org/2020/1327},
+}
+
+@misc{modular-group-messaging,
+  author = {Joël Alwen and Sandro Coretti and Yevgeniy Dodis and Yiannis
+            Tselekounis},
+  title = {Modular Design of Secure Group Messaging Protocols and the Security
+           of {MLS}},
+  howpublished = {Cryptology ePrint Archive, Paper 2021/1083},
+  year = {2021},
+  note = {\url{https://eprint.iacr.org/2021/1083}},
+  url = {https://eprint.iacr.org/2021/1083},
 }
 
 @inproceedings{gsd,
@@ -82,7 +103,7 @@
 }
 
 
-@techreport{tkem,
+@techreport{treekem,
   TITLE = {{TreeKEM: Asynchronous Decentralized Key Management for Large Dynamic
            Groups A protocol proposal for Messaging Layer Security (MLS)}},
   AUTHOR = {Bhargavan, Karthikeyan and Barnes, Richard and Rescorla, Eric},
@@ -108,7 +129,7 @@
 
 @misc{mls-support,
   author = {IETF},
-  title = {Support for MLS},
+  title = {Support for {MLS}},
   year = 2023,
   howpublished = {\url{https://www.ietf.org/blog/support-for-mls-2023/}},
   note = {Accessed: 2023-11-01},
@@ -149,4 +170,82 @@
   numpages = {12},
   location = {Fairfax, Virginia, USA},
   series = {CCS '93},
+}
+
+@misc{dhies,
+  author = {Abdalla, Michel and Bellare, Mihir and Rogaway, Phillip},
+  year = {1998},
+  title = {{DHIES}: An encryption scheme based on the {Diffie-Hellman Problem}},
+  note = {\url{https://cseweb.ucsd.edu/~mihir/papers/dhies.pdf}},
+  url = {https://cseweb.ucsd.edu/~mihir/papers/dhies.pdf},
+}
+
+
+@inproceedings{bellare1996exact,
+  title = {The exact security of digital signatures-How to sign with {RSA} and {
+           Rabin}},
+  author = {Bellare, Mihir and Rogaway, Phillip},
+  booktitle = {International conference on the theory and applications of
+               cryptographic techniques},
+  pages = {399--416},
+  year = {1996},
+  organization = {Springer},
+}
+
+@misc{double-ratchet,
+  author = {Trevor Perrin, Moxie Marlinspike},
+  title = { The {Double Ratchet} Algorithm},
+  year = 2023,
+  howpublished = { \url{https://signal.org/docs/specifications/doubleratchet/} },
+  note = {Accessed: 2023-03-05},
+}
+
+@inproceedings{double-ratchet-analysis,
+  author = {Cohn-Gordon, Katriel and Cremers, Cas and Dowling, Benjamin and
+            Garratt, Luke and Stebila, Douglas},
+  booktitle = {2017 IEEE European Symposium on Security and Privacy (EuroS&P)},
+  title = {A Formal Security Analysis of the Signal Messaging Protocol},
+  year = {2017},
+  volume = {},
+  number = {},
+  pages = {451-466},
+  keywords = {Protocols;Encryption;Public key;DH-HEMTs;Instant
+              messaging;messaging;post-compromise security;Signal;future
+              secrecy;authenticated key exchange;provable security;multi-stage
+              key exchange},
+  doi = {10.1109/EuroSP.2017.27},
+}
+
+@misc{sender-keys,
+  author = {David Balbás and Daniel Collins and Phillip Gajland},
+  title = {{WhatsUpp} with {Sender Keys}? Analysis, Improvements and Security
+           Proofs},
+  howpublished = {Cryptology ePrint Archive, Paper 2023/1385},
+  year = {2023},
+  note = {\url{https://eprint.iacr.org/2023/1385}},
+  url = {https://eprint.iacr.org/2023/1385},
+}
+
+
+@misc{cocoa,
+  author = {Joël Alwen and Benedikt Auerbach and Miguel Cueto Noval and Karen
+            Klein and Guillermo Pascual-Perez and Krzysztof Pietrzak and Michael
+            Walter},
+  title = {{CoCoA}: Concurrent Continuous Group Key Agreement},
+  howpublished = {Cryptology ePrint Archive, Paper 2022/251},
+  year = {2022},
+  doi = {10.1007/978-3-031-07085-3_28},
+  note = {\url{https://eprint.iacr.org/2022/251}},
+  url = {https://eprint.iacr.org/2022/251},
+}
+
+@misc{decaf,
+  author = {Joël Alwen and Benedikt Auerbach and Miguel Cueto Noval and Karen
+            Klein and Guillermo Pascual-Perez and Krzysztof Pietrzak},
+  title = {{DeCAF}: Decentralizable Continuous Group Key Agreement with Fast
+           Healing},
+  howpublished = {Cryptology ePrint Archive, Paper 2022/559},
+  year = {2022},
+  note = {\url{https://eprint.iacr.org/2022/559}},
+  url = {https://eprint.iacr.org/2022/559},
 }
