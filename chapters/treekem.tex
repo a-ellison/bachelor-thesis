@@ -50,8 +50,6 @@ We assume that every user $u$ is identified by some value $id_u$.
 			\end{itemize}
 		\item[] \textsc{Process:}
 			\begin{itemize}
-				\item An algorithm $\operatorname{ProcessProposal}$. Upon receiving another member's proposal $p$, a member with state $\sigma$ can set $\sigma \from \operatorname{ProcessProposal}(\sigma, p)$ to process $p$.
-				      The member should only process $p$ if $\sigma$ and the state $\sigma'$ that the other member created $p$ in are consistent.
 				\item An algorithm $\operatorname{ProcessCommit}$. Upon receiving another member's commit $c$, a member with state $\sigma$ can set $\sigma \from \operatorname{ProcessCommit}(\sigma, c)$ to process $c$. We say that the member has \emph{applied} commit $c$. If the commit removed this member from the group, they should not be able to compute the group key from $\sigma$ and should delete $\sigma$.
 				      As above, a user should only process a commit created in a consitent group state.
 				\item An algorithm $\operatorname{ProcessWelcome}$. Upon receving a welcome message $w$ for a user with public key $pk$, the user with this public key can set $\sigma \from \operatorname{ProcessWelcome}(pk, sk, w)$, where $sk$ is the corresponding secret key output by $\gen$. The user must then discard $sk$.
@@ -116,7 +114,6 @@ Users in different groups of course do not have consistent group states.
 			      \item $\operatorname{propose-remove}(i, j)$ for $i, j \in [n], \sigma_i \neq \varnothing, \sigma_j \neq \varnothing$: run $(\sigma_i, p_{P + 1}) \from \operatorname{ProposeRemove}(\sigma_i, id_j)$ to update user $i$'s state and get a proposal $p_{P + 1}$. $\adv$ is given $p_{P + 1}$. Set $P = P + 1$.
 			      \item $\operatorname{create-commit}(i, I)$ for $i \in [n], \sigma_i \neq \varnothing, I \subseteq [P]$: run $(\sigma, c_{C + 1}, w_{W + 1}, \ldots, w_{W + k}) \from \operatorname{CreateCommit}(\sigma_i, \{p_j \mid j \in I\})$ to create the new state $\sigma$, commit $c_{C + 1}$ and corresponding welcome messages. $\adv$ is given $c_{C + 1}$ and $w_{W + 1}, \ldots, w_{W + k}$. Set $U_i = U_i \cup \{(C + 1, \sigma)\}$, $C = C + 1$ and $W = W + k$.
 			      \item $\operatorname{confirm}(j, b)$ for $j$ s.t.~$(j, \sigma) \in U_i$ for some $i, \sigma$, $b \in \{0, 1\}$: Set $U_i = U_i \setminus \{(j, \sigma)\}$. If $b = 1$, set $\sigma_i = \sigma$.
-			      \item $\operatorname{deliver-proposal}(i, j)$ for $i \in [n], \sigma_i \neq \varnothing, j \in [P]$: set $\sigma_i \from \operatorname{ProcessProposal}(\sigma_i, p_j)$.
 			      \item $\operatorname{deliver-commit}(i, j)$ for $i \in [n], \sigma_i \neq \varnothing, j \in [C]$: run $\sigma \from \operatorname{ProcessCommit}(\sigma_i, c_j)$. If $c_j$ contains a remove proposal for user $i$, then set $\sigma_i = \varnothing$, generate a new pair $(pk_i, sk_i) \from \Sigma.\gen()$ and give $(i, pk_i)$ to $\adv$. Otherwise, set $\sigma_i = \sigma$.
 			      \item $\operatorname{deliver-welcome}(i, j)$ for $i \in [n], \sigma_i = \varnothing, j \in [W]$: set $\sigma_i \from \operatorname{ProcessWelcome}(pk_j, sk_j, w_j)$ and set $sk_i = \varnothing$.
 			      \item $\operatorname{corrupt}(i)$ for $i \in [n]$: $\adv$ is given $U_i$. If $\sigma_i = \varnothing$, $\adv$ is given $sk_i$. Otherwise, $\adv$ is given $\sigma_i$.
@@ -135,13 +132,11 @@ Users in different groups of course do not have consistent group states.
 	We require an adversary playing the above game to adhere to the following:
 	\begin{itemize}
 		\item The challenge commit is safe (see Definition~\vref{def:safe-commit}) \question{Avoid collision in meaning of \emph{safe}?}
-		\item For any query $\operatorname{deliver-proposal}(i, j)$ where the proposal $p_j$ was created by user $k$ while it was in state $\sigma_k'$, $\sigma_i$ and $\sigma_k'$ must be consistent
 		\item For any query $\operatorname{deliver-commit}(i, j)$ where the commit $c_j$ was created by user $k$ while it was in state $\sigma_k'$, $\sigma_i$ and $\sigma_k'$ must be consistent
 		\item $\operatorname{create-group}$ is queried exactly once \todo{More than once ok?}
-		\item Every proposal is processed at most once by any user (i.e. the adversary may not query $\operatorname{deliver-proposal}(i, j)$ twice for the same pair $(i, j)$)
 		\item Every commit is processed at most once by any user
 		\item A welcome message for user $i$ is processed by $i$ at most once and is never processed by a user $j$ with $i \neq j$
-		\item A user never processes a proposal or commit that they created
+		\item A user never processes a commit that they created
 		      \todo{Add the following other restrictions:
 			      \begin{itemize}
 				      \item committer never includes an update or remove proposal for itself
