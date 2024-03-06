@@ -8,7 +8,6 @@
 	\begin{itemize}
 		\item users are honest nodes running the protocol algorithms and maintaining local state
 		\item delivery server has a reliable and authenticated communication channel (message passing) to each individual user.
-		\item users can also communicate directly (this is done for welcome messages).
 	\end{itemize}
 }
 
@@ -21,50 +20,79 @@
 
 \question{What correctness conditions are necessary in the definition?}
 
+\todo{Call it more something like PC-CGKA? (PC: propose and commit)}
+
+We assume that every user $u$ is identified by some value $id_u$.
+
+\todo{Write security parameter?}
+
 \begin{definition}[CGKA]
-	A \emph{CGKA scheme} $\Sigma$ consists of the following:
+	A \emph{CGKA scheme} $\Sigma$ with key space $\mathcal{K}$ consists of the following algorithms:
 	\begin{enumerate}[1.]
 		\item[] \textsc{Initialization:}
 			\begin{itemize}
-				\item An algorithm $\gen$. Before joining any group, a user generates pair of keys $(pk, sk) \from \gen()$, a public and private key. The public key must be different for each user. The public key is used to invite the user to the group and should therefore be made public. The value $sk$ is kept secret.
-				\item An algorithm $\operatorname{CreateGroup}$. A user runs $\sigma \from \operatorname{CreateGroup}()$ to locally initialize a group with themselves as the only member with the state of the group stored in $\sigma$.
+				\item An algorithm $\gen$. Before joining any group, a user generates a pair of keys $(pk, sk) \from \gen(1^\eta)$, a public and private key. The public key is used to invite the user to the group and should therefore be made public. The value $sk$ is kept secret. The same key pair must not be reused to join multiple groups. A new key pair must be generated every time.
+				\item An algorithm $\operatorname{CreateGroup}$. A user runs $\sigma \from \operatorname{CreateGroup}()$ to locally initialize a group with themselves as the only member and the state of the group stored in $\sigma$. We call $\sigma$ their \emph{group state}.
 			\end{itemize}
 		\item[] \textsc{Compute the group key:}
 			\begin{itemize}
-				\item A set of possible group keys $\mathcal{K}$.
 				\item An algorithm $\operatorname{Key}$. At any point in time, a member of a group with state $\sigma$ can compute the current \emph{group key} $k \from \operatorname{Key}(\sigma)$ with $k \in \mathcal{K}$. Any set of members with consistent group states (see Definition~\vref{def:consistent-group-state}) must compute the same key $k$.
 			\end{itemize}
 		\item[] \textsc{Proposal:}
 			\begin{itemize}
-				\item An algorithm $\operatorname{ProposeUpdate}$. If a member $u$ of a group with state $\sigma$ wishes update their key material, they may run $(\sigma, p) \from \operatorname{ProposeUpdate}(\sigma)$ to create an \emph{update proposal} $p$ to be shared with other members of the group and update their state such that they have processed $p$. The update proposal contains (possibly public) information for the other group members about $u$'s new key material such that other members know how to provide encrypted information in a commit for $u$ to be able to compute the group key.
-				\item An algorithm $\operatorname{ProposeAdd}$. If a member of a group with state $\sigma$ wishes to add a new user with public key $pk_{\mathrm{new}}$ to the group, they may run $(\sigma, p) \from \operatorname{ProposeAdd}(\sigma, pk_{\mathrm{new}})$ to create an \emph{add proposal} $p$ to be shared with other members of the group and update their state such that they have processed $p$.
-				\item An algorithm $\operatorname{ProposeRemove}$. If a member of a group with state $\sigma$ wishes to remove another member identified by a value $v$ from the group, they may run $(\sigma, p) \from \operatorname{ProposeAdd}(\sigma, v)$ to create a \emph{remove proposal} $p$ to be shared with other members of the group and update their state such that they have processed $p$. The value $v$ may be the other member's public key or some value which identifies the other member in the current group state.
+				\item An algorithm $\operatorname{ProposeUpdate}$. If a member $u$ of a group with state $\sigma$ wishes update their key material, they may run $(\sigma, p) \from \operatorname{ProposeUpdate}(\sigma)$ to create an \emph{update proposal} $p$ to be shared with other members of the group and update their state such that they have processed $p$. The update proposal contains (possibly public) information for the other group members about $u$'s new key material such that other members know how to provide encrypted information in a commit (see below) such that $u$ is able to compute the group key.
+				\item An algorithm $\operatorname{ProposeAdd}$. If a member of a group with state $\sigma$ wishes to add a new user $u$ with public key $pk_u$ to the group, they may run $(\sigma, p) \from \operatorname{ProposeAdd}(\sigma, id_u, pk_u)$ to create an \emph{add proposal} $p$ to be shared with other members of the group and update their state such that they have processed $p$.
+				\item An algorithm $\operatorname{ProposeRemove}$. If a member of a group with state $\sigma$ wishes to remove another member $u$ from the group, they may run $(\sigma, p) \from \operatorname{ProposeAdd}(\sigma, id_u)$ to create a \emph{remove proposal} $p$ to be shared with other members of the group and update their state such that they have processed $p$.
 			\end{itemize}
 		\item[] \textsc{Commit:}
 			\begin{itemize}
-				\item An algorithm $\operatorname{CreateCommit}$. To apply a set of proposals $\pi$ to the group state, a member with state $\sigma$ may run $(\sigma', c, w_{_1}, \ldots, w_{_k}) \from \operatorname{CreateCommit}(\sigma, \pi)$, where $c$ is a \emph{commit} to be shared with other members, $\sigma'$ would be the new state of the member after applying the commit and each $w_{i}$ is a \emph{welcome message}, one for each new user added to the group in the commit with a corresponding add proposal in $\pi$. Welcome message $w_i$ contains a public key $pk_i$ and the message should be shared with the user with public key $pk_i$ such that they can join the group. Besides updating the key material for all other members with an update proposal in $\pi$, the commit also updates the member's key material. The member may keep both $\sigma$ and $\sigma'$ until the group agrees on whether to apply the commit $c$ or not. If the commit is to be applied, the member sets its state to $\sigma'$ and discards $\sigma$. Otherwise, it discards $\sigma'$. Applying a commit results in a new group key.
+				\item An algorithm $\operatorname{CreateCommit}$. To apply a set of proposals $\pi$ to the group state, a member with state $\sigma$ may run $(\sigma', c, w_{_1}, \ldots, w_{_k}) \from \operatorname{CreateCommit}(\sigma, \pi)$, where $c$ is a \emph{commit} to be shared with other members, $\sigma'$ would be the new state of the member after applying the commit and each $w_{i}$ is a \emph{welcome message}, one for each new user added to the group in the commit with a corresponding add proposal in $\pi$. Welcome message $w_i$ contains the identifier $id_i$ of a user and the message should be shared with that user such that they can join the group. Besides updating the key material for all other members with an update proposal in $\pi$, the commit also updates the member's key material. Accordingly, $\pi$ should not contain an update proposal for the member creating the commit. The member may keep both $\sigma$ and $\sigma'$ until the group agrees on whether to apply the commit $c$ or not. If the commit is to be applied, the member sets their state to $\sigma'$ and discards $\sigma$. In this case, we say that the user \emph{applied} commit $c$. Otherwise, they discard $\sigma'$. Applying a commit results in a new group key. We will see the $\operatorname{CreateGroup}$ operation as applying a special type of commit.
 			\end{itemize}
 		\item[] \textsc{Process:}
 			\begin{itemize}
 				\item An algorithm $\operatorname{ProcessProposal}$. Upon receiving another member's proposal $p$, a member with state $\sigma$ can set $\sigma \from \operatorname{ProcessProposal}(\sigma, p)$ to process $p$.
-				      The member should only process $p$ if the $\sigma$ and the state $\sigma'$ that the other member created $p$ in are consistent.
-				\item An algorithm $\operatorname{ProcessCommit}$. Upon receiving another member's commit $c$, a member with state $\sigma$ can set $\sigma \from \operatorname{ProcessCommit}(\sigma, c)$ to apply $c$. If the commit removed this member from the group, they should not be able to compute the group key from $\sigma$ and should delete $\sigma$. To join a group again, a new pair of keys should be generated with $\gen$.
+				      The member should only process $p$ if $\sigma$ and the state $\sigma'$ that the other member created $p$ in are consistent.
+				\item An algorithm $\operatorname{ProcessCommit}$. Upon receiving another member's commit $c$, a member with state $\sigma$ can set $\sigma \from \operatorname{ProcessCommit}(\sigma, c)$ to process $c$. We say that the member has \emph{applied} commit $c$. If the commit removed this member from the group, they should not be able to compute the group key from $\sigma$ and should delete $\sigma$.
 				      As above, a user should only process a commit created in a consitent group state.
 				\item An algorithm $\operatorname{ProcessWelcome}$. Upon receving a welcome message $w$ for a user with public key $pk$, the user with this public key can set $\sigma \from \operatorname{ProcessWelcome}(pk, sk, w)$, where $sk$ is the corresponding secret key output by $\gen$. The user must then discard $sk$.
 			\end{itemize}
 	\end{enumerate}
-	For any object $X$ above we will refer to it as $\Sigma.X$.
+	For any object $X$ above (including $\mathcal{K}$) we will refer to it as $\Sigma.X$.
 
-	Furthermore, a group member with state $\sigma$ must be able to determine the set of members of the group from $\sigma$.
+	The scheme must also specify
+	\begin{itemize}
+		\item the domain of the identifiers $id_u$
+		\item an algorithm for determining the set of members of the group from a group state $\sigma$
+	\end{itemize}
+
+	Furthermore, we require a CGKA scheme to satisfy the correctness property described in \todo{Define correctness property.}
 \end{definition}
 
-\begin{definition}[Consistent group states] \label{def:consistent-group-state}
-	Let $u_0, u_1$ two users with each user a member of some group and let $\sigma_0$ and $\sigma_1$ their group states, respectively. For $x \in \{0, 1\}$, let $c_x$ be user $u_x$'s last commit, if it has a last commit, where this denotes either
+\subsection{Correctness}
+
+\todo{Separate syntax from intuition in definition above.}
+
+\todo{Mention that public key corresponds to a key package in the RFC.}
+
+\todo{Define what we mean by \emph{applying} a commit. Namely one of the following
 	\begin{itemize}
-		\item the latest commit that it either processed, or created and then subsequently applied
-		\item or the commit that was output along with its welcome message from a call to $\operatorname{CreateCommit}$ if it just joined the group
+		\item processing a commit
+		\item creating a commit and subsequently moving to the new state of the commit
+		\item the commit that was output along with their welcome message by a call to $\operatorname{CreateCommit}$ if they just joined the group
+		\item the call to $\operatorname{CreateGroup}$ if they just created the group
 	\end{itemize}
-	The user $u_x$ has no last commit if it just created its group with the $\operatorname{CreateGroup}$ operation. The group states $\sigma_0$ and $\sigma_1$ are said to be \emph{consistent} if both users have a last commit and $c_0 = c_1$.
+}
+
+In the following, when talking about \emph{time} for a user that was a part of some group, we are referring to the sequence of group states they went through as members of the group.
+
+\begin{definition}[Last commit]
+	Let $u$ a user that at some point in time was a member of a group and had group state $\sigma$. We define their \emph{last commit} to be the most recent commit $c$ (up to arriving in state $\sigma$) that they applied .
+\end{definition}
+
+In the above definition, the user's last commit will always exist since they either joined the group through a welcome message or created the group themselves.
+
+\begin{definition}[Consistent group states] \label{def:consistent-group-state}
+	Let $u_0, u_1$ two users where each user was a member of a group at some point in time. Let $\sigma_0, \sigma_1$ the group states they were in and $c_0, c_1$ their last commits, respectively. The group states $\sigma_0$ and $\sigma_1$ are said to be \emph{consistent} if both users have the same last commit. (If a last commit is a call to $\operatorname{CreateGroup}$, it is the same as another last commit iff.\ both refer to the same call to $\operatorname{CreateGroup}$.)
 \end{definition}
 
 Users in different groups of course do not have consistent group states.
@@ -72,24 +100,26 @@ Users in different groups of course do not have consistent group states.
 
 \subsection{Security}
 
+\todo{Allow number of users to be determined adaptively?}
+
 \begin{definition}[The CGKA game]
 	Let $\Sigma$ a CGKA scheme. Define the game $\mathrm{Game}_{\adv, \Sigma}^{\mathrm{CGKA}}$ for an adversary $\adv$:
 	\begin{enumerate}[1.]
-		\item \label{def:cgka-game-step-1} The adversary $\adv$ outputs $u \in \mathbb{N}$. For each $i \in [u]$, initialize user $i$ by generating $(pk_i, sk_i) \from \Sigma.\gen()$ (and resampling $(pk_i, sk_i)$ until $pk_i \neq pk_j \; \forall j < i$), preparing $U_i = \varnothing$, the set of unconfirmed commits at user $i$, and setting $\sigma_i = \varnothing$, where $\varnothing$ denotes the empty value. The state output by an algorithm of $\Sigma$ is never the empty value. $\adv$ is given $pk_1, \ldots, pk_u$.
+		\item \label{def:cgka-game-step-1} The adversary $\adv$ outputs $n \in \mathbb{N}$. For each $i \in [n]$, initialize a user $i$ by creating an identifier $id_i$, generating $(pk_i, sk_i) \from \Sigma.\gen()$, preparing $U_i = \varnothing$, the set of unconfirmed commits at user $i$, and setting $\sigma_i = \varnothing$, where $\varnothing$ denotes the empty value. The state output by an algorithm of $\Sigma$ is never the empty value. $\adv$ is given $(pk_1, id_1), \ldots, (pk_n, id_n)$.
 
 		      Set $P = C = W = 0$, where $P$ denotes the number of proposals, $C$ the number of commits and $W$ the number of welcome messages created by $\adv$.
 		\item $\adv$ may adaptively do the following queries:
 		      \begin{itemize}
-			      \item $\operatorname{create-group}(i)$ for $i \in [u]$: set $\sigma_i \from \operatorname{CreateGroup}()$.
-			      \item $\operatorname{propose-update}(i)$ for $i \in [u], \sigma_i \neq \varnothing$: run $(\sigma_i, p_{P + 1}) \from \operatorname{ProposeUpdate}(\sigma_i)$ to update user $i$'s state and get a proposal $p_{P + 1}$. $\adv$ is given $p_{P + 1}$. Set $P = P + 1$.
-			      \item $\operatorname{propose-add}(i, j)$ for $i, j \in [u], \sigma_i \neq \varnothing, \sigma_j = \varnothing$: run $(\sigma_i, p_{P + 1}) \from \operatorname{ProposeAdd}(\sigma_i, pk_j)$ to update user $i$'s state and get a proposal $p_{P + 1}$. $\adv$ is given $p_{P + 1}$. Set $P = P + 1$.
-			      \item $\operatorname{propose-remove}(i, j)$ for $i, j \in [u], \sigma_i \neq \varnothing, \sigma_j \neq \varnothing$: run $(\sigma_i, p_{P + 1}) \from \operatorname{ProposeRemove}(\sigma_i, pk_j)$ to update user $i$'s state and get a proposal $p_{P + 1}$. $\adv$ is given $p_{P + 1}$. Set $P = P + 1$.
-			      \item $\operatorname{create-commit}(i, I)$ for $i \in [u], \sigma_i \neq \varnothing, I \subseteq [P]$: run $(\sigma, c_{C + 1}, w_{W + 1}, \ldots, w_{W + k}) \from \operatorname{CreateCommit}(\sigma_i, \{p_j \mid j \in I\})$ to create the new state $\sigma$, commit $c_{C + 1}$ and corresponding welcome messages. $\adv$ is given $c_{C + 1}$ and $w_{W + 1}, \ldots, w_{W + k}$. Set $U_i = U_i \cup \{(C + 1, \sigma)\}$, $C = C + 1$ and $W = W + k$.
+			      \item $\operatorname{create-group}(i)$ for $i \in [n]$: set $\sigma_i \from \operatorname{CreateGroup}()$.
+			      \item $\operatorname{propose-update}(i)$ for $i \in [n], \sigma_i \neq \varnothing$: run $(\sigma_i, p_{P + 1}) \from \operatorname{ProposeUpdate}(\sigma_i)$ to update user $i$'s state and get a proposal $p_{P + 1}$. $\adv$ is given $p_{P + 1}$. Set $P = P + 1$.
+			      \item $\operatorname{propose-add}(i, j)$ for $i, j \in [n], \sigma_i \neq \varnothing, \sigma_j = \varnothing$: run $(\sigma_i, p_{P + 1}) \from \operatorname{ProposeAdd}(\sigma_i, id_j, pk_j)$ to update user $i$'s state and get a proposal $p_{P + 1}$. $\adv$ is given $p_{P + 1}$. Set $P = P + 1$.
+			      \item $\operatorname{propose-remove}(i, j)$ for $i, j \in [n], \sigma_i \neq \varnothing, \sigma_j \neq \varnothing$: run $(\sigma_i, p_{P + 1}) \from \operatorname{ProposeRemove}(\sigma_i, id_j)$ to update user $i$'s state and get a proposal $p_{P + 1}$. $\adv$ is given $p_{P + 1}$. Set $P = P + 1$.
+			      \item $\operatorname{create-commit}(i, I)$ for $i \in [n], \sigma_i \neq \varnothing, I \subseteq [P]$: run $(\sigma, c_{C + 1}, w_{W + 1}, \ldots, w_{W + k}) \from \operatorname{CreateCommit}(\sigma_i, \{p_j \mid j \in I\})$ to create the new state $\sigma$, commit $c_{C + 1}$ and corresponding welcome messages. $\adv$ is given $c_{C + 1}$ and $w_{W + 1}, \ldots, w_{W + k}$. Set $U_i = U_i \cup \{(C + 1, \sigma)\}$, $C = C + 1$ and $W = W + k$.
 			      \item $\operatorname{confirm}(j, b)$ for $j$ s.t.~$(j, \sigma) \in U_i$ for some $i, \sigma$, $b \in \{0, 1\}$: Set $U_i = U_i \setminus \{(j, \sigma)\}$. If $b = 1$, set $\sigma_i = \sigma$.
-			      \item $\operatorname{deliver-proposal}(i, j)$ for $i \in [u], \sigma_i \neq \varnothing, j \in [P]$: set $\sigma_i \from \operatorname{ProcessProposal}(\sigma_i, p_j)$.
-			      \item $\operatorname{deliver-commit}(i, j)$ for $i \in [u], \sigma_i \neq \varnothing, j \in [C]$: run $\sigma \from \operatorname{ProcessCommit}(\sigma_i, c_j)$. If $c_j$ contains a remove proposal for user $i$, then set $\sigma_i = \varnothing$, generate a new pair $(pk_i, sk_i) \from \Sigma.\gen()$ such that $pk_i$ is unique and give $(i, pk_i)$ to $\adv$. Otherwise, set $\sigma_i = \sigma$.
-			      \item $\operatorname{deliver-welcome}(i, j)$ for $i \in [u], \sigma_i = \varnothing, j \in [W]$: set $\sigma_i \from \operatorname{ProcessWelcome}(pk_j, sk_j, w_j)$ and set $sk_i = \varnothing$.
-			      \item $\operatorname{corrupt}(i)$ for $i \in [u]$: $\adv$ is given $U_i$. If $\sigma_i = \varnothing$, $\adv$ is given $sk_i$. Otherwise, $\adv$ is given $\sigma_i$.
+			      \item $\operatorname{deliver-proposal}(i, j)$ for $i \in [n], \sigma_i \neq \varnothing, j \in [P]$: set $\sigma_i \from \operatorname{ProcessProposal}(\sigma_i, p_j)$.
+			      \item $\operatorname{deliver-commit}(i, j)$ for $i \in [n], \sigma_i \neq \varnothing, j \in [C]$: run $\sigma \from \operatorname{ProcessCommit}(\sigma_i, c_j)$. If $c_j$ contains a remove proposal for user $i$, then set $\sigma_i = \varnothing$, generate a new pair $(pk_i, sk_i) \from \Sigma.\gen()$ and give $(i, pk_i)$ to $\adv$. Otherwise, set $\sigma_i = \sigma$.
+			      \item $\operatorname{deliver-welcome}(i, j)$ for $i \in [n], \sigma_i = \varnothing, j \in [W]$: set $\sigma_i \from \operatorname{ProcessWelcome}(pk_j, sk_j, w_j)$ and set $sk_i = \varnothing$.
+			      \item $\operatorname{corrupt}(i)$ for $i \in [n]$: $\adv$ is given $U_i$. If $\sigma_i = \varnothing$, $\adv$ is given $sk_i$. Otherwise, $\adv$ is given $\sigma_i$.
 		      \end{itemize}
 		\item $\adv$ picks $i \in \{0\} \cup [C]$. We call the $i$-th commit the \emph{challenge commit}, where the $0$-th commit refers to the initial $\mathrm{CreateGroup}$ operation. Let $\sigma$ the state output by the operation that created the $i$-th commit (the state output by $\operatorname{CreateCommit}$ if $i > 0$ or the state output by $\operatorname{CreateGroup}$ if $i = 0$). A bit $b \from \{0, 1\}$ is sampled and $\adv$ is given
 		      \[
@@ -105,15 +135,26 @@ Users in different groups of course do not have consistent group states.
 	We require an adversary playing the above game to adhere to the following:
 	\begin{itemize}
 		\item The challenge commit is safe (see Definition~\vref{def:safe-commit}) \question{Avoid collision in meaning of \emph{safe}?}
-		\item $\operatorname{create-group}$ is queried exactly once \question{At least once?}
+		\item For any query $\operatorname{deliver-proposal}(i, j)$ where the proposal $p_j$ was created by user $k$ while it was in state $\sigma_k'$, $\sigma_i$ and $\sigma_k'$ must be consistent
+		\item For any query $\operatorname{deliver-commit}(i, j)$ where the commit $c_j$ was created by user $k$ while it was in state $\sigma_k'$, $\sigma_i$ and $\sigma_k'$ must be consistent
+		\item $\operatorname{create-group}$ is queried exactly once \todo{More than once ok?}
 		\item Every proposal is processed at most once by any user (i.e. the adversary may not query $\operatorname{deliver-proposal}(i, j)$ twice for the same pair $(i, j)$)
 		\item Every commit is processed at most once by any user
-		\item A welcome message for user $i$ is never processed by a user $j$ with $i \neq j$
-		\item Every welcome message is processed at most once by a user
-		\item For any query $\operatorname{deliver-proposal}(i, j)$ where the proposal $p_j$ was created by user $k$ while it was in state $\sigma_k'$, $\sigma_i$ and $\sigma_k$ must be consistent
-		\item For any query $\operatorname{deliver-commit}(i, j)$ where the commit $c_j$ was created by user $k$ while it was in state $\sigma_k'$, $\sigma_i$ and $\sigma_k$ must be consistent
-		\item A user never processes its own proposal or commit
+		\item A welcome message for user $i$ is processed by $i$ at most once and is never processed by a user $j$ with $i \neq j$
+		\item A user never processes a proposal or commit that they created
+		      \todo{Add the following other restrictions:
+			      \begin{itemize}
+				      \item committer never includes an update or remove proposal for itself
+				      \item a proposal included in a commit must not already have been applied in the commit history of the user
+				      \item user added that is already in the group
+				      \item multiple update/add/remove proposals applying to the same user
+				      \item user can only include a proposal it has already processed
+				      \item update proposal included must be for a user in the group
+			      \end{itemize}
+		      }
 	\end{itemize}
+
+	\todo{Justify the restrictions to the adversary.}
 \end{definition}
 
 The concept of a safe user and safe commit is adapted from the so-called ``safe predicate'' in \cite{ttkem}, which again took inspiration from \cite{rtreekem}. As elaborated in the cited papers and also analogous to how we needed to define ``safe'' nodes in the SD-GSD game, we want to forbid the adversary to ask to be challenged on a commit for which it can trivially compute the group key through some corruption it performed.
