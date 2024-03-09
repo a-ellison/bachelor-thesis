@@ -6,7 +6,7 @@ We will use the following notation throughout:
 \begin{itemize}
 	\item We write ``u.a.r.'' for ``uniformly at random''
 	\item We write $x \from S$ to say that $x$ is sampled u.a.r.\ from the finite set $S$
-	\item For $n \in \mathbb{N} \setminus \{0\}$, $[n] = \{1, \ldots, n\}$
+	\item For $n \in \mathbb{N} \setminus \{0\}$, $[n] = \{1, \ldots, n\}$, and for $a, b \in \N$ s.t.\ $a \le b$, $[a, b] = \{a, a + 1, \ldots, b\}$
 	\item If $\mathbb{G}$ is a cyclic group of order $q$ and $g$ a generator, then
 	      \begin{itemize}
 		      \item We write the group operation in $\mathbb{G}$ multiplicatively
@@ -63,8 +63,14 @@ In the following definition we will be more explicit about the randomness used b
 
 	We may also refer to algorithm $X$ by $\Pi.X$ for $X \in \{\gen, \enc, \dec\}$.
 
-	It is required that for every $\eta$, every key $(pk, sk)$ output by $\gen$, and every message $m$, it holds that $\pr{\dec_{sk}(\enc_{pk}(m)) = m} = 1$ (where the probability is over the randomness of $\enc_pk$).
+	It is required that for every $\eta$, every key $(pk, sk)$ output by $\gen$, and every message $m$, it holds that $\pr{\dec_{sk}(\enc_{pk}(m)) = m} = 1$ (where the probability is over the randomness of $\enc_{pk}$).
 \end{definition}
+
+% \subsection{Concrete security}
+%
+% In this work we are interested in concrete security. Our definition of encryption schemes and security games are identical to those in the asymptotic setting, however we need different definitions of security. To avoid any confusion, we will briefly explain what our security definitions state. Let $n$ the security parameter. To emphasize that a cryptographic scheme takes $n$ as a parameter we will see a scheme as a function $\Pi$ taking the security parameter as input. (It is only for this section that we briefly consider schemes to be functions.) The security game that captures the notion of security we are interested in also takes $n$ as a parameter and so we denote it by a function $G$ in $n$. To define security of $\Pi$ through the game $G$, we will first fix $n = n_0$ for some arbitrary value $n_0$. Then, we say that the now fixed scheme $\Pi(n_0)$ is \emph{$(t, \epsilon)$-secure} for $t \in \N, \epsilon \in [0, 1]$ if any adversary running in time $t$ has advantage at most $\epsilon$ while playing $G(n_0)$. This resemebles the approach in \cite{dhies}.
+%
+% Another approach to define concrete security would be to say that $\Pi$ is \emph{$(t, \epsilon)$-secure} for functions $t, \epsilon$ in $n$ if for all $n_0$, any adversary running in time $t(n_0)$ has advantage at most $\epsilon(n_0)$ while playing $G(n_0)$. Although this approach better captures the fact that we are interested in statements covering all choices of the security parameter, we avoid it so as to keep our security definitions concise and easy to interpret. Our results are no less general, since the security parameter may be chosen arbitrarily. An example reference using this approach is \cite{bellare1996exact}.
 
 \subsection{Security definitions}
 
@@ -79,9 +85,9 @@ In the following definition we will be more explicit about the randomness used b
 \end{definition}
 
 \begin{definition}[IND-CPA security {\cite[Definition 3.21]{introduction-to-modern-cryptography}}]
-	A private-key encryption scheme $\Pi$ is \emph{$(t, \epsilon, q)$-IND-CPA secure} if for any adversary $\adv$ running in time $t$ we have
+	A private-key encryption scheme $\Pi$ is \emph{$(t, \epsilon)$-IND-CPA-secure} if for all $\kappa$, for any adversary $\adv$ running in time $t(\kappa)$ we have
 	\begin{align*}
-		\mathrm{Adv}_{\Pi}^{\mathrm{IND-CPA}}(\adv) \coloneqq 2 \cdot \left(\pr{\mathrm{Game}_{\adv, \Pi}^{\mathrm{IND-CPA}} = 1} - \frac{1}{2}\right) \le \epsilon.
+		\mathrm{Adv}_{\adv, \Pi}^{\mathrm{IND-CPA}}(\kappa) \coloneqq 2 \cdot \left(\pr{\mathrm{Game}_{\adv, \Pi}^{\mathrm{IND-CPA}}(\kappa) = 1} - \frac{1}{2}\right) \le \epsilon(\kappa).
 	\end{align*}
 \end{definition}
 
@@ -98,7 +104,7 @@ We will make use of a weaker form of security called ``indistinguishability in t
 \end{definition}
 
 \begin{definition}[EAV security {\cite[Definition 3.8]{introduction-to-modern-cryptography}}]
-	A private-key encryption scheme $\Pi$ is \emph{$(t, \epsilon)$-EAV secure} if for any adversary $\adv$ running in time $t$ we have
+	A private-key encryption scheme $\Pi$ is \emph{$(t, \epsilon)$-EAV-secure} if for any adversary $\adv$ running in time $t$ we have
 	\begin{align*}
 		\mathrm{Adv}_{\Pi}^{\mathrm{EAV}}(\adv) \coloneqq 2 \cdot \left(\pr{\mathrm{Game}_{\adv, \Pi}^{\mathrm{EAV}} = 1} - \frac{1}{2}\right) \le \epsilon.
 	\end{align*}
