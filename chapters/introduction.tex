@@ -26,7 +26,7 @@ One choice that can be made when defining the security of a CGKA scheme is wheth
 
 The Generalized Selective Decryption (GSD) security game \cite{gsd} was introduced precisely to analyze adaptive security for protocols based on a graph-like structure (as is the case with TreeKEM). It was initially defined for the private-key setting and later adapted to the public-key setting in \cite{ttkem}. The work in \cite{ttkem} proved a polynomial bound for the adaptive security of the public-key GSD game in the so-called Random Oracle Model (ROM) for an arbitrary IND-CPA secure public-key encryption scheme. This result implies a polynomial bound for the adaptive security of TreeKEM as a CGKA as outlined also in \cite[Theorem 4]{ttkem} and subsequently proved in more detail in \cite[Theorem 12]{modular-group-messaging}.
 
-In this work, we prove a tighter bound for the adaptive security of a more general version of the public-key GSD game in the ROM for the DHIES scheme, which is currently the only scheme specified in the MLS cipher suite. Moreover, we provide our own reduction from the CGKA security of TreeKEM to the security of our GSD game.
+In this work, we prove a tighter bound for the adaptive security of a more general version of the public-key GSD game in the ROM for the DHIES scheme, which is currently the only scheme specified in the MLS cipher suite. Moreover, ... .
 
 \section{Technical overview}
 
@@ -36,18 +36,18 @@ Describe GSD
 
 \subsection{TreeKEM}
 
-Describe TreeKEM and operations
+\question{Move high level description of TreeKEM up here?}
 
 \section{Contributions}
 
 \todo{describe results and contribution in more detail
 	\begin{itemize}
 		\item own GSD definition, similar to \cite{modular-group-messaging}
-		\item complete and simple proofs
+		\item complete and simple proofs for GSD
 		\item tighter bound
-		\item clearer security definitions for SD-GSD and CGKA
-		\item more complete TreeKEM result
+		\item clearer or improved security definitions for SD-GSD and CGKA
+		\item precise statement of security loss
 	\end{itemize}
 }
 
-Following the general approach used in \cite{ttkem} to prove the security of (a variant of) TreeKEM in the ROM, we first prove a result on the GSD security of an IND-CPA secure encryption scheme in Section~\vref{sec:tighter-gsd-security}. The  We do this specifically for the DHIES scheme, which is currently the only encryption scheme specified in the MLS RFC (\cite{rfc9420}), to achieve a better reduction loss. Moreover, we will make some notable modifications to the public-key GSD game defined in \cite{ttkem}, to allow for the result to be applied to TreeKEM more directly and thus simplify the security proof.
+% Following the general approach used in \cite{ttkem} to prove the security of (a variant of) TreeKEM in the ROM, we first prove a result on the GSD security of an IND-CPA secure encryption scheme in Section~\vref{sec:tighter-gsd-security}. The  We do this specifically for the DHIES scheme, which is currently the only encryption scheme specified in the MLS RFC (\cite{rfc9420}), to achieve a better reduction loss. Moreover, we will make some notable modifications to the public-key GSD game defined in \cite{ttkem}, to allow for the result to be applied to TreeKEM more directly and thus simplify the security proof.
