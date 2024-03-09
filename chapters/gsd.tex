@@ -23,7 +23,7 @@ We call our adaptation of GSD security \emph{Seeded GSD with Dependencies} (SD-G
 \todo{Change proofs such that reductions simulate all ROs. Also replace $t_{H} \rightarrow x \cdot t_{\mathrm{sample}}$}
 
 \begin{definition}[The SD-GSD game]
-	Let $\lambda \in \N$ a security parameter. \question{Where to define $\lambda$?} Let $\Pi = (\gen, \enc, \dec)$ a public-key encryption scheme. Let $\hgen, \hdep \colon \{0, 1\}^\lambda \to \{0, 1\}^\lambda$ two functions. Define the game $\sdgsdgame{\Pi}$ for an adversary $\adv$:
+	Let $\lambda \in \N$ a security parameter and let $\hgen, \hdep \colon \{0, 1\}^\lambda \to \{0, 1\}^\lambda$ two functions. Let $\Pi = (\gen, \enc, \dec)$ a public-key encryption scheme with security parameter $\eta$, where $\gen$ uses $r(\eta)$ bits of randomness. We require that $\lambda \ge r(\eta)$ when choosing values for $\lambda$ and $\eta$. Define the game $\sdgsdgame{\Pi}(\lambda, \eta)$ for an adversary $\adv$:
 	\begin{enumerate}[1.]
 		\item $\adv$ is given $1^\eta$.
 		\item \label{def:sd-gsd-game-step-init} The adversary $\adv$ is given $1^\eta$, and outputs $n \in \N$ and a list of dependencies $D = \{(a_{i}, b_{i})\}_{i=1}^m \in [n]^2$. For each $v \in [n]$:
@@ -65,7 +65,8 @@ We call our adaptation of GSD security \emph{Seeded GSD with Dependencies} (SD-G
 
 
 \begin{definition}[SD-GSD security]
-	The triple $(\Pi, \hgen, \hdep)$, where $\Pi$ is a public-key encryption scheme and $\hgen, \hdep$ are functions $\{0, 1\}^\lambda \to \{0, 1\}^\lambda$, is \emph{$(t, \epsilon, N, \delta)$-SD-GSD secure} if for any adversary $\adv$ constructing a GSD graph of size at most $N$ and indegree at most $\delta$ and running in $t$ time we have
+	Let $\Pi, \hgen$ and $\hdep$ as above.
+	The triple $(\Pi, \hgen, \hdep)$ is \emph{$(t, \epsilon, N, \delta)$-SD-GSD-secure} if for any adversary $\adv$ constructing a GSD graph of size at most $N$ and indegree at most $\delta$ and running in $t$ time we have
 	\begin{align*}
 		\mathrm{Adv}_{\Pi}^{\mathrm{SD-GSD}}(\adv) \coloneqq 2 \cdot \left(\pr{\mathrm{Game}_{\adv, \Pi}^{\mathrm{SD-GSD}} = 1} - \frac{1}{2}\right) \le \epsilon.
 	\end{align*}
@@ -199,16 +200,16 @@ Recall case (\ref{qs-triggered-case-2}) in the high-level discussion of Theorem~
 This is exactly how we proceed in this section. Instead of asking the adversary to compute an encrypted message $m$, we turn to a more familiar decisional formulation as in the IND-CPA game (where the adversary may choose a pair $m_0, m_1$ and must distinguish whether the $d$ ciphertexts encrypt $m_0$ or $m_1$). We call this security notion \emph{EAV security under multiple (M) independent (I) encryptions of a single (S) pair of messages} (MIS-EAV).
 
 \begin{definition}[The MIS-EAV game]
-	Let $\Pi$ a private-key encryption scheme. Define the game $\mathrm{Game}_{\adv, \Pi}^{\mathrm{MIS-EAV}}$ for an adversary $\adv$:
+	Let $\kappa$ denote the security parameter and let $\Pi$ a private-key encryption scheme. Define the game $\mathrm{Game}_{\adv, \Pi}^{\mathrm{MIS-EAV}}(\kappa)$ for an adversary $\adv$:
 	\begin{enumerate}[1.]
 		\item The adversary $\adv$ outputs $q \in \N$ and a pair of messages $m_0, m_1$ of the same length. We refer to $q$ as the number of \emph{queries} made by $\adv$.
-		\item A bit $b \from \{0, 1\}$ is sampled. For each $i \in [q]$, $\adv$ is given an encryption $c_i \from \Pi.\enc_{k_i}(m_b)$ where $k_i \from \Pi.\gen()$ is generated independently of the other keys.
+		\item A bit $b \from \{0, 1\}$ is sampled. For each $i \in [q]$, $\adv$ is given an encryption $c_i \from \Pi.\enc_{k_i}(m_b)$ where $k_i \from \Pi.\gen(1^\kappa)$ is generated independently of the other keys.
 		\item $\adv$ outputs a bit $b'$. The output of the game is defined to be $1$ if $b' = b$, and $0$ otherwise.
 	\end{enumerate}
 \end{definition}
 
 \begin{definition}[MIS-EAV security]
-	A private-key encryption scheme $\Pi$ is \emph{$(t, \epsilon, q)$-MIS-EAV secure} if for any adversary $\adv$ making at most $q$ queries and running in time $t$ we have
+	A private-key encryption scheme $\Pi$ is \emph{$(t, \epsilon, q)$-MIS-EAV-secure} if for any adversary $\adv$ making at most $q$ queries and running in time $t$ we have
 	\begin{align*}
 		\mathrm{Adv}_{\Pi}^{\mathrm{MIS-EAV}}(\adv) \coloneqq 2 \cdot \left(\pr{\mathrm{Game}_{\adv, \Pi}^{\mathrm{MIS-EAV}} = 1} - \frac{1}{2}\right) \le \epsilon.
 	\end{align*}
