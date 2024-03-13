@@ -11,6 +11,7 @@
 \DeclarePairedDelimiter\abs{\lvert}{\rvert}
 \DeclarePairedDelimiter\norm{\lVert}{\rVert}
 \DeclarePairedDelimiter\bracks{\lbrack}{\rbrack}
+\DeclarePairedDelimiter\ceil{\lceil}{\rceil}
 
 %% Use the alternative epsilon per default and define the old one as \oldepsilon
 \let\oldepsilon\epsilon
@@ -21,6 +22,7 @@
 \renewcommand{\phi}{\ensuremath{\varphi}}
 
 %% Custom commands
+\newcommand{\pr}[1]{\Pr\bracks*{#1}}
 
 \newcommand{\question}[1]{\textcolor{magenta}{\textbf{Q:} #1}}
 \newcommand{\todo}[1]{\textcolor{red}{\textbf{TODO:} #1}}
@@ -36,17 +38,23 @@
 \newcommand{\qdep}{Q_\mathrm{dep}}
 \newcommand{\hdh}{H_\mathrm{DH}}
 \newcommand{\fdh}{F_\mathrm{DH}}
+\newcommand{\fhdh}{\mathcal{H}_\mathrm{DH}}
 \newcommand{\qdh}{Q_\mathrm{DH}}
 \newcommand{\mdh}{m_\mathrm{DH}}
 \newcommand{\qs}{Q_\mathrm{s}}
 \newcommand{\ms}{m_\mathrm{s}}
+\newcommand{\teav}{t_\mathrm{EAV}}
+\newcommand{\eeav}{\epsilon_\mathrm{EAV}}
+\newcommand{\tddh}{t_\mathrm{DDH}}
+\newcommand{\eddh}{\epsilon_\mathrm{DDH}}
 
 % adversary
 \newcommand{\adv}{\mathcal{A}}
 \newcommand{\wins}{\mathcal{A} \text{ wins}}
 
-\newcommand{\sdgsdgame}[2][\mathcal{A}]{\mathrm{Game}_{#1, #2}^{\mathrm{SD-GSD}}}
-\newcommand{\pr}[1]{\Pr\bracks*{#1}}
+% games and advantage
+\newcommand{\game}[3][\mathchal{A}]{\mathrm{Game}_{#1, #2}^{\mathrm{#3}}}
+\newcommand{\advantage}[3][\mathcal{A}]{\mathrm{Adv}_{#1, #2}^{\mathrm{#3}}}
 
 % schemes
 \newcommand{\dhies}{\Pi_{\mathrm{DH}}}
