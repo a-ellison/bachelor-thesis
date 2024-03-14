@@ -17,6 +17,7 @@ We will use the following notation throughout:
 	\item For $a, b \in \{0, 1\}^n$, $a \oplus b$ denotes the XOR of $a$ and $b$
 	\item $\log$ is short for $\log_2$
 	\item We will stick to using $\kappa$ as the security parameter of private-key encryption schemes and $\eta$ as the parameter of public-key encryption schemes
+	\item For a function $f$ in the security parameter $\eta$ (or $\kappa$) we will often omit writing $\eta$ as an argument and simply write $f$ to refer to $f(\eta)$
 	\item $\{0, 1\}^{\le l} = \bigcup_{i = 1}^{l} \{0, 1\}^i $
 \end{itemize}
 
@@ -75,40 +76,38 @@ In the following definition we will be more explicit about the randomness used b
 \subsection{Security definitions}
 
 \begin{definition}[The IND-CPA game]
-	Let $\kappa$ denote the security parameter and let $\Pi$ a private-key encryption scheme. Define the game $\game{\Pi}{IND-CPA}(\kappa)$ for an adversary $\adv$:
+	Let $\kappa$ denote the security parameter and let $\Pi$ a private-key encryption scheme. Define the game $\game{\Pi}{\kappa}{IND-CPA}(\adv)$ for an adversary $\adv$:
 	\begin{enumerate}[1.]
 		\item A key $k \from \gen(1^\kappa)$ is generated.
-		\item The adversary $\adv$ is given $1^\kappa$ and oracle access to $\Pi.\enc_k$, and outputs a pair of messages $m_0, m_1$ of the same length.
+		\item The adversary $\adv$ is given oracle access to $\Pi.\enc_k$, and outputs a pair of messages $m_0, m_1$ of the same length.
 		\item A bit $b \from \{0, 1\}$ is sampled and $\adv$ is given a ciphertext $c \from \enc_k(m_b)$. ($\adv$ continues to have oracle access to $\Pi.\enc_k$.)
 		\item $\adv$ outputs a bit $b'$. The output of the game is defined to be $1$ if $b' = b$, and $0$ otherwise.
 	\end{enumerate}
 \end{definition}
 
-In the following, for a function $t$ in the security parameter $\kappa$ and an adversary $\adv$, we say that \emph{$\adv$ runs in time $t$} if for all $\kappa$, the runtime of $\adv$ in an execution of $\game{\Pi}{IND-CPA}(\kappa)$ is at most $t(\kappa)$.
-
 \begin{definition}[IND-CPA security {\cite[Definition 3.21]{introduction-to-modern-cryptography}}]
-	For functions $t, \epsilon$ in the security parameter $\kappa$, a private-key encryption scheme $\Pi$ is \emph{$(t, \epsilon)$-IND-CPA-secure} if for for any adversary $\adv$ running in time $t$ we have
+	For functions $t, \epsilon$ in the security parameter $\kappa$, a private-key encryption scheme $\Pi$ is \emph{$(t, \epsilon)$-IND-CPA-secure} if for all $\kappa$, for any adversary $\adv$ running in time $t(\kappa)$ we have
 	\begin{align*}
-		\advantage{\Pi}{IND-CPA}(\kappa) \coloneqq 2 \cdot \left(\pr{\game{\Pi}{IND-CPA}(\kappa) = 1} - \frac{1}{2}\right) \le \epsilon(\kappa) \quad \forall \kappa.
+		\advantage{\Pi}{\kappa}{IND-CPA}(\adv) \coloneqq 2 \cdot \left(\pr{\game{\Pi}{\kappa}{IND-CPA}(\adv) = 1} - \frac{1}{2}\right) \le \epsilon(\kappa).
 	\end{align*}
 \end{definition}
 
 We will make use of a weaker form of security called ``indistinguishability in the presence of an eavesdropper'' \cite{introduction-to-modern-cryptography} and will refer to it as ``EAV security''. It is identical to IND-CPA security with the sole exception that the adversary does not have access to an encryption oracle.
 
 \begin{definition}[The EAV game]
-	Let $\kappa$ denote the security parameter and let $\Pi$ a private-key encryption scheme. Define the game $\game{\Pi}{EAV}(\kappa)$ for an adversary $\adv$:
+	Let $\kappa$ denote the security parameter and let $\Pi$ a private-key encryption scheme. Define the game $\game{\Pi}{\kappa}{EAV}(\adv)$ for an adversary $\adv$:
 	\begin{enumerate}[1.]
 		\item A key $k \from \gen(1^\kappa)$ is generated.
-		\item The adversary $\adv$ is given $1^\kappa$, and outputs a pair of messages $m_0, m_1$ of the same length.
+		\item The adversary $\adv$ outputs a pair of messages $m_0, m_1$ of the same length.
 		\item A bit $b \from \{0, 1\}$ is sampled and $\adv$ is given a ciphertext $c \from \enc_k(m_b)$.
 		\item $\adv$ outputs a bit $b'$. The output of the game is defined to be $1$ if $b' = b$, and $0$ otherwise.
 	\end{enumerate}
 \end{definition}
 
 \begin{definition}[EAV security {\cite[Definition 3.8]{introduction-to-modern-cryptography}}]
-	A private-key encryption scheme $\Pi$ is \emph{$(t, \epsilon)$-EAV-secure} if for any adversary $\adv$ running in time $t$ we have
+	A private-key encryption scheme $\Pi$ is \emph{$(t, \epsilon)$-EAV-secure} if for all $\kappa$, for any adversary $\adv$ running in time $t(\kappa)$ we have
 	\begin{align*}
-		\advantage{\Pi}{EAV}(\kappa) \coloneqq 2 \cdot \left(\pr{\game{\Pi}{EAV}(\kappa) = 1} - \frac{1}{2}\right) \le \epsilon(\kappa) \quad \forall \kappa.
+		\advantage{\Pi}{\kappa}{EAV}(\adv) \coloneqq 2 \cdot \left(\pr{\game{\Pi}{\kappa}{EAV}(\adv) = 1} - \frac{1}{2}\right) \le \epsilon(\kappa).
 	\end{align*}
 \end{definition}
 
@@ -120,16 +119,16 @@ We will make use of a weaker form of security called ``indistinguishability in t
 	This follows immediately from the fact that any EAV adversary is also an IND-CPA adversary.
 \end{proof}
 
-\begin{definition}[Group-generation algorithm {\cite[Section 9.3.2]{introduction-to-modern-cryptography}}]
+\begin{definition}[Group-generation algorithm {\cite[Section 9.3.2]{introduction-to-modern-cryptography}}] \label{def:group-generation-algorithm}
 	Let $\eta$ denote the security parameter. A \emph{group-generation algorithm} $\mathcal{G}$ is a probabilistic polynomial-time algorithm that takes as input $1^\eta$ and outputs $(\mathbb{G}, q, g)$, where $\mathbb{G}$ is (a description of) a cyclic group, $q$ is the order of the group with $q \ge 2^\eta$ and $g \in \mathbb{G}$ is a generator. A group element is represented as a bit-string of length at most $\gamma(\eta)$. We write $(\mathbb{G}, q, g) \from \mathcal{G}(1^\eta)$.
 \end{definition}
 
 \begin{definition}[The Decisional Diffie-Hellman (DDH) problem]
 	Let $\eta$ denote the security parameter and let $\mathcal{G}$ a group-generation algorithm.
-	Define the game $\game{\mathcal{G}}{DDH}(\eta)$ for an adversary $\adv$:
+	Define the game $\game{\mathcal{G}}{\eta}{DDH}(\adv)$ for an adversary $\adv$:
 	\begin{enumerate}[1.]
 		\item $\mathcal{G}(1^\eta)$ is run to obtain $(\mathbb{G}, q, g)$, and exponents $x, y \from [q]$ and a bit $b \from \{0, 1\}$ are sampled.
-		\item The adversary $\adv$ is given $1^\eta, \mathbb{G}$, $q$, $g$, $h_1 \coloneqq g^x, h_2 \coloneqq g^y$ and
+		\item The adversary $\adv$ is given $\mathbb{G}$, $q$, $g$, $h_1 \coloneqq g^x, h_2 \coloneqq g^y$ and
 		      \[
 			      k = \begin{cases}
 				      g^{x \cdot y} & b = 0 \\
@@ -142,9 +141,9 @@ We will make use of a weaker form of security called ``indistinguishability in t
 \end{definition}
 
 \begin{definition}[Hardness of the DDH problem {\cite[Definition 9.64]{introduction-to-modern-cryptography}}]
-	The DDH problem is \emph{$(t, \epsilon)$-hard relative to} $\mathcal{G}$ if for any adversary $\adv$ running in time $t$ we have
+	The DDH problem is \emph{$(t, \epsilon)$-hard relative to} $\mathcal{G}$ if for all $\eta$, for any adversary $\adv$ running in time $t(\eta)$ we have
 	\begin{align*}
-		\advantage{\mathcal{G}}{DDH}(\eta) \coloneqq 2 \cdot \left(\pr{\game{\mathcal{G}}{DDH}(\eta) = 1} - \frac{1}{2}\right) \le \epsilon(\eta) \quad \forall \eta.
+		\advantage{\mathcal{G}}{\eta}{DDH}(\adv) \coloneqq 2 \cdot \left(\pr{\game{\mathcal{G}}{\eta}{DDH}(\adv) = 1} - \frac{1}{2}\right) \le \epsilon(\eta).
 	\end{align*}
 \end{definition}
 
@@ -173,11 +172,11 @@ When analyzing the advantage of an adversary we may make use of the following we
 In the following definition we will refer to ``key-derivation functions''. This is only meant as a hint to the reader. We do not provide a definition here, as we will always model such a function as a random oracle (see Section~\vref{sec:rom}). \todo{Could cite https://eprint.iacr.org/2010/264.pdf}
 
 \begin{definition}[DHIES {\cite[Construction 12.19]{introduction-to-modern-cryptography}}]
-	Let $\eta$ denote the security parameter. Let $\mathcal{G}$ a group-generation algorithm. Let $\Pi_s$ a private-key encryption scheme where the security parameter $\kappa$ is some function of $\eta$ and $\Pi_s.\gen(1^{\kappa(\eta)})$ samples a key u.a.r.\ from $\{0, 1\}^{\kappa(\eta)}$. Let $\fhdh = \{\hdh^{(\eta)} \mid \eta \in \N \}$ a family of key-derivation functions where $\hdh^{(\eta)} \colon \{0, 1\}^* \to \{0, 1\}^{\kappa(\eta)}$. We write $\hdh \coloneqq \hdh^{(\eta)}$ when $\eta$ is clear from the context. Define the algorithms $\gen, \enc$ and $\dec$ as follows:
+	Let $\eta$ denote the security parameter. Let $\mathcal{G}$ a group-generation algorithm. Let $\Pi_s$ a private-key encryption scheme where $\Pi_s.\gen(1^\eta)$ samples a key u.a.r.\ from $\{0, 1\}^\eta$. Let $\fhdh = \{\hdh^{(\eta)} \mid \eta \in \N \}$ a family of key-derivation functions where $\hdh^{(\eta)} \colon \{0, 1\}^* \to \{0, 1\}^{\eta}$. We write $\hdh \coloneqq \hdh^{(\eta)}$ when $\eta$ is clear from the context. Define the algorithms $\gen, \enc$ and $\dec$ as follows:
 	\begin{itemize}
 		\item $\gen$: on input $1^\eta$ run $\mathcal{G}(1^\eta)$ to obtain $(\mathbb{G}, q, g)$. Sample $x \from [q]$ and set $h_1 \coloneqq g^x$. Set $pk \coloneqq \langle \mathbb{G}, q, g, h_1 \rangle$ and $sk \coloneqq \langle \mathbb{G}, q, g, x \rangle$, and output $(pk, sk)$.
 
-		      The message space is the message space of $\Pi_s$ (with the security parameter set to $\kappa(\eta)$).
+		      The message space is the message space of $\Pi_s$.
 		\item $\enc$: on input a public key $\langle \mathbb{G}, q, g, h_1 \rangle$ and a message $m$, sample $y \from [q]$, set $h_2 \coloneqq g^y, k \coloneqq \hdh(h_1^y)$\footnote{Where for $h \in \mathbb{G}$, $\hdh(h)$ denotes the output of $\hdh$ with the binary representation of $h$ given as input.}, compute $c' \from \Pi_s.\enc_k(m)$ and output the ciphertext $\langle h_2, c' \rangle$.
 		\item $\dec$: on input a private key $\langle \mathbb{G}, q, g, x, \hdh \rangle$ and a ciphertext $\langle h_2, c' \rangle$, compute $k \coloneqq H(h_2^x)$ and output $\Pi_s.\dec_k(c')$. If the ciphertext is not of the right form or $\Pi_s.\dec$ outputs $\bot$, output $\bot$.
 	\end{itemize}

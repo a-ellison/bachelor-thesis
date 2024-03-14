@@ -2,7 +2,7 @@
 
 \section{Proof of Lemma~\ref{lemma:mis-eav-from-eav}} \label{sec:mis-eav-from-eav-proof}
 
-\begin{proof}[of Lemma~\ref{lemma:mis-eav-from-eav}] Note that since the message space is finite, the time to encrypt a message is bounded. As outlined above the Lemma follows from a simple hybrid argument. Let $q \in \N$ and $\adv$ an arbitrary MIS-EAV adversary running in time $\tilde{t}$ and making at most $q$ queries. Define the sequence of hybrid games $H_0, \ldots, H_q$ where in the game $H_i$ the first $i$ encryptions given to the adversary encrypt $m_1$ and all remaining encryptions encrypt $m_0$. We will write
+\begin{proof}[of Lemma~\ref{lemma:mis-eav-from-eav}] Note that since the message space is finite, the time to encrypt a message is bounded. As outlined before Lemma~\ref{lemma:mis-eav-from-eav}, the lemma follows from a simple hybrid argument. Let $q$ a function in $\kappa$, let $\kappa$ arbitrary and let $\adv$ an arbitrary MIS-EAV adversary running in time $\tilde{t}(\kappa)$ and making at most $q(\kappa)$ queries. Define the sequence of hybrid games $H_0, \ldots, H_q$ where in the game $H_i$ the first $i$ encryptions given to the adversary encrypt $m_1$ and all remaining encryptions encrypt $m_0$. We will write
 	\[
 		\pr{0 \from \adv \mid H_i}
 	\]
@@ -20,14 +20,14 @@
 				      \Pi.\enc_{k_j}(m_0) & i > j
 			      \end{cases}
 		      \]
-		      and $k_j \from \Pi.\gen() \; \forall j$.
+		      and $k_j \from \Pi.\gen(1^\kappa) \; \forall j$.
 		\item $\adv'$ outputs whatever bit $\adv$ outputs.
 	\end{enumerate}
-	Now consider the value of the bit $b$ sampled in the EAV game. If $b = 0$, then the first $i - 1$ ciphertexts that $\adv$ received were encryptions of $m_1$ and the remaining ciphertexts were encryptions of $m_0$, where all encryptions were under keys sampled independently with $\Pi.\gen$. Thus, from the view of $\adv$ everything followed the same distribution as in the game $H_{i - 1}$ and
+	Now consider the value of the bit $b$ sampled in $\game{\Pi}{\kappa}{EAV}(\adv')$. If $b = 0$, then the first $i - 1$ ciphertexts that $\adv$ received were encryptions of $m_1$ and the remaining ciphertexts were encryptions of $m_0$, where all encryptions were under keys sampled independently with $\Pi.\gen$. Thus, from the view of $\adv$ everything followed the same distribution as in the game $H_{i - 1}$ and
 	\[
 		\pr{0 \from \adv' \mid b = 0} = \pr{0 \from \adv \mid H_{i - 1}}.
 	\]
-	Analogously, in the case $b = 1$ the first $i$ ciphertexts received by $\adv$ were encryptions of $m_1$ and the rest encryptions of $m_0$ so
+	Analogously, in the case $b = 1$ the first $i$ ciphertexts received by $\adv$ were encryptions of $m_1$ and the rest encryptions of $m_0$, so
 	\[
 		\pr{0 \from \adv' \mid b = 1} = \pr{0 \from \adv \mid H_{i}}.
 	\]
@@ -38,7 +38,7 @@
 				\pr{0 \from \adv \mid H_{i - 1}} - & \pr{0 \from \adv \mid H_{i}} \\
 				& = \pr{0 \from \adv' \mid b = 0} - \pr{0 \from \adv' \mid b = 1}
 			\end{split} \\
-			& \stackrel{\mathclap{\eqref{eq:advantage-equality}}}{=}  \mathrm{Adv}_{\Pi}^{\mathrm{EAV}}(\adv')                                         \\
+			& \stackrel{\mathclap{\eqref{eq:advantage-equality}}}{=} \advantage{\Pi}{\kappa}{EAV}(\adv')                                         \\
 			& \le \epsilon
 		\end{split}
 	\end{align}
@@ -54,9 +54,9 @@
 	\]
 	Then
 	\begin{align*}
-		\mathrm{Adv}_{\Pi}^{\mathrm{MIS-EAV}}(\adv) & \stackrel{\mathclap{\eqref{eq:advantage-equality}}}{=} \; \pr{0 \from \adv \mid b = 0} - \pr{0 \from \adv \mid b = 1} \\
-		                                            & = \pr{0 \from \adv \mid H_0} - \pr{0 \from \adv \mid H_q}                                                             \\
-		                                            & = \sum_{i = 1}^{q} \pr{0 \from \adv \mid H_{i - 1}} - \pr{0 \from \adv \mid H_i}                                      \\
-		                                            & \stackrel{\mathclap{\eqref{eq:eav-to-mis-eav-hybrid-distinguisher}}}{\le} q \cdot \epsilon.
+		\advantage{\Pi}{\kappa}{MIS-EAV}(\adv) & \stackrel{\mathclap{\eqref{eq:advantage-equality}}}{=} \; \pr{0 \from \adv \mid b = 0} - \pr{0 \from \adv \mid b = 1} \\
+		                                       & = \pr{0 \from \adv \mid H_0} - \pr{0 \from \adv \mid H_q}                                                             \\
+		                                       & = \sum_{i = 1}^{q} \pr{0 \from \adv \mid H_{i - 1}} - \pr{0 \from \adv \mid H_i}                                      \\
+		                                       & \stackrel{\mathclap{\eqref{eq:eav-to-mis-eav-hybrid-distinguisher}}}{\le} q \cdot \epsilon.
 	\end{align*}
 \end{proof}
