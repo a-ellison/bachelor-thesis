@@ -481,7 +481,7 @@ An intuitive strategy would be to embed the challenge by setting $pk_a = g^x$ an
 \end{itemize}
 If we make sure not to change $\adv$'s view of the game in the case $k = g^{x \cdot y}$ in this process, we can achieve an advantage of about $\pr{\fdh} / N^2$, where one factor $1/N$ arises from guessing $a$ and another from guessing $u_j$. Unfortunately, this would yield no improvement over the result from \cite{ttkem}.
 
-To avoid this issue, we can use random self-reducability of the DDH problem. We can avoid guessing $u_j$ by being more clever about how we embed $g^y$. Instead of embedding $g^y$ into a single encryption edge, we embed it into all $d$ encryption edges. To get a uniformly random exponent from $y$ we set $y_j = y + r_j \mod q$ with $r_j \from [q]$. Given $g^{x \cdot y_j}$, we can easily compute $g^{x \cdot y}$:
+To avoid this issue, we can use random self-reducability of the DDH problem and avoid guessing $u_j$. Instead of embedding $g^y$ into a single encryption edge, we embed it into all $d$ encryption edges. To get a uniformly random exponent from $y$ we set $y_j = y + r_j \mod q$ with $r_j \from [q]$. Given $g^{x \cdot y_j}$, we can easily compute $g^{x \cdot y}$:
 \[
 	g^{x \cdot y_j} = g^{x \cdot (y + r_j)} = g^{x \cdot y}	\cdot g^{x \cdot r_j} \iff g^{x \cdot y} = g^{x \cdot y_j} \cdot \underbrace{((g^x)^{r_j})^{-1}}_{\eqqcolon \, R_j}.
 \]
@@ -492,7 +492,7 @@ Now to determine whether $k$ is the real Diffie-Hellman key, we check whether $q
 	\begin{enumerate}[1.]
 		\item $\adv'$ gets $h_1, h_2$ and $k$ from the DDH challenger.
 		\item $\adv'$ runs $\adv$ to get $n$ and $D$, samples $a \from [n]$ and initializes the GSD graph, seeds and the set of edges and corrupted nodes as in step \ref{def:sd-gsd-game-step-init} of the SD-GSD game, with the sole exception that $pk_a = h_1$ (as opposed to setting it to the public key output by $\dhies.\gen(1^\eta, \hgen(s_a))$).
-		\item $\adv'$ faithfully simulates the SD-GSD game to $\adv$ with the following exception: For the $j$-th query $\operatorname{encrypt}(a, u_j)$ made by $\adv$, $\adv'$ replies with $\langle h_2 \cdot g^{r_j}, \Pi_s.\enc_{k_j}(s_{u_j}) \rangle$ where $r_j \from [q]$, $k_j \from \{0, 1\}^\kappa$. $\adv'$ also computes and stores $R_j = \left(pk_a^{r_j}\right)^{-1}$.
+		\item $\adv'$ faithfully simulates the SD-GSD game to $\adv$ with the following exception: For the $j$-th query $\operatorname{encrypt}(a, u_j)$ made by $\adv$, $\adv'$ replies with $\langle h_2 \cdot g^{r_j}, \Pi_s.\enc_{k_j}(s_{u_j}) \rangle$ where $r_j \from [q]$, $k_j \from \{0, 1\}^\eta$. $\adv'$ also computes and stores $R_j = \left(pk_a^{r_j}\right)^{-1}$.
 
 		      All random oracles queries are simulated by sampling the output of the oracle u.a.r. for new queries and using the value first sampled for repeated queries.
 
@@ -520,7 +520,7 @@ Now to determine whether $k$ is the real Diffie-Hellman key, we check whether $q
 	\begin{equation} \label{eq:lemma-dh-reduction-b=0}
 		\pr{0 \from \adv' \mid b = 0} \ge \frac{\pr{\fdh}}{N}.
 	\end{equation}
-	This part of the proof proceeds very similarly to the proof of Lemma~\vref{lemma:eav-reduction} and we will be a bit more concise. We focus on executions of $\game{\mathcal{G}}{\eta}{DDH}(\adv)$ with $b = 0$. Let the games $G_1, G_2$ be defined as in Lemma~\ref{lemma:eav-reduction}, where we denote the node sampled at the beginning of each game by $a_1, a_2$, respectively (as opposed to $w_1, w_2$). Let $E = \fdh$ and let $E_1, E_2$ and $E'$ be the analogous events in $G_1, G_2$ and the game simulated by $\adv'$ (note that in this latter game, the group elements $pk_a^{\log_g(h_2) + r_j}$ are also hidden Diffie-Hellman keys). Finally, we introduce the random variable
+	This part of the proof proceeds very similarly to the proof of Lemma~\vref{lemma:eav-reduction} and we will be a bit more concise. We focus on executions of $\game{\mathcal{G}}{\eta}{DDH}(\adv')$ with $b = 0$. Let the games $G_1, G_2$ be defined as in Lemma~\ref{lemma:eav-reduction}, where we denote the node sampled at the beginning of each game by $a_1, a_2$, respectively (as opposed to $w_1, w_2$). Let $E = \fdh$ and let $E_1, E_2$ and $E'$ be the analogous events in $G_1, G_2$ and the game simulated by $\adv'$ (note that in this latter game, the group elements $pk_a^{\log_g(h_2) + r_j}$ are also hidden Diffie-Hellman keys). Finally, we introduce the random variable
 	\[
 		A = \begin{cases}
 			0 & \overline{\fdh}                                                                    \\
@@ -563,7 +563,7 @@ Now to determine whether $k$ is the real Diffie-Hellman key, we check whether $q
 	\begin{equation} \label{eq:lemma-dh-reduction-G2-vs-simulation}
 		\pr{A_2 = a_2} = \pr{A' = a}.
 	\end{equation}
-	Consider how $G_2$ differs from the game simulated by $\adv'$. As in Lemma~\ref{lemma:eav-reduction}, both games abort at exactly the same events (note that if $q_i \cdot R_j = k$ holds and $\adv$ outputs $1$, then $q_i = k \cdot R_j^{-1} = k \cdot pk_a^{r_j} = h_1^{\log_g(h_2)} \cdot pk_a^{r_j} = pk_a^{\log_g(h_2) + r_j}$, a hidden Diffie-Hellman key). The game simulated by $\adv'$ differs in two aspects:
+	Consider how $G_2$ differs from the game simulated by $\adv'$. As in Lemma~\ref{lemma:eav-reduction}, both games abort at exactly the same events (note that if $q_i \cdot R_j = k$ holds and $\adv'$ outputs $0$, then $q_i = k \cdot R_j^{-1} = k \cdot pk_a^{r_j} = h_1^{\log_g(h_2)} \cdot pk_a^{r_j} = pk_a^{\log_g(h_2) + r_j}$, a hidden Diffie-Hellman key). The game simulated by $\adv'$ differs in two aspects:
 	\begin{enumerate}[(i)]
 		\item $\adv'$ sets $pk_a$ to $h_1$ and not to the public key output by $\dhies.\gen(1^\eta, \hgen(s_a))$
 		\item $\adv'$ answers queries $\operatorname{encrypt}(a, u)$ differently
@@ -571,7 +571,7 @@ Now to determine whether $k$ is the real Diffie-Hellman key, we check whether $q
 	Note that as long as the game $G_2$ is ongoing, $\adv$ has not queried $\hgen$ for $s_a$ or $\hdh$ for a hidden Diffie-Hellman key. Both differences are therefore indistinguishable:
 	\begin{enumerate}[(i)]
 		\item By Definition~\ref{def:public-key-encryption}, the output of $\dhies.\gen(1^\eta, r)$ with $r \from \{0, 1\}^\rho$ follows the same distribution as the output of $\dhies.\gen(1^\eta)$. The former process is behind the distribution of $pk_a$ as viewed from $\adv$ in $G_2$, as $\adv$ has not queried $\hgen(s_a)$, and the latter process is behind the distribution of $pk_a$ in the game simulated by $\adv'$, as the DDH challenger generates a public key with the same distribution as $\dhies.\gen(1^\eta)$. Since both processes follow the same distribution, $pk_a$ follows the same in $G_2$ and the game simulated by $\adv'$ from $\adv$'s perspecive.
-		\item In $G_2$ a query $\operatorname{encrypt}(a, u)$ is answered with $\langle g^z, c \rangle$ where $z \from [q], c \from \Pi_s.\enc_k(s_u)$ and $k = \hdh(pk_a^z)$. $\adv'$ answers such a query with $\langle g^{\log_g(h_1) + r}, c' \rangle$ where $r \from [q], c' \from \Pi_s.\enc_{k'}(s_u)$ and $k' \from \{0, 1\}^\kappa$. First, $\log_g(h_1) + r$ follows the same distribution as $z$. Second, $pk_a^z$ is a hidden Diffie-Hellman key and from $\adv$'s view $k$ follows the same distribution as $k'$.
+		\item In $G_2$ a query $\operatorname{encrypt}(a, u)$ is answered with $\langle g^z, c \rangle$ where $z \from [q], c \from \Pi_s.\enc_k(s_u)$ and $k = \hdh(pk_a^z)$. $\adv'$ answers such a query with $\langle g^{\log_g(h_1) + r}, c' \rangle$ where $r \from [q], c' \from \Pi_s.\enc_{k'}(s_u)$ and $k' \from \{0, 1\}^\eta$. First, $\log_g(h_1) + r$ follows the same distribution as $z$. Second, $pk_a^z$ is a hidden Diffie-Hellman key and from $\adv$'s view $k$ follows the same distribution as $k'$.
 	\end{enumerate}
 	Thus \eqref{eq:lemma-dh-reduction-G2-vs-simulation} indeed holds.
 
@@ -604,8 +604,8 @@ Now to determine whether $k$ is the real Diffie-Hellman key, we check whether $q
 	Furthemore, going through the details yields that $\adv'$ runs in time
 	\begin{align*}
 		\begin{split}
-			t_{\adv'} \coloneqq \tilde{t} + \mathcal{O}\big(\rho \cdot t_{\mathrm{sample}} \cdot \ms & + (\gamma + \kappa \cdot t_{\mathrm{sample}}) \cdot \mdh \\
-			& + N \cdot ((\rho + \kappa) \cdot t_{\mathrm{sample}} + \mdh \cdot t_{\mathrm{op}} + t_{\dhies.\gen})  \\
+			t_{\adv'} \coloneqq \tilde{t} + \mathcal{O}\big(\rho \cdot t_{\mathrm{sample}} \cdot \ms & + (\gamma + \eta \cdot t_{\mathrm{sample}}) \cdot \mdh \\
+			& + N \cdot ((\rho + \eta) \cdot t_{\mathrm{sample}} + \mdh \cdot t_{\mathrm{op}} + t_{\dhies.\gen})  \\
 			& +  N^2 \cdot t_{\dhies.\enc}\big).
 		\end{split}
 	\end{align*}
