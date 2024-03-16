@@ -267,83 +267,89 @@ Continuing the discussion above, so far we have considered a necessary condition
 
 \todo{Describe why TreeKEM satisfies \ref{def:cgka-correctness-consistent-history}.}
 
-\subsection{Outline of the protocol}
-
-As already outlined in the introduction, TreeKEM structures a group of users as a full binary tree with the group members at the leaves. The group key is then derived from the root of the tree. Every node $v$ in the tree has an associated key pair $(pk_v, sk_v)$ output by $\Pi.\gen$ where $\Pi$ is a public-key encryption scheme. All public keys are known to all users. Let the \emph{direct path} of a leaf be the path from the leaf's first parent to the root. In the usual case, every user at a leaf knows the secret keys of all nodes on their direct path, though we will see exceptions to this rule later. To illustrate the scheme and how commit operations are performed, we will consider of a group with users $A, B, \ldots, G$ and $H$, as depicted in Figure~\ref{fig:treekem-tree}. In the following, we will use these labels for the users both to refer to the users themselves and to their nodes in the tree.
-
-\begin{figure}
-	\begin{center}
-		\includegraphics{figures/treekem-tree}
-	\end{center}
-	\caption{Illustration of a group with users 8 users in the TreeKEM protocol.}\label{fig:treekem-tree}
-\end{figure}
-
-The idea behind this tree structure is that it allows for a user creating a commit with a new group key to share the new group key with the group using only a few encryptions, while still updating all the secrets the user knew in the tree in order to recover from a possible compromise (recall that in a PC-CGKA scheme a commit also updates the committer's key material).
-To illustrate how a commit is performed and how the new group key is computed, say a user $A$ performs a commit. First we only consider commits without any proposals. TreeKEM specifies two hash functions $\hgen, \hdep \colon \{0, 1\}^{r(\eta)} \to \{0, 1\}^{r(\eta)}$ where $r$ gives the number of bits of randomness used by $\Pi.\gen(1^\eta)$. Let $d = 3$ the depth of user $A$. $A$ will replace all the $d + 1$ nodes on their path to the root (including their leaf) with new nodes $A, p_1, \ldots, p_d$. Although it would be more accurate to say that $A$ just replaces the information stored in the original nodes, and this view makes more sense when implementing the protocol, it will become convenient later to say that $A$ creates new nodes.
-The key pairs for the new nodes are sampled as follows. For the leaf node $A$, user $A$ simply samples a key pair by running $\Pi.\gen(1^\eta)$. For the remaining nodes, they first sample $s_1 \from \{0, 1\}^{r(\eta)}$ and compute the key pair of the first parent $p_1$ as $\Pi.\gen(1^\eta, \hgen(s_1))$. For $i \in \{2, \ldots, d\}$ they then compute $s_i \coloneqq \hdep(s_{i - 1})$ and set the key pair of $p_i$ to be $\Pi.\gen(1^\eta, \hgen(s_i))$. The new group key is $k \coloneqq \hdep(s_{d})$.
-
-User $A$ only needs to share (encryptions of) the seeds $s_i$ for the other users to update their view of the tree and compute the new group key:
-\begin{itemize}
-	\item To share the group key with user $B$, $A$ computes the ciphertext $c_1 \coloneqq \Pi.\enc_{pk_B}(s_1)$. $B$ can then compute the seed $s_1$, then use that to compute the seeds $s_2, \ldots, s_d$, the key pairs of all new nodes on their path to the root and the group key $k$.
-	\item To share the new group key with users $C$ and $D$, $A$ computes the ciphertext $c_2 \coloneqq \Pi.\enc_{pk_X}(s_2)$, where $X$ is the parent of the nodes $C$ and $D$. Both $C$ and $D$ know the secret key $sk_X$ of their parent and can decrypt $c_2$.
-	\item To share the new group key with users $E, F, G$ and $H$, $A$ computes the ciphertext $c_3 \coloneqq \Pi.\enc_{pk_Y}(s_3)$, where $Y$ is the right child of the root node. Again, all users under $Y$ know $sk_Y$ and can thus decrypt $c_3$.
-\end{itemize}
-The commit $c$ that $A$ shares with all users includes the ciphertexts $c_1, c_2$ and $c_3$ and the public keys of all new nodes. Figure~\ref{fig:treekem-simple-update} illustrates the commit performed by $A$.
-
-\begin{figure}
-	\begin{center}
-		\includegraphics{figures/treekem-simple-update}
-	\end{center}
-	\caption{The commit by user $A$ described in the text. Dashed directed edges illustrate the fact that the target is related to the source via the hash function $\hdep$. The solid directed edges illustrate the fact that the seed of the target node is encrypted to the public key of the source node.}\label{fig:treekem-simple-update}
-\end{figure}
-
-The nodes $B, X$ and $Y$ form the \emph{copath} of $A$: the copath of a node consists of the sibling of each node on the node's path to the root, excluding the root itself. In the ideal case as above, a node performing a commit only has to compute an encryption for each node on it's copath, i.e. logarithmically many in the total number of users.
-
-Things look a bit different if the commit contains a remove proposal. Say user $A$ creates a commit that contains a remove proposal for user $E$. We could just let $A$ replace the nodes on $E$'s direct path $E$ and not encrypt anything for $E$. However, if $A$ were compromised while replacing $E$'s direct path and performed another commit to update their key material after the compromise, the information leaked in the compromise could still be used to compute the new group key, as it includes the secret keys of the nodes on $E$'s direct path.
-Instead, all nodes on $E$'s leaf and all nodes on $E$'s direct path are replaced by \emph{blank} nodes: nodes with no associated key pair. Now $A$ would have to encrypt the secret $s_3$ directly to $F$ and to the parent node of $G$ and $H$ in the commit removing user $E$. See Figure~\ref{fig:treekem-remove-user}. A blank leaf node can be populated with a new user. A blank node that is not a leaf will be replaced by a normal node once some user below the node performs a commit. Blank nodes are also useful to represent empty subtrees that have no users.
-
-\begin{figure}
-	\begin{center}
-		\todo{create figure}
-	\end{center}
-	\caption{The commit by user $A$ removing user $E$ described in the text.}\label{fig:treekem-remove-user}
-\end{figure}
-
-Creating a commit with an update proposal for user $u$ is analogous. The update proposal simply contains the public key of user $u$'s new leaf, while $u$ stored the corresponding secret key locally when creating the proposal. Because we don't want the committer to know the secret keys along $u$'s direct path, we must again blank all these nodes and encrypt to the populated nodes below these blank nodes directly.
-
-Adding a node introduces one more complication. Consider the same group as in Figure~\ref{fig:treekem-tree}, but with the leaf of user $G$ blank. Now say user $A$ would like to add user $G$ to the group.
-
-\todo{Finish explanation of adding a user and unmerged leaves.}
-
-\todo{Define resolution.}
-
-\subsection{Algorithms}
-
-\todo{Describe algorithms.}
-
-% Algorithm $\gen$:
-% \begin{itemize}
-% 	\item generate init key and private key with $\dhies.\gen$
-% 	\item generate leaf node public and private key with $\dhies.\gen$
-% 	\item output init key and leaf node public key as public key, and both private keys as secret key
-% \end{itemize}
-%
-% Algorithm $\operatorname{ProposeUpdate}(\sigma)$:
-% \begin{itemize}
-% 	\item generate $(pk, sk) \dhies.\gen()$
-% 	\item output proposal $(pk)$ and store $sk$ in $\sigma$
-% \end{itemize}
-%
-% Algorithm $\operatorname{ProposeAdd}(\sigma, pk_{\mathrm{new}})$:
-% \begin{itemize}
-% 	\item output proposal $(pk_{\mathrm{new}})$ and store the proposal in $\sigma$
-% \end{itemize}
-%
-% Algorithm $\operatorname{ProposeRemove}(\sigma, v)$:
-% \begin{itemize}
-% 	\item $v$ is the leaf node of the user to be removed
-% 	\item output proposal $(v)$ and store the proposal in $\sigma$
-% \end{itemize}
+\begin{definition}[TreeKEM {\cite{rfc9420}}] Let $\eta$ denote the security parameter. Let $\Pi$ a public-key encryption scheme, where $\Pi.\gen(1^\eta)$ uses $\rho(\eta)$ bits of randomness. Let $\fhgen = \{ \hgen^{(\eta)} \mid \eta \in \N\}, \fhdep = \{ \hdep^{(\eta)} \mid \eta \in \N\}$ families of functions with $\hgen^{(\eta)}, \hdep^{(\eta)} \colon \{0, 1\}^{\rho(\eta)} \to \{0, 1\}^{\rho(\eta)}$. We write $\hgen \coloneqq \hgen^{(\eta)}, \hdep \coloneqq \hdep^{(\eta)}$ and $\rho \coloneqq \rho(\eta)$ if $\eta$ is clear from the context. Define the CGKA scheme $\treekem$ with key space $\mathcal{K}(\eta) = \{0, 1\}^{\rho(\eta)}$ consisting of the following algorithms, where $id$ refers to the identifier of the user running the algorithm:
+	\begin{itemize}
+		\item $\gen$:
+		      \begin{itemize}
+			      \item generate $(pk_{\mathrm{init}}, sk_{\mathrm{init}}) \from \Pi.\gen(1^\eta)$, where $pk_{\mathrm{init}}$ is the init key
+			      \item generate the key pair of the user's leaf $(pk_{\mathrm{leaf}}, sk_{\mathrm{leaf}}) \from \Pi.\gen(1^\eta)$
+			      \item set $pk \coloneqq (pk_{\mathrm{init}}, pk_{\mathrm{leaf}})$, this is the user's key package, and $sk \coloneqq (sk_{\mathrm{init}}, sk_{\mathrm{leaf}})$, this will be stored by the user, and output the key pair $(pk, sk)$
+		      \end{itemize}
+		\item $\operatorname{CreateGroup}(1^\eta)$:
+		      \begin{itemize}
+			      \item generate $(pk_{\mathrm{leaf}}, sk_{\mathrm{leaf}}) \from \Pi.\gen(1^\eta)$
+			      \item create a tree with a single node $v$ and set $(pk_v, sk_v) = (pk_{\mathrm{leaf}}, sk_{\mathrm{leaf}})$
+			      \item set the group key to $k \from \{0, 1\}^\rho$
+			      \item output a state $\sigma$ containing the tree, the group key $k$ and the security parameter $\eta$
+		      \end{itemize}
+		\item $\operatorname{Key}(\sigma)$: output the group key stored in $\sigma$
+		\item $\operatorname{ProposeUpdate}(\sigma)$:
+		      \begin{itemize}
+			      \item generate $(pk_{\mathrm{leaf}}, sk_{\mathrm{leaf}}) \from \Pi.\gen(1^\eta)$
+			      \item create the add proposal $p \coloneqq (\mathrm{update}, id, pk_{\mathrm{leaf}})$ and store $sk_{\mathrm{leaf}}$ in $\sigma$
+			      \item output $(\sigma, p)$
+		      \end{itemize}
+		\item $\operatorname{ProposeAdd}(\sigma, id', pk)$:
+		      \begin{itemize}
+			      \item create the add proposal $p \coloneqq (\mathrm{add}, id', pk)$
+			      \item output $(\sigma, p)$
+		      \end{itemize}
+		\item $\operatorname{ProposeRemove}(\sigma, id')$:
+		      \begin{itemize}
+			      \item create the remove proposal $p \coloneqq (\mathrm{remove}, id')$
+			      \item output $(\sigma, p)$
+		      \end{itemize}
+		\item $\operatorname{CreateCommit}(\sigma, (p_1, \ldots, p_k))$:
+		      \begin{itemize}
+			      \item create a commit object $c$ storing all proposals and the author $id$ of the commit
+			      \item for every update proposal $p_j = (\mathrm{update}, id', pk')$:
+			            \begin{itemize}
+				            \item replace the leaf of user $id'$ with a new leaf with public key $pk$
+				            \item replace all nodes on the direct path of the new leaf with blank ones
+			            \end{itemize}
+			      \item for every remove proposal $p_j = (\mathrm{remove}, id')$:
+			            \begin{itemize}
+				            \item replace the leaf of user $id'$ and all nodes on their direct path with blank nodes
+				            \item as long as the right child of the root has an empty resolution (and the root actually has a right child), truncate the tree by deleting the subtree of the root's right child and the root itself, and setting the root's left child as the new root
+			            \end{itemize}
+			      \item for every add proposal $p_j = (\mathrm{add}, id', (pk_{\mathrm{init}}', pk_{\mathrm{leaf}}'))$ (in order):
+			            \begin{itemize}
+				            \item if there are no blank leaves in the tree, extend the tree to the right by setting the root to be a new blank node, the left child of the root to the old root and the right child of the root to a full subtree of blank nodes (of the same height as the old root's subtree)
+				            \item replace the leftmost blank leaf in the tree with a new leaf with public key $pk_{\mathrm{leaf}}'$
+				            \item for every non-blank node on the new leaf's direct path, add the new leaf to the node's set of unmerged leaves
+			            \end{itemize}
+			      \item generate $(pk_{\mathrm{leaf}}, sk_{\mathrm{leaf}}) \from \Pi.\gen(1^\eta)$ and sample $s_0 \from \{0, 1\}^\rho$
+			      \item replace $id$'s leaf with a new leaf with key pair $(pk_{\mathrm{leaf}}, sk_{\mathrm{leaf}})$
+			      \item If the tree consists of a single leaf, set the group key to $s_0$. Otherwise, for the $i$-th non-blank node $v_i$ on $id$'s direct path where $w_i$ is the sibling of $v_i$:
+			            \begin{itemize}
+				            \item if $i > 0$, compute $s_i \coloneqq \hdep(s_{i - 1})$ and $(pk, sk) = \Pi.\gen(1^\eta, \hgen(s_i))$
+				            \item replace $v_i$ with a new node $v_i'$ with key pair $(pk, sk)$ (and no unmerged leaves)
+				            \item For every node $u$ in the resolution of $w_i$: if $u$ is the leaf of user $id'$ and there is an add proposal $(\mathrm{add}, id', (pk_{\mathrm{init}}', pk_{\mathrm{leaf}}'))$, compute a ciphertext $c_u \from \Pi.\enc_{pk_{init}'}(s_i)$. Otherwise, compute a ciphertext $c_u \from \Pi.\enc_{pk_u}(s_i)$ and store it in the commit $c$.
+			            \end{itemize}
+			            Set the group key to $\hdep(s_d)$ where $v_d$ is the last (non-blank) node on $id$'s direct path, i.e.\ the root. Store the list of pubic keys $(pk_{\mathrm{leaf}}, pk_{v_0'}, \ldots, pk_{v_d'})$ in $c$.
+			      \item for every add proposal $p_j = (\mathrm{add}, id', (pk_{\mathrm{init}}', pk_{\mathrm{leaf}}'))$:
+			            \begin{itemize}
+				            \item let $l$ be the leaf of user $id'$ in the tree
+				            \item create a welcome message $w_{id'}$ containing the identifier $id'$, the ciphertext $c_l$ computed above and a copy of the public part of the tree (i.e.\ the tree without any secret keys)
+			            \end{itemize}
+			      \item output $(\sigma', c, \omega)$, where $\sigma'$ is the new group state of $id'$ after applying the above changes to the tree and setting the new group key, and $\omega$ is the list of welcome messages computed (in any order)
+		      \end{itemize}
+		\item $\operatorname{ProcessCommit}(\sigma, c)$:
+		      \begin{itemize}
+			      \item apply all proposals in $c$ to the tree as in $\operatorname{CreateCommit}$
+			      \item replace the committer's leaf and the nodes on the committer's (non-blank) direct path with the new nodes created in the commit\footenote{Recall that $c$ contains the public key of each new node.}
+			      \item find the right ciphertext $c_u$ encrypting the seed of the new node $u$ on $id$'s direct path, decrypt it (using the appropriate secret key known to $id$) and compute (and store) the secret key of $u$, the non-blank nodes above $u$ and the new group key (using the same computations involving $\hdep$ and $\hgen$ as in $\operatorname{CreateCommit}$)
+			      \item output the updated group state $\sigma'$ of $id$ containing the new tree and group key
+		      \end{itemize}
+		\item $\operatorname{ProcessWelcome}((pk_{\mathrm{init}}, pk_{\mathrm{leaf}}), (sk_{\mathrm{init}}, sk_{\mathrm{leaf}}), w)$:
+		      \begin{itemize}
+			      \item compute the seed $s = \Pi.\dec_{sk_{\mathrm{init}}}(c)$ of node $u$ in the tree provided in $w$, where $c$ is the ciphertext provided in $w$
+			      \item compute the secret key of $u$ and the non-blank nodes above $u$, and store them in the tree, and compute the group key
+			      \item output a group state $\sigma$ containing the tree, the group key and the security parameter $\eta$ (derived from $pk_{\mathrm{init}}$)
+		      \end{itemize}
+	\end{itemize}
+	The scheme $\treekem$ is called the \emph{TreeKEM} protocol.
+\end{definition}
 
 \section{TreeKEM security from SD-GSD security}
 
