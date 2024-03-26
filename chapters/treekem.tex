@@ -257,7 +257,7 @@ Continuing the discussion above, so far we have considered a necessary condition
 
 
 \begin{definition}[PC-CGKA security]
-	A PC-CGKA scheme is \emph{$(t, \epsilon, c, p, u)$-CGKA-secure} if for all $\eta$, for any adversary $\adv$ making at most $c(\eta)$ queries to $\operatorname{create-commit}$, including at most $p(\eta)$ update or add proposals in the created commits and asking for at most $u(\eta)$ users in step \ref{def:cgka-game-step-init} we have
+	A PC-CGKA scheme is \emph{$(t, \epsilon, c, p, u)$-CGKA-secure} if for all $\eta$, for any adversary $\adv$ making at most $c(\eta)$ queries to $\operatorname{create-commit}$, creating at most $p(\eta)$ update or add proposals in the created commits and asking for at most $u(\eta)$ users in step \ref{def:cgka-game-step-init} of the PC-CGKA game we have
 	\begin{align*}
 		\advantage{\Sigma}{\eta}{PC-CGKA}(\adv) \coloneqq 2 \cdot \left(\pr{\game{\Sigma}{\eta}{PC-CGKA}(\adv) = 1} - \frac{1}{2}\right) \le \epsilon(\eta).
 	\end{align*}
@@ -267,7 +267,9 @@ Continuing the discussion above, so far we have considered a necessary condition
 
 \todo{Describe why TreeKEM satisfies \ref{def:cgka-correctness-consistent-history}.}
 
-\begin{definition}[TreeKEM {\cite{rfc9420}}] Let $\eta$ denote the security parameter. Let $\Pi$ a public-key encryption scheme, where $\Pi.\gen(1^\eta)$ uses $\rho(\eta)$ bits of randomness. Let $\fhgen = \{ \hgen^{(\eta)} \mid \eta \in \N\}, \fhdep = \{ \hdep^{(\eta)} \mid \eta \in \N\}$ families of functions with $\hgen^{(\eta)}, \hdep^{(\eta)} \colon \{0, 1\}^{\rho(\eta)} \to \{0, 1\}^{\rho(\eta)}$. We write $\hgen \coloneqq \hgen^{(\eta)}, \hdep \coloneqq \hdep^{(\eta)}$ and $\rho \coloneqq \rho(\eta)$ if $\eta$ is clear from the context. Define the CGKA scheme $\treekem$ with key space $\mathcal{K}(\eta) = \{0, 1\}^{\rho(\eta)}$ consisting of the following algorithms, where $id$ refers to the identifier of the user running the algorithm:
+The TreeKEM protocol discussed in the literature is not described as an explicit protocol in the MLS specification \cite{rfc9420} and is thus only defined implicitly. The following description of the protocol was extracted from \cite{rfc9420}. Fully describing TreeKEM is complex and some details of the protocol were either simplified (e.g.\ the syntax of protocol messages) or left out as they are not relevant for proving security with respect to our definition (e.g.\ handling of bad inputs, signatures, hashes of the tree and additional functionality provided by the protocol).
+
+\begin{definition}[TreeKEM {\cite{rfc9420}}] Let $\eta$ denote the security parameter. Let $\Pi$ a public-key encryption scheme, where $\Pi.\gen(1^\eta)$ uses $\rho(\eta)$ bits of randomness. Let $\fhgen = \{ \hgen^{(\eta)} \mid \eta \in \N\}, \fhdep = \{ \hdep^{(\eta)} \mid \eta \in \N\}$ families of functions with $\hgen^{(\eta)}, \hdep^{(\eta)} \colon \{0, 1\}^{\rho(\eta)} \to \{0, 1\}^{\rho(\eta)}$. We write $\hgen \coloneqq \hgen^{(\eta)}, \hdep \coloneqq \hdep^{(\eta)}$ and $\rho \coloneqq \rho(\eta)$ if $\eta$ is clear from the context. Define the CGKA scheme $\treekem$ with key space $\mathcal{K}(\eta) = \{0, 1\}^{\rho(\eta)}$ and its algorithms defined as follows, where $id$ refers to the identifier of the user running the algorithm:
 	\begin{itemize}
 		\item $\gen$:
 		      \begin{itemize}
@@ -289,9 +291,9 @@ Continuing the discussion above, so far we have considered a necessary condition
 			      \item create the add proposal $p \coloneqq (\mathrm{update}, id, pk_{\mathrm{leaf}})$ and store $sk_{\mathrm{leaf}}$ in $\sigma$
 			      \item output $(\sigma, p)$
 		      \end{itemize}
-		\item $\operatorname{ProposeAdd}(\sigma, id', pk)$:
+		\item $\operatorname{ProposeAdd}(\sigma, id', pk')$:
 		      \begin{itemize}
-			      \item create the add proposal $p \coloneqq (\mathrm{add}, id', pk)$
+			      \item create the add proposal $p \coloneqq (\mathrm{add}, id', pk')$
 			      \item output $(\sigma, p)$
 		      \end{itemize}
 		\item $\operatorname{ProposeRemove}(\sigma, id')$:
@@ -304,7 +306,7 @@ Continuing the discussion above, so far we have considered a necessary condition
 			      \item create a commit object $c$ storing all proposals and the author $id$ of the commit
 			      \item for every update proposal $p_j = (\mathrm{update}, id', pk')$:
 			            \begin{itemize}
-				            \item replace the leaf of user $id'$ with a new leaf with public key $pk$
+				            \item replace the leaf of user $id'$ with a new leaf with public key $pk'$
 				            \item replace all nodes on the direct path of the new leaf with blank ones
 			            \end{itemize}
 			      \item for every remove proposal $p_j = (\mathrm{remove}, id')$:
@@ -324,7 +326,7 @@ Continuing the discussion above, so far we have considered a necessary condition
 			            \begin{itemize}
 				            \item if $i > 0$, compute $s_i \coloneqq \hdep(s_{i - 1})$ and $(pk, sk) = \Pi.\gen(1^\eta, \hgen(s_i))$
 				            \item replace $v_i$ with a new node $v_i'$ with key pair $(pk, sk)$ (and no unmerged leaves)
-				            \item For every node $u$ in the resolution of $w_i$: if $u$ is the leaf of user $id'$ and there is an add proposal $(\mathrm{add}, id', (pk_{\mathrm{init}}', pk_{\mathrm{leaf}}'))$, compute a ciphertext $c_u \from \Pi.\enc_{pk_{init}'}(s_i)$. Otherwise, compute a ciphertext $c_u \from \Pi.\enc_{pk_u}(s_i)$ and store it in the commit $c$.
+				            \item for every node $u$ in the resolution of $w_i$: If $u$ is the leaf of user $id'$ and there is an add proposal $(\mathrm{add}, id', (pk_{\mathrm{init}}', pk_{\mathrm{leaf}}'))$, compute a ciphertext $c_u \from \Pi.\enc_{pk_{\mathrm{init}}'}(s_i)$. Otherwise, compute a ciphertext $c_u \from \Pi.\enc_{pk_u}(s_i)$ and store it in the commit $c$.
 			            \end{itemize}
 			            Set the group key to $\hdep(s_d)$ where $v_d$ is the last (non-blank) node on $id$'s direct path, i.e.\ the root. Store the list of pubic keys $(pk_{\mathrm{leaf}}, pk_{v_0'}, \ldots, pk_{v_d'})$ in $c$.
 			      \item for every add proposal $p_j = (\mathrm{add}, id', (pk_{\mathrm{init}}', pk_{\mathrm{leaf}}'))$:
@@ -337,7 +339,7 @@ Continuing the discussion above, so far we have considered a necessary condition
 		\item $\operatorname{ProcessCommit}(\sigma, c)$:
 		      \begin{itemize}
 			      \item apply all proposals in $c$ to the tree as in $\operatorname{CreateCommit}$
-			      \item replace the committer's leaf and the nodes on the committer's (non-blank) direct path with the new nodes created in the commit\footenote{Recall that $c$ contains the public key of each new node.}
+			      \item replace the committer's leaf and the nodes on the committer's (non-blank) direct path with the new nodes created in the commit\footnote{Recall that $c$ contains the public key of each new node.}
 			      \item find the right ciphertext $c_u$ encrypting the seed of the new node $u$ on $id$'s direct path, decrypt it (using the appropriate secret key known to $id$) and compute (and store) the secret key of $u$, the non-blank nodes above $u$ and the new group key (using the same computations involving $\hdep$ and $\hgen$ as in $\operatorname{CreateCommit}$)
 			      \item output the updated group state $\sigma'$ of $id$ containing the new tree and group key
 		      \end{itemize}
@@ -348,26 +350,32 @@ Continuing the discussion above, so far we have considered a necessary condition
 			      \item output a group state $\sigma$ containing the tree, the group key and the security parameter $\eta$ (derived from $pk_{\mathrm{init}}$)
 		      \end{itemize}
 	\end{itemize}
-	The scheme $\treekem$ is called the \emph{TreeKEM} protocol.
+	The scheme $\treekem$ is called the \emph{TreeKEM protocol}.
 \end{definition}
+
+The full TreeKEM protocol as described in the RFC achieves the correctness property in Definition~\ref{def:consistent-group-state} using a hash of the tree.
 
 \section{TreeKEM security from SD-GSD security}
 
-\todo{Describe relationship between TreeKEM tree structure and GSD game.}
-
-% To motivate the main result of this section, let us make clear the relation between the PC-CGKA game for TreeKEM and the playing the SD-GSD security game. Consider the tree representing a group in TreeKEM. We can create a matching node in a GSD graph for each node in the tree. Each tree node except the root either has a key pair generated
-
 \todo{Finish statement of Theorem.}
 
+We already described the relationship between the TreeKEM protocol and the SD-GSD security game at the beginning of Chapter~\ref{sec:tighter-gsd-security}. The following theorem formalizes this.
+
 \begin{theorem}
-	Let $c, p, u \in \mathbb{N}$. Let $\treekem$ the TreeKEM protocol and recall the hash functions $\hgen, \hdep \colon \{0, 1\}^\lambda \to \{0, 1\}^\lambda$ used in TreeKEM. Let $\dhies$ the DHIES scheme instantiated with a private-key encryption scheme $\Pi_s$. Let $\hdh$ the KDF and $\mathbb{G}$ the group used in $\dhies$. If $\Pi_s$ is $(t, \epsilon)$-EAV secure, the DDH problem is $(t, \epsilon)$-hard in $\mathbb{G}$ and $\hgen, \hdep$ and $\hdh$ are modelled as random oracles, then $\treekem$ is $(\tilde{t}, \tilde{\epsilon}, c, p, u)$-PC-CGKA secure with
-	\[
-		\tilde{\epsilon} = 2 \cdot (u + 1) \cdot N \cdot \epsilon + \frac{2 \cdot \mdh \cdot N^2}{q} + \frac{\ms \cdot N}{2^{\lambda - 1}},
-	\]
-	where $N = c \cdot (\lceil \log(u) \rceil + 1) + p$, $\ms$ is an upper bound on the number of queries made to either $\hgen$ or $\hdep$ and $\mdh$ is an upper bound on the number of queries made to $\hdh$, and with
-	\[
-		\tilde{t} = \ldots
-	\]
+	Let $\eta$ denote the security parameter.
+	Let $\treekem$ the TreeKEM protocol instantiated with a public-key encryption scheme $\Pi$. Let $c, p, u$ functions in $\eta$. Set $N \coloneqq c \cdot (\ceil{\log(u)} + 1) + u + p$ and $\delta \coloneqq u$. If $\Pi$ is $(t, \epsilon, N, \delta)$-SD-GSD-secure in the ROM and the functions $\hgen, \hdep$ in $\treekem$ are modelled as random oracles, then $\treekem$ is $(\tilde{t}, \epsilon, c, p, u)$-PC-CGKA-secure with $\tilde{t} \approx t$.
 \end{theorem}
 
-\paragraph{Intuition} \todo{provide outline of the proof and reference proof in \cite{modular-group-messaging}.}
+\paragraph{Intuition} The approach for the proof is straightforward. Given an adversary $\adv$ against TreeKEM, we want to construct an SD-GSD adversary $\adv'$ that simulates $\game{\treekem}{\eta}{PC-CGKA}$ to $\adv$ and uses $\adv$'s ability to distinguish the group key of a safe commit from a random key to win the SD-GSD game. Every non-blank node in TreeKEM can be simulated with a corresponding node in the GSD graph. Note that the group key of a commit in TreeKEM is given by $\hdep(s)$ where $s$ is the seed of the root node. Thus, if $\adv$ can distinguish the group key of a safe commit from a uniformly random key $k \from \{0, 1\}^\rho$ in the simulation and $s$ is the seed the node in the GSD graph corresponding to the root of the tree in the commit, then $\adv$ is able to distinguish $\hdep(s)$ from $r \from \{0, 1\}^\rho$. For $\adv'$ to make use of this, we need to make sure that this node remains safe in the GSD graph.
+
+More concretely, let us go over how the various queries in the PC-CGKA game can be simulated. We will refer to nodes in the GSD graph as \emph{GSD nodes} and nodes in the TreeKEM tree as \emph{tree nodes}. We can also model the init keys with GSD nodes, as only seeds of nodes are ever encrypted with them. $\adv'$ can always keep track of the public state of the tree (as viewed by any user) using the $\mathrm{reveal}$ oracle in the SD-GSD game. For the initial $\operatorname{create-group}$ query or any $\operatorname{create-commit}$ query with a single node in the group, it suffices to create a GSD node for the tree leaf node and sample the group key of the commit manually. If $\adv$ asks to be challenged on such a commit, then we cannot make use of $\adv$'s output in the GSD game. However, note that if such a commit is safe, then $\adv$ is never leaked any information about the group key and has zero advantage in this case. Proposals can also be simulated easily as creating them only requires knowing public values. The leaf key pair sampled in an add proposal is of course modelled with a GSD node. To simulate the creation of a commit and corresponding welcome messages:
+\begin{itemize}
+	\item $\adv'$ can apply the proposals as in $\treekem.\operatorname{CreateCommmit}$, since this only requires knowing public values
+	\item use seed dependencies in the SD-GSD game to model the new nodes on the direct path
+	\item compute the ciphertexts for the commit and welcome messsages using queries to $\operatorname{encrypt}$
+\end{itemize}
+To simulate $\operatorname{deliver-commit}$ and $\operatorname{deliver-welcome}$, $\adv'$ updates the public state of the target user's tree accordingly. Queries to $\operatorname{corrupt}$ are a bit more involved. Since $\adv'$ can only keep track of the public state of each user, it must be prepared to compute the real group state of a user upon receiving such a query. Note however that the secret keys known by a group member can always be computed as a function of their current secret key, which can be learned using a $\operatorname{corrupt}$ query in the SD-GSD game, and the transcript of commits applied by the member with this secret key.
+
+Finally, it follows from Defintion~\ref{def:safe-commit} that when $\adv$ challenges a safe commit (in a group with more than one user), the corresponding GSD node that $\adv'$ challenges is also safe.
+
+For a detailed proof we refer the reader to \cite[Theorem 12]{modular-group-messaging}.

@@ -1,16 +1,5 @@
 \begin{abstract}
-	\todo{How to adapt abstract? What should it contain?}
+	The Messaging Layer Security (MLS) protocol, recently standardized in RFC 9420 \cite{rfc9420}, aims to provide efficient asynchronous group key establishment with strong security guarantees. The main component of MLS, which is the source of its important efficiency and security properties, is a protocol called TreeKEM \cite{treekem}. Given that a major vision for the MLS protocol is for it to become the new standard for messaging applications like WhatsApp, Facebook Messenger, Signal, etc.\ it has the potential to be used by a huge number of users. Thus, it is important to better understand the security of MLS and hence also of TreeKEM. In \cite{ttkem}, TreeKEM was proven adaptively secure in the Random Oracle Model (ROM) with a polynomial loss in security by proving a result about the security of an arbitrary public-key encryption scheme in a public-key version of the Generalized Selective Decryption (GSD) security game \cite{gsd}.
 
-	The Messaging Layer Security (MLS) protocol, recently standardized in RFC 9420 \cite{rfc9420}, aims to
-	provide efficient asynchronous group key establishment with strong security guarantees. TreeKEM
-	is the construction underlying MLS and a variant of it was proven adaptively secure in the Ran-
-	dom Oracle Model (ROM) with a polynomial loss in security in \cite{ttkem}. The proof makes use of
-	the Generalized Selective Decryption (GSD) security game introduced in \cite{gsd}, adapted to the
-	public-key setting. GSD security is closely related to the security of TreeKEM and the encryp-
-	tion scheme used in TreeKEM was proven to be GSD secure in the ROM under the standard
-	assumption of IND-CPA security, implying a proof of security for TreeKEM (a sketch of this
-	proof was provided in \cite{ttkem} for the TreeKEM variant).
-
-
-	\todo{describe results}
+	In this work, we prove a tighter bound for the security of TreeKEM. We follow the approach in \cite{ttkem} and first a introduce modified version of the public-key GSD game better suited for analyzing TreeKEM. We then provide a simple and detailed proof of security for a specific encryption scheme, the DHIES scheme (currently the only standardized scheme in MLS), in this game in the ROM and achieve a tighter bound compared to the result in \cite{ttkem}. We also define and describe the syntax and security of TreeKEM-like schemes and state a result linking the security of TreeKEM with security in our GSD game in the ROM.
 \end{abstract}
