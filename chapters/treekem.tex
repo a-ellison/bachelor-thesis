@@ -138,8 +138,6 @@ One could also consider the \emph{local} commit history of a group member $u$ in
 
 \subsection{PC-CGKA security}
 
-\todo{When is it okay to reset or delete key package of a user?}
-
 Our security definition is again inspired by \cite{ttkem}. We consider fully adaptive adversaries. The adversary controls all PC-CGKA operations performed by the users, can decide who receives what messages (i.e.\ the adversary has control over the delivery service), can decide what commits get applied or discarded, and when they are discarded, by querying ``$\operatorname{confirm}$'' and can corrupt the state of any user. We will refer to commits created by a user that they have not yet been told to apply or discard as \emph{unconfirmed commits}. Corrupting a user leaks the group states corresponding to all their unconfirmed commits. Because the adversary can schedule the delivery of messages as it likes, it is possible for the adversary to create ``forks'' in the group where some users in the group are told to process one commit, while other users are told to process another. Such forks could also happen in practice and should not break security.
 
 The adversary eventually chooses a commit to be challenged on, for which they must differentiate the group key from a uniformly random key. We must restrict the set of commits the adversary can ask to be challenged on to those that are \emph{safe} even in the face of previous or later corruptions. The level of FS and PCS expected from a PC-CGKA scheme is captured the size of this set of safe commits. Exactly which commits are considered safe will be explained later.
@@ -149,7 +147,7 @@ We also impose some notable restrictions on the adversary. The adversary cannot 
 The definition in \cite[Section B.1]{modular-group-messaging} is very similar in essence. The same restricions on the adversary are imposed. However, the security game provided there gives more power to the adversary: the adversary may additionally choose the randomness used in operations, choose its own public keys to be associated with users and tell certain users not to delete old keys. In the end this restricts the set of safe commits. We provide our own definition with the hope of having a formulation that is easier to digest, keeps the security game simpler and is more explicit about what commits are considered safe.
 
 \begin{definition}[The PC-CGKA game]
-	Let $\eta$ denote the security parameter and let $\Sigma$ a PC-CGKA scheme. Define the game $\game{\Sigma}{\eta}{CGKA}(\adv)$ for an adversary $\adv$:
+	Let $\eta$ denote the security parameter and let $\Sigma$ a PC-CGKA scheme. Define the game $\game{\Sigma}{\eta}{PC-CGKA}(\adv)$ for an adversary $\adv$:
 	\begin{enumerate}[1.]
 		\item \label{def:cgka-game-step-init} $\adv$ outputs $n \in \mathbb{N}$. For each $i \in [n]$, initialize a user $i$ by creating a (unique) identifier $id_i$, generating $(pk_i, sk_i) \from \Sigma.\gen(1^\eta)$, preparing $U_i = \varnothing$, the set of unconfirmed commits at user $i$, and setting $\sigma_i \coloneqq \varnothing$, where $\varnothing$ denotes the empty value. The state output by an algorithm of $\Sigma$ is never the empty value. $\adv$ is given $(pk_1, id_1), \ldots, (pk_n, id_n)$.
 
@@ -219,7 +217,7 @@ Now, it is important to notice that the encrypted information in commit $c$ is f
 \end{definition}
 
 \begin{definition}[Safe user] \label{def:safe-commit-wrt-user}
-	Let $\eta$ arbitrary and let $\Sigma$ a PC-CGKA scheme. Consider an execution of $\game{\Sigma}{\eta}{CGKA}(\adv)$ for some adversary $\adv$. Let $Q$ the total number of queries made by $\adv$. We will refer to queries by their index among all queries. Let $q^* \in [Q]$ a $\operatorname{create-group}(i)$ or $\operatorname{create-commit}(i, \cdot)$ query with $i \in [n]$ as the target user. Let $j \in [n]$ any user (including $i$) in the group after applying the commit $c^*$ created by $q^*$. Let the commit $c'$ be user $j$'s last update up to $c^*$.
+	Let $\eta$ arbitrary and let $\Sigma$ a PC-CGKA scheme. Consider an execution of $\game{\Sigma}{\eta}{PC-CGKA}(\adv)$ for some adversary $\adv$. Let $Q$ the total number of queries made by $\adv$. We will refer to queries by their index among all queries. Let $q^* \in [Q]$ a $\operatorname{create-group}(i)$ or $\operatorname{create-commit}(i, \cdot)$ query with $i \in [n]$ as the target user. Let $j \in [n]$ any user (including $i$) in the group after applying the commit $c^*$ created by $q^*$. Let the commit $c'$ be user $j$'s last update up to $c^*$.
 
 	Set the query $q^- \in [Q]$ depending on which case in Definition~\ref{def:last-update-before-commit} commit $c'$ falls into:
 	\begin{enumerate}[(i)]
@@ -240,7 +238,7 @@ Now, it is important to notice that the encrypted information in commit $c$ is f
 		\item Let $p$ be the update proposal for $j$ included in $c'$.
 		      \begin{itemize}
 			      \item \textbf{Case $j$ applied a commit $c_k$ that included $p$}: same as $(iv)$, but use the next query after $q_{\mathrm{deliver}}$, where $q_{\mathrm{deliver}}$ is the $\operatorname{deliver-commit}(j, k)$ query that let $j$ process $c_k$
-			      \item \textbf{Otherwise:} $q^+$ is the next query $q > q^-$ that led to user $j$ applying a commit $c$ that included a remove proposal for $j$, or set $q^+ = Q$ if no such commit exists \todo{explain this: the user will keep the new key material associated with the update proposal around in its state, so the key material is only deleted when $j$ is removed from the group}
+			      \item \textbf{Otherwise:} \todo{this should the next query after $q^-$ that leads to user $j$ applying a commit}
 		      \end{itemize}
 		\item same as $(iv)$ \todo{Note: here we are using that when $j$ is removed from the group they delete their old secret key, which contains the initial key material of $j$ in the group}
 		\item $q^+$ is the next query $q > q^-$ that led to user $j$ applying a commit $c$ that they created (i.e. $q$ is a $\operatorname{confirm}(k, 1)$ query with $c_k = c$) or that included an update or remove proposal for $j$ (i.e. $q$ is a $\operatorname{deliver-commit}(j, k)$ query with $c_k = c$), or set $q^+ = Q$ if no such commit exists
@@ -249,12 +247,13 @@ Now, it is important to notice that the encrypted information in commit $c$ is f
 	The commit $c^*$ is \emph{safe with respect to user $j$} if there was no query $\operatorname{corrupt}(j)$ in the interval $[q^-, q^+]$.
 \end{definition}
 
+\todo{Explain how this definition improves on \cite{ttkem}. (\cite{ttkem} is ambiguous in some case and also makes the interval unnecessarily large.)}
+
 Continuing the discussion above, so far we have considered a necessary condition to keep the commit $c$ safe by restricting the corruptions made to a specific user $j$. If $c$ is safe with respect to every user that $i$ considered to be in the group after applying $c$ (including user $i$), we would expect that the adversary is not able to compute the corresponding group key. Indeed, this is how we define a safe commit.
 
 \begin{definition}[Safe commit] \label{def:safe-commit}
 	Recall the setting of Definition~\ref{def:safe-commit-wrt-user}. As in Definition~\ref{def:safe-commit-wrt-user}, let $q^* \in [Q]$ a $\operatorname{create-group}(i)$ or $\operatorname{create-commit}(i, \cdot)$ query with $i \in [n]$ as the target user and let $c^*$ the commit created by $q^*$. The commit $c^*$ is \emph{safe} if for every user $j$ (including $i$) in the group after applying commit $c^*$, the commit $c^*$ is safe with respect to user $j$.
 \end{definition}
-
 
 \begin{definition}[PC-CGKA security]
 	A PC-CGKA scheme is \emph{$(t, \epsilon, c, p, u)$-CGKA-secure} if for all $\eta$, for any adversary $\adv$ making at most $c(\eta)$ queries to $\operatorname{create-commit}$, creating at most $p(\eta)$ update or add proposals in the created commits and asking for at most $u(\eta)$ users in step \ref{def:cgka-game-step-init} of the PC-CGKA game we have
@@ -264,8 +263,6 @@ Continuing the discussion above, so far we have considered a necessary condition
 \end{definition}
 
 \section{The TreeKEM Protocol}
-
-\todo{Describe why TreeKEM satisfies \ref{def:cgka-correctness-consistent-history}.}
 
 The TreeKEM protocol discussed in the literature is not described as an explicit protocol in the MLS specification \cite{rfc9420} and is thus only defined implicitly. The following description of the protocol was extracted from \cite{rfc9420}. Fully describing TreeKEM is complex and some details of the protocol were either simplified (e.g.\ the syntax of protocol messages) or left out as they are not relevant for proving security with respect to our definition (e.g.\ handling of bad inputs, signatures, hashes of the tree and additional functionality provided by the protocol).
 

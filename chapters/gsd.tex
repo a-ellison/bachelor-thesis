@@ -9,7 +9,13 @@ Now the generation of key pairs and the encryptions computed in TreeKEM match wh
 
 \section{Seeded GSD with Dependencies}
 
-\todo{Allow adversary to adaptively create nodes and seed dependencies. Also adapt proofs to guess from $[N]$ as opposed to $[n]$.}
+\todo{Allow adversary to adaptively create nodes and seed dependencies.
+	\begin{itemize}
+		\item adapt proofs to guess from $[N]$ as opposed to $[n]$
+		\item handle case where $\qs$ triggered because adversary queried a seed and that seed later became the seed of a newly created safe node
+	\end{itemize}
+}
+
 
 The definition provided here is inspired by the definition of the public-key GSD game (Definition 7) and the proof of Theorem 3 in \cite{ttkem}. A very similar definition appears in \cite{modular-group-messaging}, providing essentially the same abstraction over TreeKEM and also allowing for an adversary to provide the randmoness used for encryption and key generation. However, our definition has one notable difference: when asking to be challenged on a node with seed $s$, the adversary must distinguish $\hdep(s)$ from random as opposed to $s$. This stays true to how the group key is computed in TreeKEM and has the significant advantage of greatly simplifying our proof. On the other hand, the security implied by our definition is weaker (at least in the ROM), as it only guarantees that an adversary cannot compute the seed of the challenge node, whereas the other definitions guarantee that this seed cannot be distinguished from random.
 
@@ -143,7 +149,9 @@ Let $x_i = \log_g(pk_{u_i})$. Each encryption $c_i$ is a tuple of the form $\lan
 \end{enumerate}
 We can bound the probability of either of these events occurring using hardness of the DDH problem relative to $\mathcal{G}$ and EAV security of $\Pi_s$, respectively.
 
-To this end, we call a group element $h \in \mathbb{G}$ a \emph{hidden Diffie-Hellman key} if $h = pk_u^{y_{u, v}}$, where $(u, v)$ is an edge in the GSD graph, $u$ is safe and $y_{u, v}$ is the exponent chosen in the DHIES encryption of $s_v$ (i.e. $\adv$ was given a ciphertext of the form $\langle g^{y_{u, v}}, \ldots\rangle$ when it queried $\operatorname{encrypt}(u, v)$). Now analogously to above let $\qdh$ the event that $\adv$ queries $\hdh$ on a hidden Diffie-Hellman key, and let $\fdh$ the event that $\adv$ triggers $\qdh$ when $\qs$ has not (yet) been triggered. Then we can split the event $\qs$ into two cases as motivated above:
+To this end, we call a group element $h \in \mathbb{G}$ a \emph{hidden Diffie-Hellman key} if $h = pk_u^{y_{u, v}}$, where $(u, v)$ is an edge in the GSD graph, $u$ is safe and $y_{u, v}$ is the exponent chosen in the DHIES encryption of $s_v$ (i.e. $\adv$ was given a ciphertext of the form $\langle g^{y_{u, v}}, \ldots\rangle$ when it queried $\operatorname{encrypt}(u, v)$). Now analogously to above let $\qdh$ the event that $\adv$ queries $\hdh$ on a hidden Diffie-Hellman key, and let $\fdh$ the event that $\adv$ triggers $\qdh$ when $\qs$ has not (yet) been triggered.
+\todo{Querying a hidden DH key can also happen when the adversary first queries the group element and then later does an encrypt query that creates an edge with that group element as the key. Add notes in SD-GSD adversaries in proofs to explain how they keep track of this and check if any arguments must be adapted (what is essential is that the adversary has not queried $\hdh(k)$ for any hidden key $k$ and the simulations are thus distributed identically).}
+Then we can split the event $\qs$ into two cases as motivated above:
 \begin{align*}
 	\pr{\qs} & = \pr{\qs \land \fdh} + \pr{\qs \land \overline{\fdh}\,}.
 \end{align*}
