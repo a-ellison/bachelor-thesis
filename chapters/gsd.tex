@@ -101,8 +101,9 @@ Since in this work we are interested in SD-GSD security for the case where $\hge
 	\end{itemize}
 \end{theorem}
 
-\todo{Do it more precisely?}
-For ease of exposition, we will assume that $\mathcal{G}(1^\eta)$ is deterministic, as is the case in practice, and denote the output by $\ldots = \mathcal{G}(1^\eta)$ to emphasize this. We will therefore set the $pk \coloneqq h_1, sk \coloneqq x$ in $\dhies.\gen$, as $\mathbb{G}, q, g$ are implied by $\eta$. The results nevertheless hold also for the general case. \todo{verify claim}
+In contrast, the result in \cite{ttkem} achieves a security loss in $\mathcal{O}(N^2)$ and reduces to the IND-CPA security of the public-key encryption scheme.
+
+For ease of exposition, we will assume that $\mathcal{G}(1^\eta)$ is deterministic, as is the case in practice, and denote the output by $\ldots = \mathcal{G}(1^\eta)$ to emphasize this. We will therefore set the $pk \coloneqq h_1, sk \coloneqq x$ in $\dhies.\gen$, as $\mathbb{G}, q, g$ are implied by $\eta$. The results nevertheless hold also for the general case.
 
 \paragraph{Intuition}
 Consider an arbitrary SD-GSD adversary $\adv$. For an execution of $\game{\dhies}{\eta}{SD-GSD}(\adv)$ we say ``\emph{$\adv$ wins}" to denote the event $\game{\dhies}{\eta}{SD-GSD}(\adv) = 1$.
@@ -192,8 +193,6 @@ We bound $\pr{\qs \land \fdh}$ and $\pr{\qs \land \overline{\fdh} \,}$ in Lemma~
 		                                    & \stackrel{\mathclap{\eqref{eq:theorem-sd-gsd-security-qs-bound}}}{\le} \; \tilde{\epsilon}(\eta).
 	\end{align*}
 \end{proof}
-
-\todo{Compare with result from \cite{ttkem}}.
 
 \subsection{Reducing to EAV security}
 
@@ -381,7 +380,7 @@ Thus, the advantage of the MIS-EAV adversary is about $\pr{\qs \land \overline{\
 	(note that $t_{\adv'}$ is a constant).
 	Using that $\delta \le N, t_{\Pi_s.\gen} \le \mathcal{O}(\eta \cdot t_{\mathrm{sample}})$, $t_{\Pi_s.\enc} \le t_{\dhies.\enc}$ (as encrypting with $\dhies$ involves an encryption with $\Pi_s$), the definition of $\tilde{t}$, with appropriately chosen constants we have
 	\[
-		t_{\adv'} & \le t - \mathcal{O}(\delta \cdot (t_{\Pi_s.\gen} + t_{\Pi_s.\enc})).
+		t_{\adv'} \le t - \mathcal{O}(\delta \cdot (t_{\Pi_s.\gen} + t_{\Pi_s.\enc})).
 	\]
 	By Lemma~\ref{lemma:mis-eav-from-eav} $\Pi_s$ is $(t - \mathcal{O}(\delta \cdot (t_{\Pi_s.\gen} + t_{\Pi_s.\enc})), \delta \cdot \eeav, \delta)$-MIS-EAV-secure, so
 	\begin{equation} \label{eq:lemma-eav-reduction-advantage-upper-bound}
