@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE ipe SYSTEM "ipe.dtd">
 <ipe version="70218" creator="Ipe 7.2.24">
-<info created="D:20240309153354" modified="D:20240312154830"/>
+<info created="D:20240309153354" modified="D:20240406194859"/>
 <ipestyle name="basic">
 <symbol name="arrow/arc(spx)">
 <path stroke="sym-stroke" fill="sym-stroke" pen="sym-pen">
@@ -474,12 +474,6 @@ h
 11.3137 0 0 11.3137 240 704 e
 </path>
 <text matrix="1 0 0 1 -98.551 -58.3114" transformations="translations" pos="234.815 654.907" stroke="black" type="label" width="7.472" height="6.808" depth="0" valign="baseline" style="math" opacity="30%">A</text>
-<group matrix="1 0 0 1 -3.736 -3.404">
-<path matrix="1 0 0 1 3.736 -60.596" stroke="black" fill="1">
-11.3137 0 0 11.3137 240 704 e
-</path>
-<text transformations="translations" pos="240 640" stroke="black" type="label" width="7.472" height="6.808" depth="0" valign="baseline">X</text>
-</group>
 <text matrix="1 0 0 1 -3.999 -3.404" transformations="translations" pos="360 680" stroke="black" type="label" width="7.998" height="6.808" depth="0" valign="baseline" style="math">Y</text>
 <text matrix="1 0 0 1 2.75 -3.836" transformations="translations" pos="240 760" stroke="black" type="label" width="5.5" height="6.918" depth="0" halign="right" valign="baseline" style="math">k</text>
 <text matrix="1 0 0 1 -3.736 -3.404" transformations="translations" pos="100 600" stroke="black" type="label" width="7.472" height="6.808" depth="0" valign="baseline" style="math">A</text>
@@ -494,5 +488,11 @@ h
 <text matrix="1 0 0 1 -16 -16" transformations="translations" pos="320 720" stroke="black" type="label" width="8.781" height="4.294" depth="1.49" valign="baseline" style="math">c_3</text>
 <text matrix="1 0 0 1 -116 -56" transformations="translations" pos="320 720" stroke="black" type="label" width="8.781" height="4.294" depth="1.49" valign="baseline" style="math">c_2</text>
 <text matrix="1 0 0 1 -166 -96" transformations="translations" pos="320 720" stroke="black" type="label" width="8.781" height="4.294" depth="1.49" valign="baseline" style="math">c_1</text>
+<group>
+<path matrix="1 0 0 1 0 -64" stroke="black" fill="1">
+11.3137 0 0 11.3137 240 704 e
+</path>
+<text matrix="1 0 0 1 -80 0" transformations="translations" pos="320 640" stroke="black" type="label" width="9.036" height="6.808" depth="0" halign="center" valign="center" style="math">X</text>
+</group>
 </page>
 </ipe>
