@@ -24,8 +24,13 @@
 %% Custom commands
 \newcommand{\pr}[1]{\Pr\bracks*{#1}}
 
-\newcommand{\question}[1]{\textcolor{magenta}{\textbf{Q:} #1}}
-\newcommand{\todo}[1]{\textcolor{red}{\textbf{TODO:} #1}}
+\ifdefined\thesisfinal
+	\newcommand{\question}[1]{}
+	\newcommand{\todo}[1]{}
+\else
+	\newcommand{\question}[1]{\textcolor{magenta}{\textbf{Q:} #1}}
+	\newcommand{\todo}[1]{\textcolor{red}{\textbf{TODO:} #1}}
+\fi
 
 \newcommand{\from}{\leftarrow}
 \newcommand{\gen}{\mathrm{Gen}}

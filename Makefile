@@ -17,12 +17,13 @@ PDFTOPS = pdf2ps
 EPSTOPDF = epstopdf
 FIGTODEV = fig2dev
 MPOST = mpost
+COMPILE_WITH_FINAL_FLAG = "\def\thesisfinal{}\input{../../thesis}"
 
 .PHONY: all clean archive
 
 all:  thesis
 
-texfiles = $(wildcard *.tex)
+texfiles = $(wildcard *.tex) $(wildcard **/*.tex)
 
 .PHONY: thesis
 thesis: thesis.pdf
@@ -33,20 +34,18 @@ thesis.pdf: $(texfiles) thesis.bbl
 	$(Q) cd build/pdf/ && TEXINPUTS="../../:$$TEXINPUTS" $(Q_LATEX) $(PDFLATEX) -interaction=nonstopmode -file-line-error ../../thesis.tex
 	$(Q) ln -f build/pdf/thesis.pdf thesis.pdf
 
-thesis.dvi: $(texfiles) thesis.bbl
-	$(Q) rm -rf build/dvi/; mkdir -p build/dvi/
-	$(Q) cd build/dvi/ && TEXINPUTS="../../:$$TEXINPUTS" $(Q_LATEX) $(LATEX) -interaction=nonstopmode -file-line-error ../../thesis.tex
-	$(Q) cd build/dvi/ && TEXINPUTS="../../:$$TEXINPUTS" $(Q_LATEX) $(LATEX) -interaction=nonstopmode -file-line-error ../../thesis.tex
-	$(Q) ln -f build/dvi/thesis.dvi thesis.dvi
-
-thesis.ps: thesis.dvi
-	$(Q)$(Q_OTHER) $(DVIPS) -q thesis
+thesis.bbl: thesis.aux
+	$(Q)$(Q_OTHER) $(BIBTEX) thesis
 
 thesis.aux: $(texfiles)
 	$(Q) $(Q_LATEX) $(LATEX) -interaction=nonstopmode -file-line-error thesis.tex
 
-thesis.bbl: thesis.aux
-	$(Q)$(Q_OTHER) $(BIBTEX) thesis
+
+final: $(texfiles) thesis.bbl
+	$(Q) rm -rf build/pdf/; mkdir -p build/pdf/
+	$(Q) cd build/pdf/ && TEXINPUTS="../../:$$TEXINPUTS" $(Q_LATEX) $(PDFLATEX) -interaction=nonstopmode -file-line-error $(COMPILE_WITH_FINAL_FLAG)
+	$(Q) cd build/pdf/ && TEXINPUTS="../../:$$TEXINPUTS" $(Q_LATEX) $(PDFLATEX) -interaction=nonstopmode -file-line-error $(COMPILE_WITH_FINAL_FLAG)
+	$(Q) ln -f build/pdf/thesis.pdf thesis.pdf
 
 clean:
 	rm -rf build/
