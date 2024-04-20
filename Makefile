@@ -55,9 +55,9 @@ clean:
 
 archive: thesis-template.zip
 
-thesis-template.zip: *.tex Makefile ETHlogo.* refs.bib
+thesis-template.zip: **.tex Makefile **/ETHlogo.* refs.bib
 	mkdir -p thesis
-	cp `git ls-files "*.tex" Makefile "ETHlogo.*" refs.bib` thesis/
+	cp `git ls-files "**.tex" Makefile "**/ETHlogo.*" refs.bib` thesis/
 	perl -i -pe 's/\$$VERSION\$$/'"$$(git describe)/" thesis/*.tex
 	rm -f thesis-template.zip
 	zip -r thesis-template.zip thesis/

@@ -51,17 +51,17 @@
 
 %% Some more packages that you may want to use.  Have a look at the
 %% file, and consult the package docs for each.
-\input{extrapackages}
+\input{config/extrapackages}
 
 %% Our layout configuration.  DO NOT CHANGE.
-\input{layoutsetup}
+\input{config/layoutsetup}
 
 %% Theorem environments.  You will have to adapt this for a German
 %% thesis.
-\input{theoremsetup}
+\input{config/theoremsetup}
 
 %% Helpful macros.
-\input{macrosetup}
+\input{config/macrosetup}
 
 %% Make document internal hyperlinks wherever possible. (TOC, references)
 %% This MUST be loaded after varioref, which is loaded in 'extrapackages'
@@ -93,7 +93,7 @@
 \end{titlingpage}
 
 %% The abstract of your thesis.  Edit the file as needed.
-\input{abstract}
+\input{content/abstract}
 
 %% TOC with the proper setup, do not change.
 \cleartorecto
@@ -101,17 +101,17 @@
 \mainmatter
 
 %% Your real content!
-\input{chapters/introduction}
+\input{content/introduction}
 
-\input{chapters/preliminaries}
+\input{content/preliminaries}
 
-\input{chapters/gsd}
+\input{content/gsd}
 
-\input{chapters/treekem}
+\input{content/treekem}
 
 \appendix
 
-\input{appendix}
+\input{content/appendix}
 
 \backmatter
 
