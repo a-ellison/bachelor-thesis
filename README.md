@@ -1,4 +1,4 @@
-# Tighter Security for Group Key Agreement in the Random Oracle Model
+# Tighter Security for Group Key Agreement in the Random Oracle Model ([thesis](./thesis.pdf), [slides](./presentation/presentation.pdf))
 
 ## Abstract 
 
