@@ -1,4 +1,4 @@
-\chapter{Introduction}
+\section{Introduction}
 
 We all rely on messaging applications like WhatsApp, Facebook Messenger, Signal, etc.\ in our daily lives and take it for granted that our messages will be transmitted securely, for some definition of ``secure''. A common security feature expected from the protocol employed in a messaging application and known also to the general public is end-to-end encryption, i.e.\ that only the end users of a messaging session can read the messages being sent and the service provider or any party with access to the communication channel learns nothing of their contents. Another straightforward feature is that the protocol should work in an asynchronous setting: we would like to send messages even when the recipient is offline, and we expect them to receive the messsage once they come online. For this we must rely on a delivery service to store and deliver the messages. Of course also this delivery service should learn nothing about the contents of the messages.
 
@@ -28,7 +28,7 @@ The Generalized Selective Decryption (GSD) security game \cite{gsd} was introduc
 
 In this work, we formally prove the adaptive security of a specific public-key encryption scheme, the DHIES scheme, in a modified version of the public-key GSD game, adapted to better model TreeKEM, in the ROM. Focusing on the DHIES scheme allows us to achieve a tighter bound than the one in \cite{ttkem}. Moreover, we define the syntax and security of propose and commit CGKA schemes, provide a high-level description of how the TreeKEM protocol can be instantiated with our definitions and state a result in the ROM relating the security of a public-key encryption scheme in our modified GSD game with the security of TreeKEM as a CGKA scheme when instantiated with this public-key encryption scheme.
 
-\section{Contributions}
+\subsection{Contributions}
 
 We present the following main contributions:
 \begin{itemize}
@@ -38,9 +38,9 @@ We present the following main contributions:
 	\item A high-level description of the TreeKEM protocol and how it can be instantiated with respect to our CGKA definition. Finally, we state a result relating the security of our GSD game and the security of TreeKEM, and provide an outline of the proof.
 \end{itemize}
 
-\section{Technical overview}
+\subsection{Technical overview}
 
-\subsection{The GSD game}
+\subsubsection{The GSD game}
 
 In the GSD security game, given an encryption scheme a graph, the \emph{GSD graph}, is constructed by the challenger where every node in the graph is associated with a symmetric key in the private-key setting, or a public/private key pair in the public-key setting. The adversary can then request encryptions of a node's (secret) key under the (public) key of another node. In the public-key setting, such an \emph{encryption query} also reveals the node's public key. This creates an \emph{encryption edge} in the graph, directed from the node whose (public) key was used for encryption to the node whose key was encrypted. The adversary can also corrupt any node, which reveals its (secret) key and allows the adversary to compute the (secret) key of any other node reachable from the corrupted node in the graph by performing decryptions along the path to the other node. At the end of the game the adversary chooses a node to be challenged on, the \emph{challenge node}. A coin is then tossed and the adversary is given either the (secret) key of the challenge node or a uniformly random (secret) key and it must guess which scenario it is in. The possible choices for the challenge node must of course be restricted to nodes whose keys were not compromised through a corruption, meaning that the challenge node should never be reachable from a corrupted node in the graph. Further restrictions are also necessary which we do not go into here. Figure~\ref{fig:gsd-example} illustrates what an example GSD graph may look like.
 
@@ -51,13 +51,13 @@ In the GSD security game, given an encryption scheme a graph, the \emph{GSD grap
 	\caption{An illustration of the GSD graph for an instance of the GSD game. The challenge node is $v$. The node $c$ was corrupted, resulting in all nodes reachable from it being compromised, as marked with red color.} \label{fig:gsd-example}
 \end{figure}
 
-\subsection{The TreeKEM protocol} \label{sec:treekem-overview}
+\subsubsection{The TreeKEM protocol} \label{sec:treekem-overview}
 
-\subsubsection{Propose and commit syntax}
+\paragraph{Propose and commit syntax}
 
 As a CGKA scheme, TreeKEM must support operations for updating the key material of a group member, adding a new user and removing a member. The syntax for these operations has changed over time. In the current version of MLS, the protocol uses so-called \emph{proposals} and \emph{commits}. Whenever a user would like have their key material updated (by someone else), add a new user or remove a group member, they create a corresponding \emph{update}, \emph{add} or \emph{remove proposal}, respectively, and share this proposal with the group. Any group member can then create a \emph{commit} to apply a set of proposals, create a new group key and update their key material in the process. The commit object includes (encrypted) information such that every group member can update their view of the group and compute the new group key.
 
-\subsubsection{TreeKEM dynamics}
+\paragraph{TreeKEM dynamics}
 
 As already outlined briefly, TreeKEM uses a full binary tree to model the group. Every user, associated with a leaf in the tree, maintains a synchronized view of the tree, though different users will know more about different parts of the tree. The group key is derived from the root of the tree. Every node $n$ in the tree has an associated key pair $(pk_n, sk_n)$ output by $\Pi.\gen$ where $\Pi$ is a public-key encryption scheme. All public keys are known to all users. Let the \emph{direct path} of a leaf be the path from the leaf's first parent to the root. Every user at a leaf knows the secret key of their leaf and, in the usual case, the secret keys of all nodes on their direct path, though we will see exceptions to this rule later. To illustrate the scheme and how commit operations are performed, we will consider of a group with users $A, B, \ldots, G$ and $H$, as depicted in Figure~\ref{fig:treekem-tree}. In the following, we will use these labels for the users both to refer to the users themselves and to their nodes in the tree.
 

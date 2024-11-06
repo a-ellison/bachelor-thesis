@@ -1,4 +1,4 @@
-\chapter{Tighter GSD security} \label{sec:tighter-gsd-security}
+\section{Tighter GSD security} \label{sec:tighter-gsd-security}
 
 The graph constructed in the public-key GSD game and the tree structure behind the TreeKEM protocol clearly resemble each other. Let $\eta$ denote the security parameter and let $\Pi$ the public-key encryption scheme in use, where $\Pi.\gen(1^\eta)$ uses $\rho(\eta)$ bits of randomness. We can make some small modifications to the public-key GSD game such that the operations performed in TreeKEM match the ones performed in this modified GSD game. Take the functions $\hgen, \hdep$ used in TreeKEM and first modify the game as follows:
 \begin{itemize}
@@ -7,7 +7,7 @@ The graph constructed in the public-key GSD game and the tree structure behind t
 \end{itemize}
 Now the generation of key pairs and the encryptions computed in TreeKEM match what is done in this adapted GSD game. (Although the key pair of a leaf in TreeKEM need not be generated through such a seed, we assumed this to be equivalent to running $\Pi.\gen(1^\eta)$ in Definition~\ref{def:public-key-encryption}.) To model the fact that in TreeKEM a seed of a node may depend on the seed of another node through $\hdep$ (as in the new direct path computed in a commit), we introduce a new type of edge which we call a \emph{seed dependency}: a seed dependency $(u, v)$ implies that $s_v = \hdep(s_u)$. We will call our adaptation of the public-key GSD game \emph{Seeded GSD with Dependencies} (SD-GSD).
 
-\section{Seeded GSD with Dependencies}
+\subsection{Seeded GSD with Dependencies}
 
 \todo{Allow adversary to adaptively create nodes and seed dependencies.
 	\begin{itemize}
@@ -80,7 +80,7 @@ Since in this work we are interested in SD-GSD security for the case where $\hge
 	A public-key encryption scheme $\Pi$ is \emph{$(t, \epsilon, N, \delta)$-SD-GSD-secure in the ROM} if the triple $(\Pi, \fhgen, \fhdep)$ is $(t, \epsilon, N, \delta)$-SD-GSD-secure when $\hgen$ and $\hdep$ are modelled as random oracles. For security parameter $\eta$ and an adversary $\adv$, we write $\game{\Pi}{\eta}{SD-GSD}(\adv)$ to denote the game where $\hgen$ and $\hdep$ are modelled as random oracles and $\advantage{\Pi}{\eta}{SD-GSD}(\adv)$ for $\adv$'s advantage in this game.
 \end{definition}
 
-\section{Proving SD-GSD security for DHIES in the ROM}
+\subsection{Proving SD-GSD security for DHIES in the ROM}
 
 \begin{theorem} \label{theorem:sdgsd-security}
 	Let $\eta$ denote the security parameter.
@@ -202,7 +202,7 @@ We bound $\pr{\qs \land \fdh}$ and $\pr{\qs \land \overline{\fdh} \,}$ in Lemma~
 	\end{align*}
 \end{proof}
 
-\subsection{Reducing to EAV security}
+\subsubsection{Reducing to EAV security}
 
 Recall case (\ref{qs-triggered-case-2}) in the high-level discussion of Theorem~\ref{theorem:sdgsd-security}: the adversary $\adv$ was able to learn the seed $s_w$ given the EAV secure encryptions $\Pi_s.\enc_{k_1}(s_w), \ldots, \Pi_s.\enc_{k_d}(s_w)$. We can see $\adv$ as an adversary against a security game where $\adv$ is given $d$ EAV secure encryptions $c_1 \from \Pi_s.\enc_{k_1}(m), \ldots, c_d \from \Pi_s.\enc_{k_d}(m)$ of a message $m$ with $k_i \from \Pi_s.\gen(1^\eta)$ and must compute $m$. If we can prove that beating such a game is hard, then we can bound the probability of $\adv$ actually learning $s_w$ in this way.
 
@@ -404,7 +404,7 @@ Thus, the advantage of the MIS-EAV adversary is about $\pr{\qs \land \overline{\
 	as was to prove.
 \end{proof}
 
-\subsubsection{Tighter MIS-EAV security for certain schemes} \label{sec:tighter-mis-eav-security}
+\paragraph{Tighter MIS-EAV security for certain schemes} \label{sec:tighter-mis-eav-security}
 
 In our reduction from MIS-EAV security to EAV security (Lemma~\ref{lemma:mis-eav-from-eav}) we applied a general hybrid argument. It is also tempting to try a more direct approach. The EAV and MIS-EAV games seem less far apart than IND-CPA for single and multiple encryptions: All additional encryptions in the MIS-EAV game encrypt the same message, with the only difference being that each encryption is performed using a fresh key. If only we could take a single encryption $c \from \enc_k(m)$ and from it produce several encryptions $c_i \from \enc_{k_i}(m)$ for $k_i \from \gen(1^\kappa)$ (without knowing $k$ or $m$), then the additional encryptions would leak no new information to the adversary, and we would have a tight bound on MIS-EAV security from EAV security. There is a simple EAV secure scheme that achieves the above property: the one-time pad. Given an encryption $c = k \oplus m$, we can just sample $k' \from \{0, 1\}^\kappa$ and compute the ciphertext $c' = c \oplus k' = (k \oplus k') \oplus m$, an encryption of $m$ under the uniformly random key $k \oplus k'$. In the following, we formalize this property of a private-key encryption scheme and use it to prove the desired bound on MIS-EAV security.
 
@@ -458,7 +458,7 @@ By assuming a key-rerandomizable encryption scheme and applying Lemma~\vref{lemm
 \end{corollary}
 
 
-\subsection{Reducing to the DDH problem}
+\subsubsection{Reducing to the DDH problem}
 
 \begin{lemma} \label{lemma:dh-reduction}
 	Recall the assumptions, variables and events from the statement and proof of Theorem~\ref{theorem:sdgsd-security}. In particular, assume that the DDH problem is $(t, \eddh)$-hard relative to $\mathcal{G}$. Let $\eta$ arbitrary and let $\adv$ an SD-GSD adversary constructing a GSD graph of size at most $N(\eta)$ and indegree at most $\delta(\eta)$, making at most $\ms(\eta)$ queries to $\hgen$ or $\hdep$ and at most $\mdh(\eta)$ queries to $\hdh$, and running in time $\tilde{t}(\eta)$. Then

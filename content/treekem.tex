@@ -1,8 +1,8 @@
-\chapter{Application to TreeKEM} \label{sec:application-to-treekem}
+\section{Application to TreeKEM} \label{sec:application-to-treekem}
 
-\section{Continuous Group Key Agreement}
+\subsection{Continuous Group Key Agreement}
 
-\subsection{The model}
+\subsubsection{The model}
 
 As already described briefly in the introduction, a CGKA scheme allows a group of users to agree on a group key, indistinguishable from random for any eavesdropper, while providing mechanisms to add or remove users from the group and update the group key and users' key material, such that FS and PCS can be achieved.
 
@@ -12,11 +12,11 @@ In our model, users are honest nodes running the protocol algorithms and maintai
 
 For a more complete model we refer the reader to \cite{modular-group-messaging}. The authors consider not just CGKA but the more difficult problem of \emph{secure group messaging} as tackled by the MLS protocol. The model they consider allows an attacker to inject protocol messages and gives them some control over the public keys stored by the delivery service.
 
-\subsection{PC-CGKA schemes}
+\subsubsection{PC-CGKA schemes}
 
 Multiple definitions of the syntax and security of CGKA schemes already exist \cite{rtreekem,ttkem,modular-group-messaging}, all meant to capture the syntax of how update, add and remove operations were performed with the latest verion of TreeKEM at the time, and all with the same name. As already described in the introduction, the current version of TreeKEM uses propose and commit operations to advance the group state, which is also the syntax formalized in \cite{modular-group-messaging} and in this work. The syntax defined in \cite{rtreekem,ttkem} came before the propose and commit syntax was introduced. In this syntax there are no proposals and every operation is a commit, either adding a single user, removing a singler group member, or just updating the key material of the committer. To differentiate our definitions from existing ones that describe something different as in \cite{rtreekem,ttkem}, we will talk about \emph{propose and commit continuous group key agreement} (PC-CGKA) schemes.
 
-\subsubsection{Syntax}
+\paragraph{Syntax}
 
 Our definition of the syntax of PC-CGKA schemes is inspired from the definition in \cite{ttkem} and is essentially the same as what is described in \cite[Section 4.1.1]{modular-group-messaging}.
 
@@ -72,7 +72,7 @@ We assume that every user $u$ is identified by some value $id_u$.
 	\item $\operatorname{ProcessWelcome}$:  The user must discard their secret key $sk$ after processing a welcome message, so that the contents of the welcome message remain secret in case the user gets compromised (recall FS). As we cannot express this conveniently in our syntax, our security definition does not check for this.
 \end{itemize}
 
-\subsubsection{Correctness}
+\paragraph{Correctness}
 
 The above description of PC-CGKA schemes already provides some explicit correctness properties or implicitly implies other ones. We will explicitly define one important correctness property that a PC-CGKA scheme should satisfy in Definition~\vref{def:cgka-correctness-consistent-history}. \todo{Justify why I mention this property and why it is important. Explain examples of commit history and why it plays a role in security.}
 
@@ -136,7 +136,7 @@ Note that if the PC-CGKA scheme maintains a consistent history, for a commit $c$
 
 One could also consider the \emph{local} commit history of a group member $u$ in group state $\sigma$, consisting of the sequence of commits applied by $u$ since joining the group and until arriving in $\sigma$. If the PC-CGKA scheme maintains a consistent history, this local commit history is a suffix of the commit history of the last commit in $\sigma$. (To see this, first note that by definition the last commit in $\sigma$ is the last commit the local commit history. Then repeatedly apply the argument before Definition~\ref{def:commit-history}.) Thus, for a set of users in consistent group states, the users all agree on the commits they have processed and their order (up to the earliest commit present in the local commit history of all users).
 
-\subsection{PC-CGKA security}
+\subsubsection{PC-CGKA security}
 
 Our security definition is again inspired by \cite{ttkem}. We consider fully adaptive adversaries. The adversary controls all PC-CGKA operations performed by the users, can decide who receives what messages (i.e.\ the adversary has control over the delivery service), can decide what commits get applied or discarded, and when they are discarded, by querying ``$\operatorname{confirm}$'' and can corrupt the state of any user. We will refer to commits created by a user that they have not yet been told to apply or discard as \emph{unconfirmed commits}. Corrupting a user leaks the group states corresponding to all their unconfirmed commits. Because the adversary can schedule the delivery of messages as it likes, it is possible for the adversary to create ``forks'' in the group where some users in the group are told to process one commit, while other users are told to process another. Such forks could also happen in practice and should not break security.
 
@@ -262,7 +262,7 @@ Continuing the discussion above, so far we have considered a necessary condition
 	\end{align*}
 \end{definition}
 
-\section{The TreeKEM Protocol}
+\subsection{The TreeKEM Protocol}
 
 The TreeKEM protocol discussed in the literature is not described as a self-contained subprotocol in the MLS specification \cite{rfc9420} and is therefore only defined implicitly. The following description of the protocol was extracted from \cite{rfc9420}. Fully describing TreeKEM is complex and some parts of the protocol were either simplified (e.g.\ the content of protocol messages) or omitted as they are not relevant for proving security with respect to our definition (e.g.\ handling of bad inputs, signatures, hashes of the tree and additional functionality provided by the protocol).
 
@@ -353,7 +353,7 @@ The TreeKEM protocol discussed in the literature is not described as a self-cont
 
 The full TreeKEM protocol as described in the RFC achieves the correctness property in Definition~\ref{def:consistent-group-state} using a hash of the tree.
 
-\section{TreeKEM security from SD-GSD security}
+\subsection{TreeKEM security from SD-GSD security}
 
 We have already described the relationship between the TreeKEM protocol and the SD-GSD security game at the beginning of Chapter~\ref{sec:tighter-gsd-security}. The following theorem formalizes this.
 

@@ -1,6 +1,6 @@
-\chapter{Appendix}
+\section{Appendix}
 
-\section{Proof of Lemma~\ref{lemma:mis-eav-from-eav}} \label{sec:mis-eav-from-eav-proof}
+\subsection{Proof of Lemma~\ref{lemma:mis-eav-from-eav}} \label{sec:mis-eav-from-eav-proof}
 
 \begin{proof}[of Lemma~\ref{lemma:mis-eav-from-eav}] Note that since the message space is finite, the time to encrypt a message is bounded. As outlined before Lemma~\ref{lemma:mis-eav-from-eav}, the lemma follows from a simple hybrid argument. Let $q$ a function in $\kappa$, let $\kappa$ arbitrary and let $\adv$ an arbitrary MIS-EAV adversary running in time $\tilde{t}(\kappa)$ and making at most $q(\kappa)$ queries. Define the sequence of hybrid games $H_0, \ldots, H_q$ where in the game $H_i$ the first $i$ encryptions given to the adversary encrypt $m_1$ and all remaining encryptions encrypt $m_0$. We will write
 	\[
