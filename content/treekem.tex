@@ -264,7 +264,7 @@ Continuing the discussion above, so far we have considered a necessary condition
 
 \section{The TreeKEM Protocol}
 
-The TreeKEM protocol discussed in the literature is not described as an explicit protocol in the MLS specification \cite{rfc9420} and is thus only defined implicitly. The following description of the protocol was extracted from \cite{rfc9420}. Fully describing TreeKEM is complex and some details of the protocol were either simplified (e.g.\ the syntax of protocol messages) or left out as they are not relevant for proving security with respect to our definition (e.g.\ handling of bad inputs, signatures, hashes of the tree and additional functionality provided by the protocol).
+The TreeKEM protocol discussed in the literature is not described as a self-contained subprotocol in the MLS specification \cite{rfc9420} and is therefore only defined implicitly. The following description of the protocol was extracted from \cite{rfc9420}. Fully describing TreeKEM is complex and some parts of the protocol were either simplified (e.g.\ the content of protocol messages) or omitted as they are not relevant for proving security with respect to our definition (e.g.\ handling of bad inputs, signatures, hashes of the tree and additional functionality provided by the protocol).
 
 \begin{definition}[TreeKEM {\cite{rfc9420}}] Let $\eta$ denote the security parameter. Let $\Pi$ a public-key encryption scheme, where $\Pi.\gen(1^\eta)$ uses $\rho(\eta)$ bits of randomness. Let $\fhgen = \{ \hgen^{(\eta)} \mid \eta \in \N\}, \fhdep = \{ \hdep^{(\eta)} \mid \eta \in \N\}$ families of functions with $\hgen^{(\eta)}, \hdep^{(\eta)} \colon \{0, 1\}^{\rho(\eta)} \to \{0, 1\}^{\rho(\eta)}$. We write $\hgen \coloneqq \hgen^{(\eta)}, \hdep \coloneqq \hdep^{(\eta)}$ and $\rho \coloneqq \rho(\eta)$ if $\eta$ is clear from the context. Define the CGKA scheme $\treekem$ with key space $\mathcal{K}(\eta) = \{0, 1\}^{\rho(\eta)}$ and its algorithms defined as follows, where $id$ refers to the identifier of the user running the algorithm:
 	\begin{itemize}
@@ -317,15 +317,16 @@ The TreeKEM protocol discussed in the literature is not described as an explicit
 				            \item replace the leftmost blank leaf in the tree with a new leaf with public key $pk_{\mathrm{leaf}}'$
 				            \item for every non-blank node on the new leaf's direct path, add the new leaf to the node's set of unmerged leaves
 			            \end{itemize}
-			      \item generate $(pk_{\mathrm{leaf}}, sk_{\mathrm{leaf}}) \from \Pi.\gen(1^\eta)$ and sample $s_0 \from \{0, 1\}^\rho$
+			      \item generate $(pk_{\mathrm{leaf}}, sk_{\mathrm{leaf}}) \from \Pi.\gen(1^\eta)$ and sample $s_1 \from \{0, 1\}^\rho$
 			      \item replace $id$'s leaf with a new leaf with key pair $(pk_{\mathrm{leaf}}, sk_{\mathrm{leaf}})$
-			      \item If the tree consists of a single leaf, set the group key to $s_0$. Otherwise, for the $i$-th non-blank node $v_i$ on $id$'s direct path where $w_i$ is the sibling of $v_i$:
+			      \item If the tree consists of a single leaf, set the group key to $s_1$. Otherwise, for the $i$-th node $v_i$ on $id$'s direct path where its child $w_i$ on the copath of $id$ has a non-empty resolution:
 			            \begin{itemize}
-				            \item if $i > 0$, compute $s_i \coloneqq \hdep(s_{i - 1})$ and $(pk, sk) = \Pi.\gen(1^\eta, \hgen(s_i))$
+				            \item if $i > 1$, compute $s_i \coloneqq \hdep(s_{i - 1})$ and $(pk, sk) = \Pi.\gen(1^\eta, \hgen(s_i))$
 				            \item replace $v_i$ with a new node $v_i'$ with key pair $(pk, sk)$ (and no unmerged leaves)
-				            \item for every node $u$ in the resolution of $w_i$: If $u$ is the leaf of user $id'$ and there is an add proposal $(\mathrm{add}, id', (pk_{\mathrm{init}}', pk_{\mathrm{leaf}}'))$, compute a ciphertext $c_u \from \Pi.\enc_{pk_{\mathrm{init}}'}(s_i)$. Otherwise, compute a ciphertext $c_u \from \Pi.\enc_{pk_u}(s_i)$ and store it in the commit $c$.
+				            \item for every node $u$ in the resolution of $w_i$: If $u$ is the leaf of a user $id'$ and the commit contains an add proposal $(\mathrm{add}, id', (pk_{\mathrm{init}}', pk_{\mathrm{leaf}}'))$, compute a ciphertext $c_u \from \Pi.\enc_{pk_{\mathrm{init}}'}(s_i)$
+				                  \footnote{As defined here, there is no use for the init key in the protocol and we could simply encrypt the seed under the leaf's public key (in other words set $(pk_{\mathrm{init}}', sk_{\mathrm{init}}') = (pk_{\mathrm{leaf}}', sk_{\mathrm{leaf}}')$). In the real TreeKEM protocol the message encrypted using the init key includes additional information and is different from the type of message encrypted under a leaf's public key.}. Otherwise, compute a ciphertext $c_u \from \Pi.\enc_{pk_u}(s_i)$ and store it in the commit $c$.
 			            \end{itemize}
-			            Set the group key to $\hdep(s_d)$ where $v_d$ is the last (non-blank) node on $id$'s direct path, i.e.\ the root. Store the list of pubic keys $(pk_{\mathrm{leaf}}, pk_{v_0'}, \ldots, pk_{v_d'})$ in $c$.
+			            Set the group key to $\hdep(s_d)$ where $v_d$ is the last node on $id$'s direct path, i.e.\ the root. Store the list of pubic keys $(pk_{\mathrm{leaf}}, pk_{v_1'}, \ldots, pk_{v_d'})$ in $c$.
 			      \item for every add proposal $p_j = (\mathrm{add}, id', (pk_{\mathrm{init}}', pk_{\mathrm{leaf}}'))$:
 			            \begin{itemize}
 				            \item let $l$ be the leaf of user $id'$ in the tree
