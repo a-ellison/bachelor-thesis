@@ -164,7 +164,7 @@ The definition in \cite[Section B.1]{modular-group-messaging} is very similar in
 			      \item $\operatorname{deliver-welcome}(i, j)$ for $i \in [n], \sigma_i = \varnothing, j \in [W]$: set $\sigma_i \from \operatorname{ProcessWelcome}(pk_j, sk_j, w_j)$.\footnote{Note that in a real execution of the protocol the user must delete $sk_j$ from their local state after processing the welcome message $w_j$. Accordingly, $sk_j$ is no longer leaked to the adversary in a later query $\operatorname{corrupt}(j)$.}
 			      \item $\operatorname{corrupt}(i)$ for $i \in [n]$: If $\sigma_i = \varnothing$, $\adv$ is given $sk_i$. Otherwise, $\adv$ is given $\sigma_i$ and $U_i$.
 		      \end{itemize}
-		\item $\adv$ picks $i \in [0, C]$. We call the commit $c_i$ the \emph{challenge commit}, where the $c_0$ refers to the initial $\operatorname{CreateGroup}$ operation. Let $\sigma$ the group state output by the operation that created $c_i$ (the state output by $\operatorname{CreateCommit}$ if $i > 0$ or the state output by $\operatorname{CreateGroup}$ if $i = 0$). A bit $b \from \{0, 1\}$ is sampled and $\adv$ is given
+		\item $\adv$ picks $i \in [0, C]$. We call the commit $c_i$ the \emph{challenge commit}, where $c_0$ refers to the initial $\operatorname{CreateGroup}$ operation. Let $\sigma$ the group state output by the operation that created $c_i$ (the state output by $\operatorname{CreateCommit}$ if $i > 0$ or the state output by $\operatorname{CreateGroup}$ if $i = 0$). A bit $b \from \{0, 1\}$ is sampled and $\adv$ is given
 		      \[
 			      k = \begin{cases}
 				      \Sigma.\operatorname{Key}(\sigma) & b = 0 \\
@@ -351,7 +351,7 @@ The TreeKEM protocol discussed in the literature is not described as a self-cont
 	The scheme $\treekem$ is called the \emph{TreeKEM protocol}.
 \end{definition}
 
-The full TreeKEM protocol as described in the RFC achieves the correctness property in Definition~\ref{def:consistent-group-state} using a hash of the tree.
+The full TreeKEM protocol as described in the RFC achieves the correctness property in Definition~\ref{def:cgka-correctness-consistent-history} using a hash of the tree.
 
 \subsection{TreeKEM security from SD-GSD security}
 
