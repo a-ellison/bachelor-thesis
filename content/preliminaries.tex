@@ -22,7 +22,7 @@ We will use the following notation throughout:
 
 \subsection{Basic definitions}
 
-Our definitions were adapted from \cite{introduction-to-modern-cryptography}. We will make use of some well-known concepts including private-key and public-key encryption, IND-CPA security, EAV security and the Random Oracle Model (ROM), and of some simple lemmas. The corresponding definitions and lemmas can be found in section \ref{sec:preliminaries-appendix} of the appendix.
+Our definitions were adapted from \cite{introduction-to-modern-cryptography}. Some simple lemmas and definitions for well-known concepts including private-key and public-key encryption, IND-CPA security, EAV security and the Random Oracle Model (ROM) can be found in section \ref{sec:preliminaries-appendix} of the appendix.
 
 \begin{definition}[Group-generation algorithm {\cite[Section 9.3.2]{introduction-to-modern-cryptography}}] \label{def:group-generation-algorithm}
 	Let $\eta$ denote the security parameter. A \emph{group-generation algorithm} $\mathcal{G}$ is a probabilistic polynomial-time algorithm that takes as input $1^\eta$ and outputs $(\mathbb{G}, q, g)$, where $\mathbb{G}$ is (a description of) a cyclic group, $q$ is the order of the group with $q \ge 2^\eta$ and $g \in \mathbb{G}$ is a generator. A group element is represented as a bit-string of length at most $\gamma(\eta)$. We write $(\mathbb{G}, q, g) \from \mathcal{G}(1^\eta)$.
@@ -52,7 +52,7 @@ Our definitions were adapted from \cite{introduction-to-modern-cryptography}. We
 	\end{align*}
 \end{definition}
 
-In the following definition we will refer to ``key-derivation functions''. This is only meant as a hint to the reader. We do not provide a definition here, as we will always model such a function as a random oracle (see Section~\vref{sec:rom}).
+In the following definition we will refer to ``key-derivation functions''. This is only meant as a hint to the reader. We do not provide a definition here, as we will always model such a function as a random oracle (see Section~\ref{sec:rom}).
 
 \begin{definition}[DHIES {\cite[Construction 12.19]{introduction-to-modern-cryptography}}]
 	Let $\eta$ denote the security parameter. Let $\mathcal{G}$ a group-generation algorithm. Let $\Pi_s$ a private-key encryption scheme where $\Pi_s.\gen(1^\eta)$ samples a key u.a.r.\ from $\{0, 1\}^\eta$. Let $\fhdh = \{\hdh^{(\eta)} \mid \eta \in \N \}$ a family of key-derivation functions where $\hdh^{(\eta)} \colon \{0, 1\}^* \to \{0, 1\}^{\eta}$. We write $\hdh \coloneqq \hdh^{(\eta)}$ when $\eta$ is clear from the context. Define the algorithms $\gen, \enc$ and $\dec$ as follows:
