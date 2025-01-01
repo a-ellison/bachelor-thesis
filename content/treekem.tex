@@ -8,19 +8,17 @@ As already described briefly in the introduction, a CGKA scheme allows a group o
 
 Fully modelling a group of users running a CGKA scheme is complex. Since the protocol must work in the asynchronous setting, there must be a delivery service that takes protocol messages and forwards them to the recipients. Users also need to be able to publish some kind of public key, the key packages used in TreeKEM, such that they can be invited to the group with a welcome message. This functionality is also left to the delivery service. Moreover, there must be mechanisms in place to authenticate protocol messages and the published public keys.
 
-In our model, users are honest nodes running the protocol algorithms and maintaining local state. They send out new messages and process received messages immediately. They have a reliable communication channel to the delivery service, and all public keys and protocol messages are assumed to be authenticated, meaning that an attacker cannot forge them. The delivery service, and thus an attacker, can of course see all protocol messages. We assume little about the what messages get delivered by the delivery service: the service may deliver a message to some users but not others and it may not deliver certain messages at all.
+In our model, users are honest nodes running the protocol algorithms and maintaining local state. They send out new messages and process received messages immediately. They have a reliable communication channel to the delivery service, and all public keys and protocol messages are assumed to be authenticated, meaning that an attacker cannot forge them. The delivery service, and thus an attacker, can of course see all protocol messages. We assume little about what messages get delivered by the delivery service: the service may deliver a message to some users but not others and it may not deliver certain messages at all.
 
 For a more complete model we refer the reader to \cite{modular-group-messaging}. The authors consider not just CGKA but the more difficult problem of \emph{secure group messaging} as tackled by the MLS protocol. The model they consider allows an attacker to inject protocol messages and gives them some control over the public keys stored by the delivery service.
 
 \subsubsection{PC-CGKA schemes}
 
-Multiple definitions of the syntax and security of CGKA schemes already exist \cite{rtreekem,ttkem,modular-group-messaging}, all meant to capture the syntax of how update, add and remove operations were performed with the latest verion of TreeKEM at the time, and all with the same name. As already described in the introduction, the current version of TreeKEM uses propose and commit operations to advance the group state, which is also the syntax formalized in \cite{modular-group-messaging} and in this work. The syntax defined in \cite{rtreekem,ttkem} came before the propose and commit syntax was introduced. In this syntax there are no proposals and every operation is a commit, either adding a single user, removing a singler group member, or just updating the key material of the committer. To differentiate our definitions from existing ones that describe something different as in \cite{rtreekem,ttkem}, we will talk about \emph{propose and commit continuous group key agreement} (PC-CGKA) schemes.
+Multiple definitions of the syntax and security of CGKA schemes already exist \cite{rtreekem,ttkem,modular-group-messaging}, all meant to capture the syntax of how update, add and remove operations were performed with the latest verion of TreeKEM at the time, and all with the same name. As already described in the introduction, the current version of TreeKEM uses propose and commit operations to advance the group state, which is also the syntax formalized in \cite{modular-group-messaging} and in this work. The syntax defined in \cite{rtreekem,ttkem} came before the propose and commit syntax was introduced. In this syntax there are no proposals and every operation is a commit, either adding a single user, removing a single group member, or just updating the key material of the committer. To differentiate our definitions from existing ones that describe something different as in \cite{rtreekem,ttkem}, we will talk about \emph{propose and commit continuous group key agreement} (PC-CGKA) schemes.
 
 \paragraph{Syntax}
 
-Our definition of the syntax of PC-CGKA schemes is inspired from the definition in \cite{ttkem} and is essentially the same as what is described in \cite[Section 4.1.1]{modular-group-messaging}.
-
-We assume that every user $u$ is identified by some value $id_u$.
+Our definition of the syntax of PC-CGKA schemes is inspired from the definition in \cite{ttkem} and is essentially the same as what is described in \cite[Section 4.1.1]{modular-group-messaging}. We assume that every user $u$ is identified by some value $id_u$.
 
 \begin{definition}[PC-CGKA]
 	Let $\eta$ denote the security parameter.
@@ -69,12 +67,12 @@ We assume that every user $u$ is identified by some value $id_u$.
 
 
 	\item $\operatorname{ProcessCommit}$: If the commit removed the member from the group, they should not be able to compute the group key from $\sigma$ and should delete $\sigma$.
-	\item $\operatorname{ProcessWelcome}$:  The user must discard their secret key $sk$ after processing a welcome message, so that the contents of the welcome message remain secret in case the user gets compromised (recall FS). As we cannot express this conveniently in our syntax, our security definition does not check for this.
+	\item $\operatorname{ProcessWelcome}$:  The user must discard their secret key $sk$ after processing a welcome message, so that the contents of the welcome message remain secret in case the user gets compromised (recall FS). As we cannot express this conveniently with our syntax, our security definition does not check for this (and does not give the adversary the secret key if a user is compromised after having processed their welcome message).
 \end{itemize}
 
 \paragraph{Correctness}
 
-The above description of PC-CGKA schemes already provides some explicit correctness properties or implicitly implies other ones. We will explicitly define one important correctness property that a PC-CGKA scheme should satisfy in Definition~\vref{def:cgka-correctness-consistent-history}. \todo{Justify why I mention this property and why it is important. Explain examples of commit history and why it plays a role in security.}
+The above description of semantics already provides some explicit correctness properties or implicitly implies other ones. We will explicitly define one important correctness property that a PC-CGKA scheme should satisfy in Definition~\vref{def:cgka-correctness-consistent-history}. \todo{Justify why I mention this property and why it is important. Explain examples of commit history and why it plays a role in security.}
 
 The correctness property concerns the handling of ``bad'' (malformed or inconsistent) inputs. The algorithms of a PC-CGKA scheme should have several checks built in to deal with such inputs. For example
 \begin{itemize}
@@ -140,9 +138,9 @@ One could also consider the \emph{local} commit history of a group member $u$ in
 
 Our security definition is again inspired by \cite{ttkem}. We consider fully adaptive adversaries. The adversary controls all PC-CGKA operations performed by the users, can decide who receives what messages (i.e.\ the adversary has control over the delivery service), can decide what commits get applied or discarded, and when they are discarded, by querying ``$\operatorname{confirm}$'' and can corrupt the state of any user. We will refer to commits created by a user that they have not yet been told to apply or discard as \emph{unconfirmed commits}. Corrupting a user leaks the group states corresponding to all their unconfirmed commits. Because the adversary can schedule the delivery of messages as it likes, it is possible for the adversary to create ``forks'' in the group where some users in the group are told to process one commit, while other users are told to process another. Such forks could also happen in practice and should not break security.
 
-The adversary eventually chooses a commit to be challenged on, for which they must differentiate the group key from a uniformly random key. We must restrict the set of commits the adversary can ask to be challenged on to those that are \emph{safe} even in the face of previous or later corruptions. The level of FS and PCS expected from a PC-CGKA scheme is captured the size of this set of safe commits. Exactly which commits are considered safe will be explained later.
+The adversary eventually chooses a commit to be challenged on, for which they must differentiate the group key from a uniformly random key. We must restrict the set of commits the adversary can ask to be challenged on to those that are expected to be \emph{safe} even in the face of previous or later corruptions. The level of FS and PCS expected from a PC-CGKA scheme is captured by the size of this set of safe commits. Exactly which commits are considered safe will be explained later.
 
-We also impose some notable restrictions on the adversary. The adversary cannot inject protocol messages or public keys and it may only deliver a message to users that are supposed to process that message, in order to avoid giving users messages with bad inputs. The latter restriction is justified, as in a correct PC-CGKA protocol such messages would simply be discarded and correctness can be verified independently. Imposing the restriction on the adversary allows us to ignore the details of handling bad inputs when specifying a PC-CGKA scheme and analyzing the core aspects of its security.
+We also impose some notable restrictions on the adversary. The adversary cannot inject protocol messages or public keys and it may only deliver a message to users that are supposed to process that message, in order to avoid giving users messages with bad inputs. The latter restriction is justified, as in a correct PC-CGKA protocol such messages would simply be discarded and correctness can be verified independently. Imposing the restriction on the adversary allows us to ignore the details of handling bad inputs when specifying a PC-CGKA scheme and to analyze the core aspects of its security.
 
 The definition in \cite[Section B.1]{modular-group-messaging} is very similar in essence. The same restricions on the adversary are imposed. However, the security game provided there gives more power to the adversary: the adversary may additionally choose the randomness used in operations, choose its own public keys to be associated with users and tell certain users not to delete old keys. In the end this restricts the set of safe commits. We provide our own definition with the hope of having a formulation that is easier to digest, keeps the security game simpler and is more explicit about what commits are considered safe.
 
@@ -207,7 +205,7 @@ Now, it is important to notice that the encrypted information in commit $c$ is f
 
 
 \begin{definition} \label{def:last-update-before-commit}
-	Let $c$ a commit and let $u$ a user in the group after applying $c$. Let $h = (c_1, \ldots, c_k)$ the commit history of $c$. Define $u$'s \emph{last update up to} $c$ as the last commit $c_i$ to satisfy the following:
+	Let $c$ a commit and let $u$ a user in the group after applying $c$. Let $h = (c_1, \ldots, c_k)$ the commit history of $c$. Define $u$'s \emph{last update up to} $c$ as the last commit $c_i$ to satisfy one of the following:
 	\begin{enumerate}[(i)]
 		\item $c_i$ was created by $u$
 		\item $c_i$ included an update proposal for $u$
@@ -217,34 +215,33 @@ Now, it is important to notice that the encrypted information in commit $c$ is f
 \end{definition}
 
 \begin{definition}[Safe user] \label{def:safe-commit-wrt-user}
-	Let $\eta$ arbitrary and let $\Sigma$ a PC-CGKA scheme. Consider an execution of $\game{\Sigma}{\eta}{PC-CGKA}(\adv)$ for some adversary $\adv$. Let $Q$ the total number of queries made by $\adv$. We will refer to queries by their index among all queries. Let $q^* \in [Q]$ a $\operatorname{create-group}(i)$ or $\operatorname{create-commit}(i, \cdot)$ query with $i \in [n]$ as the target user. Let $j \in [n]$ any user (including $i$) in the group after applying the commit $c^*$ created by $q^*$. Let the commit $c'$ be user $j$'s last update up to $c^*$.
+	Let $\Sigma$ a PC-CGKA scheme and let $\eta$ arbitrary. Consider an execution of $\game{\Sigma}{\eta}{PC-CGKA}(\adv)$ for some adversary $\adv$. Let $Q$ the total number of queries made by $\adv$. We will refer to queries by their index among all queries. Let $q^* \in [Q]$ a $\operatorname{create-group}(i)$ or $\operatorname{create-commit}(i, \cdot)$ query with $i \in [n]$ as the target user. Let $j \in [n]$ any user (including $i$) in the group after applying the commit $c^*$ created by $q^*$. Let the commit $c'$ be user $j$'s last update up to $c^*$.
 
 	Set the query $q^- \in [Q]$ depending on which case in Definition~\ref{def:last-update-before-commit} commit $c'$ falls into:
 	\begin{enumerate}[(i)]
 		\item $q^-$ is the $\operatorname{create-commit}(j, \cdot)$ query that created $c'$
 		\item $q^-$ is the $\operatorname{propose-update}(j)$ query that created the update proposal for $j$ included in $c'$
-		\item $q^-$ is the last $\operatorname{deliver-commit}$ query before $q^*$ that reset $j$'s public and private key pair or $q^- = 0$ if no such query was made
+		\item Let $q_{\mathrm{add}}$ be the query to $\operatorname{propose-add}$ that created the add proposal for user $j$ that was included in $c'$.
+		      $q^-$ is the last $\operatorname{deliver-commit}$ query before $q_{\mathrm{add}}$ that reset $j$'s public and private key pair, or set $q^- = 0$ if no such query was made.
 		\item $q^-$ is the corresponding query $\operatorname{create-group}(j)$ that ran $\operatorname{CreateGroup}$
 	\end{enumerate}
 
-	\todo{Simplify this case if possible.}
-
-	Again, set the query $q^+ \in [Q]$ depending on which case in Definition~\ref{def:last-update-before-commit} commit $c'$ falls into:
+	Analogously, set the query $q^+ \in [Q]$ depending on which case in Definition~\ref{def:last-update-before-commit} commit $c'$ falls into:
 	\begin{enumerate}[(i)]
 		\item \begin{itemize}
-			      \item \textbf{Case user $j$ applied $c'$, i.e. a query $\operatorname{confirm}(k, 1)$ with index $q_{\mathrm{confirm}}$ was made where $c_k = c'$:} same as $(iv)$, but use the next query after $q_{\mathrm{confirm}}$.
+			      \item \textbf{Case user $j$ applied $c'$}: Then a query $\operatorname{confirm}(k, 1)$ with index $q_{\mathrm{confirm}}$ was made where $c_k = c'$. Set $q^+$ same as in $(iv)$, but with $q^+ > q_{\mathrm{confirm}}$.
 			      \item \textbf{Otherwise:} $q^+$ is the next query that removed the new state associated with $c'$ from $U_j$. This is either a query $\operatorname{confirm}(k, 0)$ with $c_k = c'$, a query $\operatorname{confirm}(k, 1)$ with $c_k \neq c'$ or a query $\operatorname{deliver-commit}(j, k)$ with $c_k \neq c'$. Set $q^+ = Q$ if there is no such query.
 		      \end{itemize}
 		\item Let $p$ be the update proposal for $j$ included in $c'$.
 		      \begin{itemize}
 			      \item \textbf{Case $j$ applied a commit $c_k$ that included $p$}: same as $(iv)$, but use the next query after $q_{\mathrm{deliver}}$, where $q_{\mathrm{deliver}}$ is the $\operatorname{deliver-commit}(j, k)$ query that let $j$ process $c_k$
-			      \item \textbf{Otherwise:} \todo{this should the next query after $q^-$ that leads to user $j$ applying a commit}
+			      \item \textbf{Otherwise:} $q^+$ is first query such that $q^+ > q^-$ that led to user $j$ applying a commit, or set $q^+ = Q$ otherwise\footnote{Once user $j$ has applied any commit after creating the update proposal $p$ that does not include $p$, it is clear that $p$ is outdated and its associated data should be deleted.}
 		      \end{itemize}
-		\item same as $(iv)$ \todo{Note: here we are using that when $j$ is removed from the group they delete their old secret key, which contains the initial key material of $j$ in the group}
-		\item $q^+$ is the next query $q > q^-$ that led to user $j$ applying a commit $c$ that they created (i.e. $q$ is a $\operatorname{confirm}(k, 1)$ query with $c_k = c$) or that included an update or remove proposal for $j$ (i.e. $q$ is a $\operatorname{deliver-commit}(j, k)$ query with $c_k = c$), or set $q^+ = Q$ if no such commit exists
+		\item same as $(iv)$
+		\item $q^+$ is first query such that $q^+ > q^-$ that led to user $j$ applying a commit $c$ that they created (so $q^+$ is a $\operatorname{confirm}(k, 1)$ query with $c_k = c$) or that included an update or remove proposal for $j$ (so $q^+$ is a $\operatorname{deliver-commit}(j, k)$ query with $c_k = c$), or set $q^+ = Q$ if no such commit exists\footnote{This is simply describing the next query that made user $j$ update their key material, and therefore delete their old key material.}
 	\end{enumerate}
 
-	The commit $c^*$ is \emph{safe with respect to user $j$} if there was no query $\operatorname{corrupt}(j)$ in the interval $[q^-, q^+]$.
+	The commit $c^*$ is \emph{safe with respect to user $j$} if there was no $\operatorname{corrupt}(j)$ query in the interval $[q^-, q^+]$.
 \end{definition}
 
 \todo{Explain how this definition improves on \cite{ttkem}. (\cite{ttkem} is ambiguous in some case and also makes the interval unnecessarily large.)}
