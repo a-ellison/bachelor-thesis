@@ -264,7 +264,7 @@ For a certain class of schemes, we can improve on Lemma~\ref{lemma:mis-eav-from-
 \begin{lemma} \label{lemma:dh-reduction}
 	Recall the assumptions, variables and events from the statement and proof of Theorem~\ref{theorem:sdgsd-security}. In particular, assume that the DDH problem is $(t, \eddh)$-hard relative to $\mathcal{G}$. Let $\eta$ arbitrary and let $\adv$ an SD-GSD adversary constructing a GSD graph of size at most $N(\eta)$ and indegree at most $\delta(\eta)$, making at most $\ms(\eta)$ queries to $\hgen$ or $\hdep$ and at most $\mdh(\eta)$ queries to $\hdh$, and running in time $\tilde{t}(\eta)$. Then
 	\[
-		\pr{\qs \land \fdh} \le N \cdot \eddh + \frac{\mdh \cdot N^2}{2^{\eta - 1}}.
+		\pr{\qs \land \fdh} \le N \cdot \eddh + \frac{\mdh \cdot N^2}{2^{\eta}}.
 	\]
 \end{lemma}
 

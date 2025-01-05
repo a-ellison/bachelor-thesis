@@ -368,7 +368,7 @@ By assuming a key-rerandomizable encryption scheme and applying Lemma~\vref{lemm
 		\pr{q_i \cdot R_j = k} = \frac{1}{q} \le \frac{1}{2^\eta},
 	\]
 	where we used that $q \ge 2^\eta$ by Definition~\ref{def:group-generation-algorithm}.
-	Thus, by a union bound and using that $i \in [\mdh], 1 \le j \le N - 1 \le N$ ($j$ is bounded by the maximum outdegree) and  we have
+	Thus, by a union bound and using that $i \in [\mdh], 1 \le j \le N - 1 \le N$ ($j$ is bounded by the maximum outdegree) we have
 	\begin{equation} \label{eq:lemma-dh-reduction-b=1}
 		\pr{0 \from \adv' \mid b = 1} \le \frac{\mdh \cdot N}{2^\eta}.
 	\end{equation}
