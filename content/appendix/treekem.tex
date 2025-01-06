@@ -349,3 +349,32 @@ The TreeKEM protocol discussed in the literature is not described as a self-cont
 \end{definition}
 
 The full TreeKEM protocol as described in the RFC achieves the correctness property in Definition~\ref{def:cgka-correctness-consistent-history} using a hash of the tree.
+
+\subsection{TreeKEM security from SD-GSD security}
+
+We have already described the relationship between the TreeKEM protocol and the SD-GSD security game at the beginning of Chapter~\ref{sec:tighter-gsd-security}. The following theorem formalizes this.
+
+\begin{theorem} \label{theorem:cgka-from-sdgsd}
+	Let $\eta$ denote the security parameter.
+	Let $\treekem$ the TreeKEM protocol instantiated with a public-key encryption scheme $\Pi$. Let $c, p, u$ functions in $\eta$. Set $N \coloneqq c \cdot (\ceil{\log(u)} + 1) + u + p$ and $\delta \coloneqq u$. If $\Pi$ is $(t, \epsilon, N, \delta)$-SD-GSD-secure in the ROM and the functions $\hgen, \hdep$ in $\treekem$ are modelled as random oracles, then $\treekem$ is $(\tilde{t}, \epsilon, c, p, u)$-PC-CGKA-secure with $\tilde{t} \approx t$.
+\end{theorem}
+
+\paragraph{Intuition} The approach for the proof is straightforward. Given an adversary $\adv$ against TreeKEM, we want to construct an SD-GSD adversary $\adv'$ that simulates $\game{\treekem}{\eta}{PC-CGKA}$ to $\adv$ and uses $\adv$'s ability to distinguish the group key of a safe commit from a random key to win the SD-GSD game. Every non-blank node in TreeKEM can be simulated with a corresponding node in the GSD graph. Note that the group key of a commit in TreeKEM is given by $\hdep(s)$ where $s$ is the seed of the root node. Thus, if $\adv$ can distinguish the group key of a safe commit from a uniformly random key $k \from \{0, 1\}^\rho$ in the simulation and $s$ is the seed of the node in the GSD graph corresponding to the root of the tree in the commit, then $\adv$ is able to distinguish $\hdep(s)$ from $r \from \{0, 1\}^\rho$. For $\adv'$ to make use of this, we need to make sure that this node remains safe in the GSD graph.
+
+More concretely, let us go over how the various queries in the PC-CGKA game can be simulated. We will refer to nodes in the GSD graph as \emph{GSD nodes} and nodes in the TreeKEM tree as \emph{tree nodes}. We can also model the init keys with GSD nodes, as only seeds of nodes are ever encrypted with them. $\adv'$ can always keep track of the public state of the tree (as viewed by any user) using the $\mathrm{reveal}$ oracle in the SD-GSD game. For the initial $\operatorname{create-group}$ query or any $\operatorname{create-commit}$ query with a single node in the group, it suffices to create a GSD node for the leaf tree node and sample the group key of the commit u.a.r. If $\adv$ asks to be challenged on such a commit, then we cannot make use of $\adv$'s output in the GSD game. However, note that if such a commit is safe, then $\adv$ is never leaked any information about the group key and has zero advantage in this case. Proposals can also be simulated easily as creating them only requires knowing public values. The leaf key pair sampled in an add proposal is of course modelled with a GSD node. To simulate the creation of a commit and corresponding welcome messages:
+\begin{itemize}
+	\item $\adv'$ can apply the proposals as in $\treekem.\operatorname{CreateCommmit}$, since this only requires knowing public values
+	\item use seed dependencies in the SD-GSD game to model the new nodes on the direct path
+	\item compute the ciphertexts for the commit and welcome messsages using encryption queries in the SD-GSD game
+\end{itemize}
+To simulate $\operatorname{deliver-commit}$ and $\operatorname{deliver-welcome}$, $\adv'$ updates the public state of the target user's tree accordingly. Queries to $\operatorname{corrupt}$ are a bit more involved. Since $\adv'$ can only keep track of the public state of each user, it must be prepared to compute the real group state of a user upon receiving such a query. Note however that the secret keys known by a group member can always be computed as a function of their current secret key, which can be learned using a $\operatorname{corrupt}$ query in the SD-GSD game, and the transcript of commits applied by the member with this secret key.
+
+Finally, it follows from Defintion~\ref{def:safe-commit} that when $\adv$ challenges a safe commit (in a group with more than one user), the corresponding GSD node that $\adv'$ challenges is also safe.
+
+For a detailed proof we refer the reader to \cite[Theorem 12]{modular-group-messaging}.
+
+Theorems~\ref{theorem:sdgsd-security} and \ref{theorem:cgka-from-sdgsd} together implying the following final result on the security of TreeKEM when DHIES is used as the public-key encryption scheme. This result was already stated informally in Section~\ref{sec:treekem-security}.
+
+\begin{theorem}
+
+\end{theorem}

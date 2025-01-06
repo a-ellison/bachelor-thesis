@@ -1,24 +1,44 @@
 \section{Application to TreeKEM} \label{sec:application-to-treekem}
 
-\subsection{TreeKEM security from SD-GSD security}
+\subsection{TreeKEM security} \label{sec:treekem-security}
 
-We have already described the relationship between the TreeKEM protocol and the SD-GSD security game at the beginning of Chapter~\ref{sec:tighter-gsd-security}. The following theorem formalizes this.
+The following theorem, stated informally here and more formally in Section ... of the appendix, is our main practical result.
 
-\begin{theorem}
-	Let $\eta$ denote the security parameter.
-	Let $\treekem$ the TreeKEM protocol instantiated with a public-key encryption scheme $\Pi$. Let $c, p, u$ functions in $\eta$. Set $N \coloneqq c \cdot (\ceil{\log(u)} + 1) + u + p$ and $\delta \coloneqq u$. If $\Pi$ is $(t, \epsilon, N, \delta)$-SD-GSD-secure in the ROM and the functions $\hgen, \hdep$ in $\treekem$ are modelled as random oracles, then $\treekem$ is $(\tilde{t}, \epsilon, c, p, u)$-PC-CGKA-secure with $\tilde{t} \approx t$.
+\begin{theorem}[Informal]
+	If the DHIES scheme is used in TreeKEM, the private-key encryption scheme in DHIES is $(t, \eeav)$-EAV-secure and the DDH problem is $(t, \eddh)$-hard in the Diffie-Hellman group, then for all $c, p, u$, TreeKEM is $(\tilde{t}, \tilde{\epsilon}, c, p, u)$-secure in the ROM with $\tilde{t} \approx t$ and
+	\begin{align*}
+		\tilde{\epsilon} & = 2 \cdot \delta \cdot N \cdot \eeav + 2 \cdot N \cdot \eddh + \frac{2 \cdot \mdh \cdot N^2}{q} + \frac{\ms \cdot N}{2^{\rho - 1}} \\
+		\delta           & \coloneqq u                                                                                                                        \\
+		N                & \coloneqq 2 \cdot c \cdot \log(u) + u + p
+	\end{align*}
+	where
+	\begin{itemize}
+		\item $c$ is the number of commits created
+		\item $p$ is the number of add or update proposals created
+		\item $u$ is the maximum number of users
+		\item $\ms$ is the number of queries to the functions $\hgen$ or $\hdep$ in TreeKEM
+		\item $\mdh$ is the number of queries to $\hdh$ in DHIES
+		\item $q$ is the size of the Diffie-Hellman group
+		\item $\rho$ is the number of bits of randomness used by DHIES for key generation
+	\end{itemize}
 \end{theorem}
 
-\paragraph{Intuition} The approach for the proof is straightforward. Given an adversary $\adv$ against TreeKEM, we want to construct an SD-GSD adversary $\adv'$ that simulates $\game{\treekem}{\eta}{PC-CGKA}$ to $\adv$ and uses $\adv$'s ability to distinguish the group key of a safe commit from a random key to win the SD-GSD game. Every non-blank node in TreeKEM can be simulated with a corresponding node in the GSD graph. Note that the group key of a commit in TreeKEM is given by $\hdep(s)$ where $s$ is the seed of the root node. Thus, if $\adv$ can distinguish the group key of a safe commit from a uniformly random key $k \from \{0, 1\}^\rho$ in the simulation and $s$ is the seed of the node in the GSD graph corresponding to the root of the tree in the commit, then $\adv$ is able to distinguish $\hdep(s)$ from $r \from \{0, 1\}^\rho$. For $\adv'$ to make use of this, we need to make sure that this node remains safe in the GSD graph.
+\subsection{Interpreting the result}
 
-More concretely, let us go over how the various queries in the PC-CGKA game can be simulated. We will refer to nodes in the GSD graph as \emph{GSD nodes} and nodes in the TreeKEM tree as \emph{tree nodes}. We can also model the init keys with GSD nodes, as only seeds of nodes are ever encrypted with them. $\adv'$ can always keep track of the public state of the tree (as viewed by any user) using the $\mathrm{reveal}$ oracle in the SD-GSD game. For the initial $\operatorname{create-group}$ query or any $\operatorname{create-commit}$ query with a single node in the group, it suffices to create a GSD node for the leaf tree node and sample the group key of the commit u.a.r. If $\adv$ asks to be challenged on such a commit, then we cannot make use of $\adv$'s output in the GSD game. However, note that if such a commit is safe, then $\adv$ is never leaked any information about the group key and has zero advantage in this case. Proposals can also be simulated easily as creating them only requires knowing public values. The leaf key pair sampled in an add proposal is of course modelled with a GSD node. To simulate the creation of a commit and corresponding welcome messages:
-\begin{itemize}
-	\item $\adv'$ can apply the proposals as in $\treekem.\operatorname{CreateCommmit}$, since this only requires knowing public values
-	\item use seed dependencies in the SD-GSD game to model the new nodes on the direct path
-	\item compute the ciphertexts for the commit and welcome messsages using encryption queries in the SD-GSD game
-\end{itemize}
-To simulate $\operatorname{deliver-commit}$ and $\operatorname{deliver-welcome}$, $\adv'$ updates the public state of the target user's tree accordingly. Queries to $\operatorname{corrupt}$ are a bit more involved. Since $\adv'$ can only keep track of the public state of each user, it must be prepared to compute the real group state of a user upon receiving such a query. Note however that the secret keys known by a group member can always be computed as a function of their current secret key, which can be learned using a $\operatorname{corrupt}$ query in the SD-GSD game, and the transcript of commits applied by the member with this secret key.
+Let us go through a concrete example to see what level of security this bound guarantees for TreeKEM. We will look at the \texttt{MLS\_128\_DHKEMX25519\_AES128GCM\_SHA256\_Ed25519} cipher suite specified in \cite{rfc9420}, which uses Curve25519 as the Diffie-Hellman group, SHA2-256 as the key-derivation function in DHIES, and AES with a 128-bit key size for private-key encryption. Both Curve25519 and AES are believed to have a 128-bit security level \todo{citation (Wikipedia?)}, so for example we can set $(t, \eeav) = (t, \eddh) = (2^{80}, 2^{-48})$. The group size for Curve25519 is at least $2^{252}$,  \todo{Can I cite Wikipedia for this?} The seeds sampled in MLS (called ``path secrets" in the RFC) and used as arguments to $\hgen$ and $\hdep$ are 256 bits with SHA2-256 as the key-derivation function, meaning that $\rho = 256$. Furthermore we can set $\mdh \le 2^{60}$ and $\ms \le 2^{61}$.
 
-Finally, it follows from Defintion~\ref{def:safe-commit} that when $\adv$ challenges a safe commit (in a group with more than one user), the corresponding GSD node that $\adv'$ challenges is also safe.
+For the parameters $c$ and $u$ we can consider a large group of about 1000 users, existing for 5 years and making one commit every hour. Then $u \le 2^{10}$ and $c \le 2^{16}$. For $p$, if we assume that a significant fraction of the users will want to update with every commit and that add proposals are rare, then we can bound it by $p \le c \cdot u$.
 
-For a detailed proof we refer the reader to \cite[Theorem 12]{modular-group-messaging}.
+These numbers yield the following results:
+\begin{align*}
+	\delta & \le 2^{10}, N \le 2^{27}                                                      \text{ (dominated by $p$)} \\
+	\et    & \le 2^{37} \cdot \eeav + 2^{27} \cdot \eddh + \frac{1}{2^{136}}                                          \\
+	       & \le \frac{1}{2^{10}}
+\end{align*}
+with the $\eeav$ term dominating the result. This gives a security level of $\tilde{t}/\et \ge 2^{90}$. Since private-key encryption is relatively cheap, using 256-bit AES would have a small impact on the performance and would increase the security level to 100 bits. Lastly, using 256-bit AES and a Diffie-Hellman group with a 256-bit security level yields 139 bits of security for TreeKEM.
+
+The previous best result in \cite[Theorem 3]{ttkem} proved a bound with
+\[
+	\et \le 2 \cdot N^2 \cdot \epsilon + \mathrm{negl}(\eta)
+\]
+for the GSD game, where $\epsilon$ is the IND-CPA security of the underlying public-key encryption scheme. Using the above parameters for a 128-bit security level this implies only 73 bits of security (and the result remains unchanged with 256-bit AES). Therefore, our result significantly improves the guaranteed security level of TreeKEM (in the ROM).

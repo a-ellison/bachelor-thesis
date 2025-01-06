@@ -84,7 +84,7 @@ Since in this work we are interested in SD-GSD security for the case where $\hge
 
 \begin{theorem} \label{theorem:sdgsd-security}
 	Let $\eta$ denote the security parameter.
-	Let $\dhies$ the DHIES scheme instantiated with a group-generation algorithm $\mathcal{G}$ and a private-key encryption scheme $\Pi_s$.  If $\Pi_s$ is $(t, \eeav)$-EAV-secure, the DDH problem is $(t, \eddh)$-hard relative to $\mathcal{G}$ and the function $\hdh$ in $\dhies$ is modelled as a random oracle, then for any $\delta, N$ with $\delta \le N$, $\dhies$ is $(\tilde{t}, \tilde{\epsilon}, N, \delta)$-SD-GSD-secure in the ROM with\footnote{Note that in the following equality we have omitted writing the argument $\eta$ to the various functions and are implying that the equality holds for all $\eta$.}
+	Let $\dhies$ the DHIES scheme instantiated with a group-generation algorithm $\mathcal{G}$ and a private-key encryption scheme $\Pi_s$. If $\Pi_s$ is $(t, \eeav)$-EAV-secure, the DDH problem is $(t, \eddh)$-hard relative to $\mathcal{G}$ and the function $\hdh$ in $\dhies$ is modelled as a random oracle, then for any $\delta, N$ with $\delta \le N$, $\dhies$ is $(\tilde{t}, \tilde{\epsilon}, N, \delta)$-SD-GSD-secure in the ROM with\footnote{Note that in the following equality we have omitted writing the argument $\eta$ to the various functions and are implying that the equality holds for all $\eta$.}
 	\[
 		\tilde{\epsilon} = 2 \cdot \delta \cdot N \cdot \eeav + 2 \cdot N \cdot \eddh + \frac{\mdh \cdot N^2}{2^{\eta - 1}} + \frac{\ms \cdot N}{2^{\rho - 1}},
 	\]
