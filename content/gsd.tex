@@ -84,12 +84,11 @@ Since in this work we are interested in SD-GSD security for the case where $\hge
 \subsection{Proving SD-GSD security for DHIES in the ROM}
 
 \begin{theorem} \label{theorem:sdgsd-security}
-	Let $\eta$ denote the security parameter.
-	Let $\dhies$ the DHIES scheme instantiated with a group-generation algorithm $\mathcal{G}$ and a private-key encryption scheme $\Pi_s$. If $\Pi_s$ is $(t, \eeav)$-EAV-secure, the DDH problem is $(t, \eddh)$-hard relative to $\mathcal{G}$ and the function $\hdh$ in $\dhies$ is modelled as a random oracle, then for any $\delta, N$ with $\delta \le N$, $\dhies$ is $(\tilde{t}, \tilde{\epsilon}, N, \delta)$-SD-GSD-secure in the ROM with\footnote{Note that in the following equality we have omitted writing the argument $\eta$ to the various functions and are implying that the equality holds for all $\eta$.}
+	Let $\dhies$ denote the DHIES scheme instantiated with a group-generation algorithm $\mathcal{G}$ and a private-key encryption scheme $\Pi_s$. If $\Pi_s$ is $(t, \eeav)$-EAV-secure, the DDH problem is $(t, \eddh)$-hard relative to $\mathcal{G}$ and the function $\hdh$ in $\dhies$ is modelled as a random oracle, then for any $\delta, N$ with $\delta \le N$, $\dhies$ is $(\tilde{t}, \tilde{\epsilon}, N, \delta)$-SD-GSD-secure in the ROM with\footnote{Note that in the following equality we have omitted writing the argument $\eta$ to the various functions and are implying that the equality holds for all $\eta$.}
 	\[
-		\tilde{\epsilon} = 2 \cdot \delta \cdot N \cdot \eeav + 2 \cdot N \cdot \eddh + \frac{\mdh \cdot N^2}{2^{\eta - 1}} + \frac{\ms \cdot N}{2^{\rho - 1}},
+		\tilde{\epsilon} = 2 \cdot \delta \cdot N \cdot \eeav + 2 \cdot N \cdot \eddh + \frac{2 \cdot \mdh \cdot N^2}{q} + \frac{\ms \cdot N}{2^{\rho - 1}},
 	\]
-	where $\ms$ is an upper bound on the number of queries made to either $\hgen$ or $\hdep$ and $\mdh$ is an upper bound on the number of queries made to $\hdh$, and with
+	where $\ms$ is an upper bound on the number of queries made to either $\hgen$ or $\hdep$, $\mdh$ is an upper bound on the number of queries made to $\hdh$, $q$ is a lower bound on the size of the group output by $\mathcal{G}$ and $\rho$ is the number of random bits sampled by $\dhies.\gen$, and with
 	\[
 		\tilde{t} = t \begin{aligned}[t]
 			- & \mathcal{O}
@@ -110,7 +109,7 @@ Since in this work we are interested in SD-GSD security for the case where $\hge
 
 In contrast, the result in \cite{ttkem} achieves a security loss in $\mathcal{O}(N^2)$ and reduces to the IND-CPA security of the public-key encryption scheme.
 
-For ease of exposition, we will assume that $\mathcal{G}(1^\eta)$ is deterministic, as is the case in practice. We will therefore set the $pk \coloneqq h_1, sk \coloneqq x$ in $\dhies.\gen$, as $\mathbb{G}, q, g$ are implied by $\eta$. The results nevertheless hold also for the general case.
+For ease of exposition, we will assume that $\mathcal{G}(1^\eta)$ is deterministic, as is the case in practice. We will therefore set $pk \coloneqq h_1, sk \coloneqq x$ in $\dhies.\gen$, as $\mathbb{G}, q, g$ are implied by $\eta$. The results nevertheless hold also for the general case.
 
 \paragraph{Intuition}
 Consider an arbitrary SD-GSD adversary $\adv$. For an execution of $\game{\dhies}{\eta}{SD-GSD}(\adv)$ we say ``\emph{$\adv$ wins}" to denote the event $\game{\dhies}{\eta}{SD-GSD}(\adv) = 1$.
@@ -185,7 +184,7 @@ We bound $\pr{\qs \land \fdh}$ and $\pr{\qs \land \overline{\fdh} \,}$ in Lemma~
 
 	By Lemma~\vref{lemma:dh-reduction} we have\footnote{Note that we are again omitting the argument $\eta$ from the functions on the right hand side ($N, \eddh$ and $\mdh$ in this case).}
 	\[
-		\pr{\qs \land \fdh} \le N \cdot \eddh + \frac{\mdh \cdot N^2}{2^\eta}.
+		\pr{\qs \land \fdh} \le N \cdot \eddh + \frac{\mdh \cdot N^2}{q}.
 	\]
 	and by Lemma~\vref{lemma:eav-reduction} we have
 	\[
@@ -193,7 +192,7 @@ We bound $\pr{\qs \land \fdh}$ and $\pr{\qs \land \overline{\fdh} \,}$ in Lemma~
 	\]
 	so we know that
 	\begin{equation} \label{eq:theorem-sd-gsd-security-qs-bound}
-		\pr{\qs} \le N \cdot \eddh + \delta \cdot N \cdot \eeav + \frac{\mdh \cdot N^2}{2^\eta} + \frac{\ms \cdot N}{2^\rho} = \tilde{\epsilon}(\eta) / 2.
+		\pr{\qs} \le N \cdot \eddh + \delta \cdot N \cdot \eeav + \frac{\mdh \cdot N^2}{q} + \frac{\ms \cdot N}{2^\rho} = \tilde{\epsilon}(\eta) / 2.
 	\end{equation}
 	Then
 	\begin{align*}
@@ -265,7 +264,7 @@ For a certain class of schemes, we can improve on Lemma~\ref{lemma:mis-eav-from-
 \begin{lemma} \label{lemma:dh-reduction}
 	Recall the assumptions, variables and events from the statement and proof of Theorem~\ref{theorem:sdgsd-security}. In particular, assume that the DDH problem is $(t, \eddh)$-hard relative to $\mathcal{G}$. Let $\eta$ arbitrary and let $\adv$ an SD-GSD adversary constructing a GSD graph of size at most $N(\eta)$ and indegree at most $\delta(\eta)$, making at most $\ms(\eta)$ queries to $\hgen$ or $\hdep$ and at most $\mdh(\eta)$ queries to $\hdh$, and running in time $\tilde{t}(\eta)$. Then
 	\[
-		\pr{\qs \land \fdh} \le N \cdot \eddh + \frac{\mdh \cdot N^2}{2^{\eta}}.
+		\pr{\qs \land \fdh} \le N \cdot \eddh + \frac{\mdh \cdot N^2}{q}.
 	\]
 \end{lemma}
 

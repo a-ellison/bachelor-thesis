@@ -259,7 +259,7 @@ By assuming a key-rerandomizable encryption scheme and applying Lemma~\vref{lemm
 	\]
 	and the bound $\tilde{\epsilon}$ on the success probability of an SD-GSD adversary thus improved to
 	\[
-		\tilde{\epsilon} = 2 \cdot N \cdot (\eeav + \eddh) + \frac{\mdh \cdot N^2}{2^{\eta - 1}} + \frac{\ms \cdot N}{2^{\rho - 1}}
+		\tilde{\epsilon} = 2 \cdot N \cdot (\eeav + \eddh) + \frac{2 \cdot \mdh \cdot N^2}{q} + \frac{\ms \cdot N}{2^{\rho - 1}}
 	\]
 	(with appropriate changes to the runtime $\tilde{t}$).
 \end{corollary}
@@ -365,18 +365,17 @@ By assuming a key-rerandomizable encryption scheme and applying Lemma~\vref{lemm
 
 	Second, we will show that $\pr{0 \from \adv' \mid b = 1}$ is negligible. When $b = 1$ in $\game{\mathcal{G}}{\eta}{DDH}(\adv')$, $k$ is a uniformly random group element independent of any information given to $\adv$, in particular of $q_i \cdot R_j$ for any $i, j$. Thus for any $i, j$,
 	\[
-		\pr{q_i \cdot R_j = k} = \frac{1}{q} \le \frac{1}{2^\eta},
+		\pr{q_i \cdot R_j = k} = \frac{1}{q}.
 	\]
-	where we used that $q \ge 2^\eta$ by Definition~\ref{def:group-generation-algorithm}.
 	Thus, by a union bound and using that $i \in [\mdh], 1 \le j \le N - 1 \le N$ ($j$ is bounded by the maximum outdegree) we have
 	\begin{equation} \label{eq:lemma-dh-reduction-b=1}
-		\pr{0 \from \adv' \mid b = 1} \le \frac{\mdh \cdot N}{2^\eta}.
+		\pr{0 \from \adv' \mid b = 1} \le \frac{\mdh \cdot N}{q}.
 	\end{equation}
 
 	Combining \eqref{eq:lemma-dh-reduction-advantage}, \eqref{eq:lemma-dh-reduction-b=0} and \eqref{eq:lemma-dh-reduction-b=1} we get
 	\begin{align} \label{eq:lemma-dh-reduction-advantage-lower-bound}
 		\begin{split}
-			\advantage{\mathcal{G}}{\eta}{DDH}(\adv') \ge \frac{\pr{\fdh}}{N} - \frac{\mdh \cdot N}{2^\eta}.
+			\advantage{\mathcal{G}}{\eta}{DDH}(\adv') \ge \frac{\pr{\fdh}}{N} - \frac{\mdh \cdot N}{q}.
 		\end{split}
 	\end{align}
 
@@ -394,9 +393,9 @@ By assuming a key-rerandomizable encryption scheme and applying Lemma~\vref{lemm
 	\]
 	and if we combine this with \eqref{eq:lemma-dh-reduction-advantage-lower-bound} we get
 	\begin{align*}
-		\frac{\pr{\fdh}}{N} - \frac{\mdh \cdot N}{2^\eta} & \le \eddh                                          \\
-		                                                  & \iff                                               \\
-		\pr{\fdh}                                         & \le N \cdot \eddh + \frac{\mdh \cdot N^2}{2^\eta},
+		\frac{\pr{\fdh}}{N} - \frac{\mdh \cdot N}{q} & \le \eddh                                     \\
+		                                             & \iff                                          \\
+		\pr{\fdh}                                    & \le N \cdot \eddh + \frac{\mdh \cdot N^2}{q},
 	\end{align*}
 	concluding the proof.
 \end{proof}

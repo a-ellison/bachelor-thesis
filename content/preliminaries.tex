@@ -24,8 +24,8 @@ We will use the following notation throughout:
 
 Our definitions were adapted from \cite{introduction-to-modern-cryptography}. Some simple lemmas and definitions for well-known concepts including private-key and public-key encryption, IND-CPA security, EAV security and the Random Oracle Model (ROM) can be found in section \ref{sec:preliminaries-appendix} of the appendix.
 
-\begin{definition}[Group-generation algorithm {\cite[Section 9.3.2]{introduction-to-modern-cryptography}}] \label{def:group-generation-algorithm}
-	Let $\eta$ denote the security parameter. A \emph{group-generation algorithm} $\mathcal{G}$ is a probabilistic polynomial-time algorithm that takes as input $1^\eta$ and outputs $(\mathbb{G}, q, g)$, where $\mathbb{G}$ is (a description of) a cyclic group, $q$ is the order of the group with $q \ge 2^\eta$ and $g \in \mathbb{G}$ is a generator. A group element is represented as a bit-string of length at most $\gamma(\eta)$. We write $(\mathbb{G}, q, g) \from \mathcal{G}(1^\eta)$.
+\begin{definition}[Group-generation algorithm {\cite[Section 9.3.2]{introduction-to-modern-cryptography}}]
+	A \emph{group-generation algorithm} $\mathcal{G}$ is a probabilistic polynomial-time algorithm that takes as input $1^\eta$ and outputs $(\mathbb{G}, q, g)$, where $\mathbb{G}$ is (a description of) a cyclic group with order $q$ and $g \in \mathbb{G}$ is a generator. A group element is represented as a bit-string of length at most $\gamma(\eta)$. We write $(\mathbb{G}, q, g) \from \mathcal{G}(1^\eta)$.
 \end{definition}
 
 \begin{definition}[The Decisional Diffie-Hellman (DDH) problem]
