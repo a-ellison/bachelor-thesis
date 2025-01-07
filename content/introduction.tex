@@ -26,17 +26,11 @@ One choice that can be made when defining the security of a CGKA scheme is wheth
 
 The Generalized Selective Decryption (GSD) security game \cite{gsd} was introduced precisely to analyze adaptive security for protocols based on a graph-like structure (as is the case with TreeKEM). It was initially defined for the private-key setting and later adapted to the public-key setting in \cite{ttkem}. The work in \cite{ttkem} proved a polynomial bound for the adaptive security of the public-key GSD game in the so-called Random Oracle Model (ROM) for an arbitrary IND-CPA secure public-key encryption scheme. This result implies a polynomial bound for the adaptive security of TreeKEM as a CGKA scheme as outlined in \cite[Theorem 4]{ttkem} and subsequently proved in more detail in \cite[Theorem 12]{modular-group-messaging}.
 
-In this work, we formally prove the adaptive security of a specific public-key encryption scheme, the DHIES scheme, in a modified version of the public-key GSD game, adapted to better model TreeKEM, in the ROM. Focusing on the DHIES scheme allows us to achieve a tighter bound than the one in \cite{ttkem}. Moreover, we define the syntax and security of propose and commit CGKA schemes, provide a high-level description of how the TreeKEM protocol can be instantiated with our definitions and state a result in the ROM relating the security of a public-key encryption scheme in our modified GSD game with the security of TreeKEM as a CGKA scheme when instantiated with this public-key encryption scheme.
 
 \subsection{Contributions}
 
-We present the following main contributions:
-\begin{itemize}
-	\item A simple definition of an adaptation of the public-key GSD game better suited to model TreeKEM.
-	\item A simple and detailed proof of (adaptive) security of the DHIES scheme with respect to our GSD definition. We achieve a tighter bound than the one proven so far.
-	\item Simple and clear definitions of the syntax and security of propose and commit CGKA schemes. We explain our definition in detail and briefly discuss the correctness of CGKA schemes.
-	\item A high-level description of the TreeKEM protocol and how it can be instantiated with respect to our CGKA definition. Finally, we state a result relating the security of our GSD game and the security of TreeKEM, and provide an outline of the proof.
-\end{itemize}
+In this work, we formally prove the adaptive security of a specific public-key encryption scheme, the DHIES scheme, in a modified version of the public-key GSD game, adapted to better model TreeKEM, in the ROM. Focusing on the DHIES scheme allows us to achieve a tighter bound than the one in \cite{ttkem}. We then state the result on the security of TreeKEM implied by this bound, and give an interpretation of the result with protocol parameters used in practice.
+Moreover, we provide precise definitions for the syntax and security of propose and commit CGKA schemes and a high-level description of how the TreeKEM protocol can be instantiated with our definitions in the appendix.
 
 \subsection{Technical overview}
 

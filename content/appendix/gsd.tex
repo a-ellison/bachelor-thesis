@@ -64,7 +64,7 @@
 \subsection{Proof of Lemma~\ref{lemma:eav-reduction}} \label{sec:eav-reduction-proof}
 
 \begin{proof}[of Lemma~\ref{lemma:eav-reduction}]
-	As already motivated, we construct an MIS-EAV adversary $\adv'$ to derive the bound. $\adv'$ behaves as follows:
+	As already motivated after Lemma~\ref{lemma:eav-reduction}, we construct an MIS-EAV adversary $\adv'$ to derive the bound. $\adv'$ behaves as follows:
 	\begin{enumerate}[1.]
 		\item $\adv'$ runs $\adv$ to get $n$ and $D$ and initializes the GSD graph, seeds and the set of edges and corrupted nodes as in step \ref{def:sd-gsd-game-step-init} of the SD-GSD game.
 		\item \label{eav-reduction-mis-eav-adversary-step-init} $\adv'$ samples $w \from [n], s \from \{0, 1\}^\rho$ and gives $\delta$ and the messages $s_w, s$ to the challenger. Let $c_1, \ldots, c_\delta$ the encryptions it gets back.
@@ -267,7 +267,7 @@ By assuming a key-rerandomizable encryption scheme and applying Lemma~\vref{lemm
 \subsection{Proof of Lemma~\ref{lemma:dh-reduction}} \label{sec:dh-reduction-proof}
 
 \begin{proof}[of Lemma~\ref{lemma:dh-reduction}]
-	As outlined above we use $\adv$ to construct a DDH adversary $\adv'$.
+	As outlined after Lemma~\ref{lemma:dh-reduction} we use $\adv$ to construct a DDH adversary $\adv'$:
 	\begin{enumerate}[1.]
 		\item $\adv'$ gets $h_1, h_2$ and $k$ from the DDH challenger.
 		\item $\adv'$ runs $\adv$ to get $n$ and $D$, samples $a \from [n]$ and initializes the GSD graph, seeds and the set of edges and corrupted nodes as in step \ref{def:sd-gsd-game-step-init} of the SD-GSD game, with the sole exception that $pk_a = h_1$ (as opposed to setting it to the public key output by $\dhies.\gen(1^\eta, \hgen(s_a))$).

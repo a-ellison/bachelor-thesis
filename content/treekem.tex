@@ -1,10 +1,8 @@
-\section{Application to TreeKEM} \label{sec:application-to-treekem}
+\section{TreeKEM security}
 
-\subsection{TreeKEM security} \label{sec:treekem-security}
+The following theorem, stated informally here, is our main practical result.
 
-The following theorem, stated informally here and more formally in Section ... of the appendix, is our main practical result.
-
-\begin{theorem}[Informal]
+\begin{theorem}[Informal] \label{theorem:treekem-security-informal}
 	If the DHIES scheme is used in TreeKEM, the private-key encryption scheme in DHIES is $(t, \eeav)$-EAV-secure and the DDH problem is $(t, \eddh)$-hard in the Diffie-Hellman group, then for all $c, p, u$, TreeKEM is $(\tilde{t}, \tilde{\epsilon}, c, p, u)$-secure in the ROM with $\tilde{t} \approx t$ and
 	\begin{align*}
 		\tilde{\epsilon} & = 2 \cdot \delta \cdot N \cdot \eeav + 2 \cdot N \cdot \eddh + \frac{2 \cdot \mdh \cdot N^2}{q} + \frac{\ms \cdot N}{2^{\rho - 1}} \\
@@ -23,11 +21,13 @@ The following theorem, stated informally here and more formally in Section ... o
 	\end{itemize}
 \end{theorem}
 
+In Section~\ref{sec:treekem-security} of the appendix we restate the above theorem formally. To this end, we also provide the formal definitions for propose and commit CGKA schemes needed to state our result and a high-level description of how to instantiate (the essence of) the TreeKEM protocol with our definitions.
+
 \subsection{Interpreting the result}
 
-Let us go through a concrete example to see what level of security this bound guarantees for TreeKEM. We will look at the \texttt{MLS\_128\_DHKEMX25519\_AES128GCM\_SHA256\_Ed25519} cipher suite specified in \cite{rfc9420}, which uses Curve25519 as the Diffie-Hellman group, SHA2-256 as the key-derivation function in DHIES, and AES with a 128-bit key size for private-key encryption. Both Curve25519 and AES are believed to have a 128-bit security level \todo{citation (Wikipedia?)}, so for example we can set $(t, \eeav) = (t, \eddh) = (2^{80}, 2^{-48})$. The group size for Curve25519 is at least $2^{252}$,  \todo{Can I cite Wikipedia for this?} The seeds sampled in MLS (called ``path secrets" in the RFC) and used as arguments to $\hgen$ and $\hdep$ are 256 bits with SHA2-256 as the key-derivation function, meaning that $\rho = 256$. Furthermore we can set $\mdh \le 2^{60}$ and $\ms \le 2^{61}$.
+Let us go through a concrete example to see what level of security this bound guarantees for TreeKEM. We will look at the \texttt{MLS\_128\_DHKEMX25519\_AES128GCM\_SHA256\_Ed25519} cipher suite specified in \cite[Section~17.1]{rfc9420}, which uses Curve25519 as the Diffie-Hellman group, SHA2-256 as the key-derivation function in DHIES, and AES with a 128-bit key size for private-key encryption. Both Curve25519 \cite{curve25519} and AES are believed to have a 128-bit security level \todo{citation (Wikipedia?)}, so for example we can set $(t, \eeav) = (t, \eddh) = (2^{80}, 2^{-48})$. The group size for Curve25519 is at least $2^{252}$ \cite{curve25519}. The seeds sampled in MLS (called ``path secrets" in the RFC) and used as arguments to $\hgen$ and $\hdep$ are 256 bits with SHA2-256 as the key-derivation function \cite{rfc9420}, meaning that $\rho = 256$. Furthermore we can set $\mdh \le 2^{60}$ and $\ms \le 2^{61}$.
 
-For the parameters $c$ and $u$ we can consider a large group of about 1000 users, existing for 5 years and making one commit every hour. Then $u \le 2^{10}$ and $c \le 2^{16}$. For $p$, if we assume that a significant fraction of the users will want to update with every commit and that add proposals are rare, then we can bound it by $p \le c \cdot u$.
+For the parameters $c$ and $u$ we can consider a large group of about 1000 users, existing for 5 years and making one commit every hour. Then $u \le 2^{10}$ and $c \le 2^{16}$. For $p$, if we assume that a significant fraction of the users will want to update with every commit and that add proposals are comparatively rare, then we can bound it by $p \le c \cdot u$.
 
 These numbers yield the following results:
 \begin{align*}

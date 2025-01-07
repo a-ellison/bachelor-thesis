@@ -29,7 +29,7 @@ Our definitions were adapted from \cite{introduction-to-modern-cryptography}. So
 \end{definition}
 
 \begin{definition}[The Decisional Diffie-Hellman (DDH) problem]
-	Let $\eta$ denote the security parameter and let $\mathcal{G}$ a group-generation algorithm.
+	Let $\mathcal{G}$ a group-generation algorithm.
 	Define the game $\game{\mathcal{G}}{\eta}{DDH}(\adv)$ for an adversary $\adv$:
 	\begin{enumerate}[1.]
 		\item $\mathcal{G}(1^\eta)$ is run to obtain $(\mathbb{G}, q, g)$, and exponents $x, y \from [q]$ and a bit $b \from \{0, 1\}$ are sampled.
@@ -55,7 +55,7 @@ Our definitions were adapted from \cite{introduction-to-modern-cryptography}. So
 In the following definition we will refer to ``key-derivation functions''. This is only meant as a hint to the reader. We do not provide a definition here, as we will always model such a function as a random oracle (see Section~\ref{sec:rom}).
 
 \begin{definition}[DHIES {\cite[Construction 12.19]{introduction-to-modern-cryptography}}]
-	Let $\eta$ denote the security parameter. Let $\mathcal{G}$ a group-generation algorithm. Let $\Pi_s$ a private-key encryption scheme where $\Pi_s.\gen(1^\eta)$ samples a key u.a.r.\ from $\{0, 1\}^\eta$. Let $\fhdh = \{\hdh^{(\eta)} \mid \eta \in \N \}$ a family of key-derivation functions where $\hdh^{(\eta)} \colon \{0, 1\}^* \to \{0, 1\}^{\eta}$. We write $\hdh \coloneqq \hdh^{(\eta)}$ when $\eta$ is clear from the context. Define the algorithms $\gen, \enc$ and $\dec$ as follows:
+	Let $\mathcal{G}$ a group-generation algorithm. Let $\Pi_s$ a private-key encryption scheme where $\Pi_s.\gen(1^\eta)$ samples a key u.a.r.\ from $\{0, 1\}^\eta$. Let $\fhdh = \{\hdh^{(\eta)} \mid \eta \in \N \}$ a family of key-derivation functions where $\hdh^{(\eta)} \colon \{0, 1\}^* \to \{0, 1\}^{\eta}$. We write $\hdh \coloneqq \hdh^{(\eta)}$ when $\eta$ is clear from the context. Define the algorithms $\gen, \enc$ and $\dec$ as follows:
 	\begin{itemize}
 		\item $\gen$: on input $1^\eta$ run $\mathcal{G}(1^\eta)$ to obtain $(\mathbb{G}, q, g)$. Sample $x \from [q]$ and set $h_1 \coloneqq g^x$. Set $pk \coloneqq \langle \mathbb{G}, q, g, h_1 \rangle$ and $sk \coloneqq \langle \mathbb{G}, q, g, x \rangle$, and output $(pk, sk)$.
 

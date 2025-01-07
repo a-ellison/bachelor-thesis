@@ -1,4 +1,4 @@
-\section{Application to TreeKEM}
+\section{TreeKEM security} \label{sec:treekem-security}
 
 \subsection{Continuous Group Key Agreement}
 
@@ -145,7 +145,7 @@ We also impose some notable restrictions on the adversary. The adversary cannot 
 The definition in \cite[Section B.1]{modular-group-messaging} is very similar in essence. The same restricions on the adversary are imposed. However, the security game provided there gives more power to the adversary: the adversary may additionally choose the randomness used in operations, choose its own public keys to be associated with users and tell certain users not to delete old keys. In the end this restricts the set of safe commits. We provide our own definition with the hope of having a formulation that is easier to digest, keeps the security game simpler and is more explicit about what commits are considered safe.
 
 \begin{definition}[The PC-CGKA game]
-	Let $\eta$ denote the security parameter and let $\Sigma$ a PC-CGKA scheme. Define the game $\game{\Sigma}{\eta}{PC-CGKA}(\adv)$ for an adversary $\adv$:
+	Let $\Sigma$ a PC-CGKA scheme. Define the game $\game{\Sigma}{\eta}{PC-CGKA}(\adv)$ for an adversary $\adv$:
 	\begin{enumerate}[1.]
 		\item \label{def:cgka-game-step-init} $\adv$ outputs $n \in \mathbb{N}$. For each $i \in [n]$, initialize a user $i$ by creating a (unique) identifier $id_i$, generating $(pk_i, sk_i) \from \Sigma.\gen(1^\eta)$, preparing $U_i = \varnothing$, the set of unconfirmed commits at user $i$, and setting $\sigma_i \coloneqq \varnothing$, where $\varnothing$ denotes the empty value. The state output by an algorithm of $\Sigma$ is never the empty value. $\adv$ is given $(pk_1, id_1), \ldots, (pk_n, id_n)$.
 
@@ -185,7 +185,6 @@ The definition in \cite[Section B.1]{modular-group-messaging} is very similar in
 		\item A user creating a commit never includes an update or remove proposal for themselves, or multiple update/add/remove proposals for to the same user
 		\item A user is never asked to create an add proposal for a user they consider to be in the group, or create a remove proposal for a user they do not consider to be in the group
 	\end{itemize}
-	\todo{Justify the restrictions to the adversary.}
 \end{definition}
 
 The concept of a safe user and safe commit is adapted from the so-called ``safe predicate'' in \cite{ttkem}, which again took inspiration from \cite{rtreekem}. As elaborated in the cited papers and also analogous to how we needed to define ``safe'' nodes in the SD-GSD game, we want to forbid the adversary to ask to be challenged on a commit for which it can trivially compute the group key through some corruption it performed.
@@ -253,7 +252,7 @@ Continuing the discussion above, so far we have considered a necessary condition
 \end{definition}
 
 \begin{definition}[PC-CGKA security]
-	A PC-CGKA scheme is \emph{$(t, \epsilon, c, p, u)$-CGKA-secure} if for all $\eta$, for any adversary $\adv$ making at most $c(\eta)$ queries to $\operatorname{create-commit}$, creating at most $p(\eta)$ update or add proposals in the created commits and asking for at most $u(\eta)$ users in step \ref{def:cgka-game-step-init} of the PC-CGKA game we have
+	A PC-CGKA scheme is \emph{$(t, \epsilon, c, p, u)$-PC-CGKA-secure} if for all $\eta$, for any adversary $\adv$ making at most $c(\eta)$ queries to $\operatorname{create-commit}$, creating at most $p(\eta)$ update or add proposals in the created commits and asking for at most $u(\eta)$ users in step \ref{def:cgka-game-step-init} of the PC-CGKA game we have
 	\begin{align*}
 		\advantage{\Sigma}{\eta}{PC-CGKA}(\adv) \coloneqq 2 \cdot \left(\pr{\game{\Sigma}{\eta}{PC-CGKA}(\adv) = 1} - \frac{1}{2}\right) \le \epsilon(\eta).
 	\end{align*}
@@ -263,7 +262,7 @@ Continuing the discussion above, so far we have considered a necessary condition
 
 The TreeKEM protocol discussed in the literature is not described as a self-contained subprotocol in the MLS specification \cite{rfc9420} and is therefore only defined implicitly. The following description of the protocol was extracted from \cite{rfc9420}. Fully describing TreeKEM is complex and some parts of the protocol were either simplified (e.g.\ the content of protocol messages) or omitted as they are not relevant for proving security with respect to our definition (e.g.\ handling of bad inputs, signatures, hashes of the tree and additional functionality provided by the protocol).
 
-\begin{definition}[TreeKEM {\cite{rfc9420}}] Let $\eta$ denote the security parameter. Let $\Pi$ a public-key encryption scheme, where $\Pi.\gen(1^\eta)$ uses $\rho(\eta)$ bits of randomness. Let $\fhgen = \{ \hgen^{(\eta)} \mid \eta \in \N\}, \fhdep = \{ \hdep^{(\eta)} \mid \eta \in \N\}$ families of functions with $\hgen^{(\eta)}, \hdep^{(\eta)} \colon \{0, 1\}^{\rho(\eta)} \to \{0, 1\}^{\rho(\eta)}$. We write $\hgen \coloneqq \hgen^{(\eta)}, \hdep \coloneqq \hdep^{(\eta)}$ and $\rho \coloneqq \rho(\eta)$ if $\eta$ is clear from the context. Define the CGKA scheme $\treekem$ with key space $\mathcal{K}(\eta) = \{0, 1\}^{\rho(\eta)}$ and its algorithms defined as follows, where $id$ refers to the identifier of the user running the algorithm:
+\begin{definition}[TreeKEM {\cite{rfc9420}}] Let $\Pi$ a public-key encryption scheme, where $\Pi.\gen(1^\eta)$ uses $\rho(\eta)$ bits of randomness. Let $\fhgen = \{ \hgen^{(\eta)} \mid \eta \in \N\}, \fhdep = \{ \hdep^{(\eta)} \mid \eta \in \N\}$ families of functions with $\hgen^{(\eta)}, \hdep^{(\eta)} \colon \{0, 1\}^{\rho(\eta)} \to \{0, 1\}^{\rho(\eta)}$. We write $\hgen \coloneqq \hgen^{(\eta)}, \hdep \coloneqq \hdep^{(\eta)}$ and $\rho \coloneqq \rho(\eta)$ if $\eta$ is clear from the context. Define the CGKA scheme $\treekem$ with key space $\mathcal{K}(\eta) = \{0, 1\}^{\rho(\eta)}$ and its algorithms defined as follows, where $id$ refers to the identifier of the user running the algorithm:
 	\begin{itemize}
 		\item $\gen$:
 		      \begin{itemize}
@@ -355,7 +354,6 @@ The full TreeKEM protocol as described in the RFC achieves the correctness prope
 We have already described the relationship between the TreeKEM protocol and the SD-GSD security game at the beginning of Chapter~\ref{sec:tighter-gsd-security}. The following theorem formalizes this.
 
 \begin{theorem} \label{theorem:cgka-from-sdgsd}
-	Let $\eta$ denote the security parameter.
 	Let $\treekem$ the TreeKEM protocol instantiated with a public-key encryption scheme $\Pi$. Let $c, p, u$ functions in $\eta$. Set $N \coloneqq c \cdot (\ceil{\log(u)} + 1) + u + p$ and $\delta \coloneqq u$. If $\Pi$ is $(t, \epsilon, N, \delta)$-SD-GSD-secure in the ROM and the functions $\hgen, \hdep$ in $\treekem$ are modelled as random oracles, then $\treekem$ is $(\tilde{t}, \epsilon, c, p, u)$-PC-CGKA-secure with $\tilde{t} \approx t$.
 \end{theorem}
 
@@ -373,8 +371,19 @@ Finally, it follows from Defintion~\ref{def:safe-commit} that when $\adv$ challe
 
 For a detailed proof we refer the reader to \cite[Theorem 12]{modular-group-messaging}.
 
-Theorems~\ref{theorem:sdgsd-security} and \ref{theorem:cgka-from-sdgsd} together implying the following final result on the security of TreeKEM when DHIES is used as the public-key encryption scheme. This result was already stated informally in Section~\ref{sec:treekem-security}.
+Theorems~\ref{theorem:sdgsd-security} and \ref{theorem:cgka-from-sdgsd} together implying the following final result on the security of TreeKEM when DHIES is used as the public-key encryption scheme. This result was already stated informally in Theorem~\ref{theorem:treekem-security-informal}.
 
-\begin{theorem}
-
+\begin{theorem} \label{theorem:treekem-security}
+	Let $\treekemdhies$ denote TreeKEM protocol instantiated with $\dhies$ (DHIES) as the public-key encryption scheme. Let $\Pi_s$ the private-key encryption scheme, $\mathcal{G}$ the group-generation algorithm and $\hdh$ the key-derivation function used in $\dhies$.
+	If $\Pi_s$ is $(t, \eeav)$-EAV-secure and the DDH problem is $(t, \eddh)$-hard relative to $\mathcal{G}$ and the functions $\hdh, \hgen$ and $\hdep$ are modelled as random oracles, then for all $c, p, u$ with $u \ge 3$, $\treekemdhies$ is $(\tilde{t}, \tilde{\epsilon}, c, p, u)$-PC-CGKA-secure with $\tilde{t} \approx t$ and
+	\begin{align*}
+		\tilde{\epsilon} & = 2 \cdot \delta \cdot N \cdot \eeav + 2 \cdot N \cdot \eddh + \frac{2 \cdot \mdh \cdot N^2}{q} + \frac{\ms \cdot N}{2^{\rho - 1}} \\
+		\delta           & \coloneqq u                                                                                                                        \\
+		N                & \coloneqq 2 \cdot c \cdot \log(u) + u + p
+	\end{align*}
+	where $\ms$ is an upper bound on the number of queries made to either $\hgen$ or $\hdep$, $\mdh$ is an upper bound on the number of queries made to $\hdh$, $q$ is a lower bound on the size of the group output by $\mathcal{G}$ and $\rho$ is the number of random bits sampled by $\dhies.\gen$.
 \end{theorem}
+
+\begin{proof}
+	Combine Theorem~\ref{theorem:sdgsd-security} and Theorem~\ref{theorem:cgka-from-sdgsd}, and note that $\ceil{\log(x)} + 1 \le 2 \cdot \log(x)$ for $x \ge 3$
+\end{proof}
