@@ -78,7 +78,7 @@ The commit $c$ that $A$ shares with all users includes the ciphertexts $c_1, c_2
 	\begin{center}
 		\includegraphics{figures/treekem-simple-update}
 	\end{center}
-	\caption{The commit by user $A$ described in the text. Dashed directed edges illustrate the fact that the target is related to the source via the hash function \question{Should I call this a PRF instead?} $\hdep$. The solid directed edges illustrate the fact that the seed of the target node is encrypted to the public key of the source node.}\label{fig:treekem-simple-update}
+	\caption{The commit by user $A$ described in the text. Dashed directed edges illustrate the fact that the target is related to the source via the hash function $\hdep$. The solid directed edges illustrate the fact that the seed of the target node is encrypted to the public key of the source node.}\label{fig:treekem-simple-update}
 \end{figure}
 
 The nodes $B, X$ and $Y$ form the \emph{copath} of $A$: the copath of a node $v$ consists of the sibling of each node on $v$'s path to the root, excluding the root itself. In the ideal case as above, a node performing a commit only has to compute one encryption for each node on its copath, i.e. logarithmically many encryptions in the total number of users.

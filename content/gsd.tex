@@ -248,8 +248,6 @@ The details of the proof can be found in Section~\ref{sec:mis-eav-from-eav-proof
 
 \paragraph{Intuition} By Lemma~\vref{lemma:mis-eav-from-eav} we know that $\Pi_s$ is MIS-EAV secure. Continuing the high-level argument before the proof of Theorem~\ref{theorem:sdgsd-security}, consider the first moment that $\adv$ triggers $\qs \land \overline{\fdh}$ by querying the seed of some safe node $w$.  As intended, it follows from the definition of the event $\fdh$ that from $\adv$'s perspective all DHIES ciphertexts it got from queries $\operatorname{encrypt}(u, w)$ for any $u$ contain encryptions of $s_w$ under independent, uniformly random keys using $\Pi_s$. Moreover, as already argued once, $\adv$ has learned nothing from a potential seed dependency $(p, w)$, so these encryptions are everything $\adv$ had at its proposal to learn $s_w$.
 
-\todo{Add plot.}
-
 We can use $\adv$'s ability to compute the seed $s_w$ of a safe node $w$ from encryptions of $s_w$ to construct an MIS-EAV adversary: We first guess a node $w$ whose seed $\adv$ may query first. Next we give the MIS-EAV challenger $s_w$ and some other independent seed $s$. We simulate the SD-GSD game to $\adv$ and embed the encryptions from the MIS-EAV challenger when answering queries of the form $\operatorname{encrypt}(u, w)$ for any $u$. Now consider the behavior of $\adv$ depending on which seed the challenger chooses to encrypt:
 \begin{itemize}
 	\item If the challenger chooses to encrypt $s_w$, then $\adv$ will trigger the event $\qs \land \overline{\fdh}$ with the same probability as before. We can detect whether $\qs \land \overline{\fdh}$ gets triggered since all seeds in the simulation are known. If $\qs \land \overline{\fdh}$ occurs and we guessed $w$ correctly, the event will be triggered at $w$ and $\adv$ will query $s_w$, telling us that the challenger encrypted $s_w$.
@@ -270,8 +268,6 @@ For a certain class of schemes, we can improve on Lemma~\ref{lemma:mis-eav-from-
 
 \paragraph{Intuition} We will bound the simpler event $\fdh$. This event tells us that there is some safe node $a$ in the GSD graph with encryption edges to nodes $u_1, \ldots, u_d$, where the query $\operatorname{encrypt}(a, u_i)$ returned the ciphertext $\langle g^{y_i}, \Pi_s.\enc_{k_i}(s_{u_i}) \rangle$ with $k_i = \hdh(g^{sk_{a} \cdot y_i})$, such that $g^{sk_a \cdot y_j}$ was the first hidden Diffie-Hellman key queried by $\adv$ for some $j$.
 Moreover, at the time $g^{sk_a \cdot y_j}$ was queried, no hidden seed had yet been queried by $\adv$, implying that $\adv$ had not queried $\hgen(s_a)$ and thus had no information about $sk_a$ besides $pk_a$ (recall that $(pk_a, sk_a) = \dhies.\gen(1^\eta, \hgen(s_a))$).
-
-\todo{Add plot.}
 
 It is interesting to note that our approach does not require that $\adv$ has not queried $\hdep$ for a hidden seed (i.e. that $\qdep$ was not triggered) as is implied by the event $\fdh$, because knowing $\hgen(s_a)$ is the only way to learn about $sk_a$. Regardless, we still want to have our definition of $\fdh$ include this information, as the bound on $\pr{\qs \land \overline{\fdh} \,}$ in Lemma~\vref{lemma:eav-reduction} relies on the fact that in the event of $\qs \land \overline{\fdh}$ happening,  $\qdh$ was not yet triggered when the event $\qs$ was triggered, i.e. when either the event $\qgen$ \emph{or} the event $\qdep$ was triggered.
 
