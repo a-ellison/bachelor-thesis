@@ -23,44 +23,151 @@
               in size ranging from two to thousands.},
 }
 
-@misc{ttkem,
-  author = {Joël Alwen and Margarita Capretto and Miguel Cueto and Chethan
-            Kamath and Karen Klein and Ilia Markov and Guillermo Pascual-Perez
-            and Krzysztof Pietrzak and Michael Walter and Michelle Yeo},
-  title = {Keep the Dirt: Tainted {TreeKEM}, Adaptively and Actively Secure {
-           Continuous Group Key Agreement}},
-  howpublished = {Cryptology ePrint Archive, Paper 2019/1489},
-  year = {2019},
-  url = {https://eprint.iacr.org/2019/1489},
+@inproceedings{ttkem,
+  author = {Klein, Karen and Pascual-Perez, Guillermo and Walter, Michael and
+            Kamath, Chethan and Capretto, Margarita and Cueto, Miguel and Markov,
+            Ilia and Yeo, Michelle and Alwen, Joël and Pietrzak, Krzysztof},
+  booktitle = {2021 IEEE Symposium on Security and Privacy (SP)},
+  title = {Keep the Dirt: Tainted {TreeKEM}, Adaptively and Actively Secure
+           Continuous Group Key Agreement},
+  year = {2021},
+  volume = {},
+  number = {},
+  pages = {268-284},
+  keywords = {Adaptation models;Privacy;Protocols;Subspace
+              constraints;Security;Servers;Proposals;secure-group-messaging;adaptive-security;message-layer-security
+              },
+  doi = {10.1109/SP40001.2021.00035},
 }
 
-@misc{rtreekem,
-  author = {Joël Alwen and Sandro Coretti and Yevgeniy Dodis and Yiannis
-            Tselekounis},
-  title = {Security Analysis and Improvements for the {IETF} {MLS} Standard for
-           Group Messaging},
-  howpublished = {Cryptology ePrint Archive, Paper 2019/1189},
-  year = {2019},
-  url = {https://eprint.iacr.org/2019/1189},
+@inproceedings{rtreekem,
+  author = "Alwen, Jo{\"e}l and Coretti, Sandro and Dodis, Yevgeniy and
+            Tselekounis, Yiannis",
+  editor = "Micciancio, Daniele and Ristenpart, Thomas",
+  title = "Security Analysis and Improvements for the {IETF} {MLS} Standard for
+           Group Messaging",
+  booktitle = "Advances in Cryptology -- CRYPTO 2020",
+  year = "2020",
+  publisher = "Springer International Publishing",
+  address = "Cham",
+  pages = "248--277",
+  abstract = "Secure messaging (SM) protocols allow users to communicate
+              securely over untrusted infrastructure. In contrast to most other
+              secure communication protocols (such as TLS, SSH, or Wireguard), SM
+              sessions may be long-lived (e.g., years) and highly asynchronous.
+              In order to deal with likely state compromises of users during the
+              lifetime of a session, SM protocols do not only protect
+              authenticity and privacy, but they also guarantee forward secrecy
+              (FS) and post-compromise security (PCS). The former ensures that
+              messages sent and received before a state compromise remain secure,
+              while the latter ensures that users can recover from state
+              compromise as a consequence of normal protocol usage.",
+  isbn = "978-3-030-56784-2",
 }
 
 
-@misc{insider-security,
-  author = {Joël Alwen and Daniel Jost and Marta Mularczyk},
-  title = {On The Insider Security of {MLS}},
-  howpublished = {Cryptology ePrint Archive, Paper 2020/1327},
-  year = {2020},
-  url = {https://eprint.iacr.org/2020/1327},
+@inproceedings{insider-security,
+  author = {Alwen, Jo\"{e}l and Jost, Daniel and Mularczyk, Marta},
+  title = {On the Insider Security of {MLS}},
+  year = {2022},
+  isbn = {978-3-031-15978-7},
+  publisher = {Springer-Verlag},
+  address = {Berlin, Heidelberg},
+  doi = {10.1007/978-3-031-15979-4_2},
+  abstract = {The Messaging Layer Security (MLS) protocol is an open standard
+              for end-to-end (E2E) secure group messaging being developed by the
+              IETF, poised for deployment to consumers, industry, and government.
+              It is designed to provide E2E privacy and authenticity for messages
+              in long-lived sessions whenever possible, despite the participation
+              (at times) of malicious insiders that can adaptively interact with
+              the PKI at will, actively deviate from the protocol, leak honest
+              parties’ states, and fully control the network. The core of the MLS
+              protocol (from which it inherits essentially all of its efficiency
+              and security properties) is a Continuous Group Key Agreement (CGKA)
+              protocol. It provides asynchronous E2E group management by allowing
+              group members to agree on a fresh independent symmetric key after
+              every change to the group’s state (e.g. when someone joins/leaves
+              the group).In this work, we make progress towards a precise
+              understanding of the insider security of MLS (Draft 12). On the
+              theory side, we overcome several subtleties to formulate the first
+              notion of insider security for CGKA (or group messaging). Next, we
+              isolate the core components of MLS to obtain a CGKA protocol we dub
+              Insider Secure TreeKEM (ITK). Finally, we give a rigorous security
+              proof for ITK. In particular, this work also initiates the study of
+              insider secure CGKA and group messaging protocols. Along the way we
+              give three new (very practical) attacks on MLS and corresponding
+              fixes. (Those fixes have now been included into the standard.) We
+              also describe a second attack against MLS-like CGKA protocols
+              proven secure under all previously considered security notions
+              (including those designed specifically to analyze MLS). These
+              attacks highlight the pitfalls in simplifying security notions even
+              in the name of tractability.},
+  booktitle = {Advances in Cryptology – CRYPTO 2022: 42nd Annual International
+               Cryptology Conference, CRYPTO 2022, Santa Barbara, CA, USA, August
+               15–18, 2022, Proceedings, Part II},
+  pages = {34–68},
+  numpages = {35},
+  location = {Santa Barbara, CA, USA},
 }
 
-@misc{modular-group-messaging,
-  author = {Joël Alwen and Sandro Coretti and Yevgeniy Dodis and Yiannis
-            Tselekounis},
+@inproceedings{modular-group-messaging,
+  author = {Alwen, Jo\"{e}l and Coretti, Sandro and Dodis, Yevgeniy and
+            Tselekounis, Yiannis},
   title = {Modular Design of Secure Group Messaging Protocols and the Security
            of {MLS}},
-  howpublished = {Cryptology ePrint Archive, Paper 2021/1083},
   year = {2021},
-  url = {https://eprint.iacr.org/2021/1083},
+  isbn = {9781450384544},
+  publisher = {Association for Computing Machinery},
+  address = {New York, NY, USA},
+  doi = {10.1145/3460120.3484820},
+  abstract = {The Messaging Layer Security (MLS) project is an IETF effort
+              aiming to establish an industry-wide standard for secure group
+              messaging (SGM). Its development is supported by several major
+              secure-messaging providers (with a combined user base in the
+              billions) and a growing body of academic research. MLS has evolved
+              over many iterations to become a complex, non-trivial, yet
+              relatively ad-hoc cryptographic protocol. In an effort to tame its
+              complexity and build confidence in its security, past analyses of
+              MLS have restricted themselves to sub-protocols of MLS---most
+              prominently a type of sub-protocol embodying so-called continuous
+              group key agreement (CGKA). However, to date the task of proving or
+              even defining the security of the full MLS protocol has been left
+              open. In this work, we fill in this missing piece. First, we
+              formally capture the security of SGM protocols by defining a
+              corresponding security game, which is parametrized by a safety
+              predicate that characterizes the exact level of security achieved
+              by a construction. Then, we cast MLS as an SGM protocol, showing
+              how to modularly build it from the following three main components
+              (and some additional standard cryptographic primitives) in a
+              black-box fashion: (a) CGKA, (b) forward-secure group AEAD
+              (FS-GAEAD), which is a new primitive and roughly corresponds to an
+              "epoch'' of group messaging, and (c) a so-called PRF-PRNG, which is
+              a two-input hash function that is a pseudorandom function (resp.
+              generator with input) in its first (resp. second) input. Crucially,
+              the security predicate for the SGM security of MLS can be expressed
+              purely as a function of the security predicates of the underlying
+              primitives, which allows to swap out any of the components and
+              immediately obtain a security statement for the resulting SGM
+              construction. Furthermore, we provide instantiations of all
+              component primitives, in particular of CGKA with MLS's TreeKEM
+              sub-protocol (which we prove adaptively secure) and of FS-GAEAD
+              with a novel construction (which has already been adopted by MLS).
+              Along the way we introduce a collection of new techniques,
+              primitives, and results with applications to other SGM protocols
+              and beyond. For example, we extend the Generalized Selective
+              Decryption proof technique (which is central in CGKA literature)
+              and prove adaptive security for another (practical) more secure
+              CGKA protocol called RTreeKEM (Alwen et al., CRYPTO '20). The
+              modularity of our approach immediately yields a corollary
+              characterizing the security of an SGM construction using RTreeKEM.},
+  booktitle = {Proceedings of the 2021 ACM SIGSAC Conference on Computer and
+               Communications Security},
+  pages = {1463–1483},
+  numpages = {21},
+  keywords = {backward secrecy, cryptographic protocols, forward secrecy,
+              messaging layer security, mls, rtreekem, secure messaging, treekem},
+  location = {Virtual Event, Republic of Korea},
+  series = {CCS '21},
 }
 
 @inproceedings{gsd,
@@ -198,13 +305,26 @@
   doi = {10.1109/EuroSP.2017.27},
 }
 
-@misc{sender-keys,
-  author = {David Balbás and Daniel Collins and Phillip Gajland},
-  title = {{WhatsUpp} with {Sender Keys}? {Analysis}, Improvements and Security
-           Proofs},
-  howpublished = {Cryptology ePrint Archive, Paper 2023/1385},
-  year = {2023},
-  url = {https://eprint.iacr.org/2023/1385},
+@inproceedings{sender-keys,
+  author = "Balb{\'a}s, David and Collins, Daniel and Gajland, Phillip",
+  editor = "Guo, Jian and Steinfeld, Ron",
+  title = "{WhatsUpp} with Sender Keys? {Analysis}, Improvements and Security
+           Proofs",
+  booktitle = "Advances in Cryptology -- ASIACRYPT 2023",
+  year = "2023",
+  publisher = "Springer Nature Singapore",
+  address = "Singapore",
+  pages = "307--341",
+  abstract = "Developing end-to-end encrypted instant messaging solutions for
+              group conversations is an ongoing challenge that has garnered
+              significant attention from practitioners and the cryptographic
+              community alike. Notably, industry-leading messaging apps such as
+              WhatsApp and Signal Messenger have adopted the Sender Keys protocol
+              , where each group member shares their own symmetric encryption key
+              with others Despite its widespread adoption, Sender Keys has never
+              been formally modelled in the cryptographic literature, raising the
+              following natural question:",
+  isbn = "978-981-99-8733-7",
 }
 
 @inproceedings{curve25519,
