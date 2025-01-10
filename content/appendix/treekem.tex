@@ -1,5 +1,46 @@
 \section{TreeKEM security} \label{sec:treekem-security}
 
+\subsection{Commits with proposals in TreeKEM}
+
+In order to motivate our definitions for the syntax and security of CGKA schemes, we will first finish our discussion of the TreeKEM protocol from Section~\ref{sec:treekem-overview}.
+
+\paragraph{Remove and update proposals} Recall the example of a commit without proposals in Section~\ref{sec:simple-commit}. Things look a bit different if the commit contains a remove proposal. Say user $A$ creates a commit that contains a remove proposal for user $E$. We could just let $A$ replace the nodes on $E$'s direct path $E$ and not encrypt anything for $E$. However, if $A$ were compromised while replacing $E$'s direct path and performed another commit to update their key material after the compromise, the information leaked in the compromise could still be used to compute the new group key, as it includes the secret keys of the nodes on $E$'s direct path.
+Instead, $E$'s leaf and all nodes on $E$'s direct path are replaced by \emph{blank} nodes: nodes with no associated key pair. Now $A$ has to encrypt the secret $s_3$ directly to $F$ and to the parent node of $G$ and $H$ in the commit removing user $E$. See Figure~\ref{fig:treekem-remove}. A blank leaf node can be populated with a new user. A blank node that is not a leaf will be replaced by a non-blank node once some user in the node's subtree performs a commit. Blank nodes are also useful to represent the nodes of a subtree with no users.
+
+\begin{figure}
+	\begin{center}
+		\includegraphics{figures/treekem-remove}
+	\end{center}
+	\caption{The commit by user $A$ removing user $E$ described in the text. Nodes with a dashed border represent the (new) blank nodes.}\label{fig:treekem-remove}
+\end{figure}
+
+Creating a commit with an update proposal for user a $u$ is analogous. The update proposal simply contains the public key of user $u$'s new leaf, while $u$ stored the corresponding secret key locally when creating the proposal. Because we don't want the committer to know the secret keys along $u$'s direct path, we must again replace these nodes with blank ones and encrypt to the non-blank nodes below directly.
+
+\paragraph{Add proposals} Adding a user introduces one new but similar complication. Consider the same group as in Figure~\ref{fig:treekem-tree}, but with the leaf of user $H$ blank. Now say user $A$ would like to add user $H$ to the group. Although we would want $H$ to know all secret keys on their direct path, $A$ can only provide the secrets of their lowest common ancestor, which is the root node in this case.
+In such a situation where a non-blank node $n$ has a leaf $l$ below it where $l$ does not know $n$'s secret key, we say that $l$ is \emph{unmerged} relative to $n$. Every non-blank, non-leaf node stores its list of unmerged leaves and whenever one encrypts to a node, one should also encrypt to all its unmerged leaves. A user's leaf becomes ``merged'' as the nodes on their direct path are replaced and they are provided the seeds to compute the secret keys of the new nodes.
+Note that for any non-leaf node $n$, any one of its descendants $d$ and any unmerged leaf of $n$ that is a descendant of $d$, this leaf must also be an unmerged leaf of $d$: every commit that replaces $d$ also replaces the node $n$ and if a user at a leaf learns the secret key of the new node for $d$ through its seed, they also learn the seed of and therefore the secret key of the new node for $n$. Figure~\ref{fig:treekem-add} shows a commit by user $A$ adding $H$, followed by another commit by user $E$.
+
+\begin{figure}
+	\centering
+	\begin{subfigure}[b]{\textwidth}
+		\centering
+		\includegraphics[width=\textwidth]{figures/treekem-add-1}
+		\caption{User $A$ adds user $H$. As a small detail: the encryption for user $H$ is computed using $H$'s init key instead of the public key of their leaf.}
+		\label{fig:treekem-A-add-H}
+	\end{subfigure}
+	\begin{subfigure}[b]{\textwidth}
+		\centering
+		\includegraphics[width=\textwidth]{figures/treekem-add-2}
+		\caption{Commit by user $E$. $H$ is now ``merged'' relative to node $Y'$.}
+	\end{subfigure}
+	\caption{A commit adding user $H$ and another commit by a user $E$ as described in the text. Orange edges illustrate the fact that the target leaf is unmerged relative to the source node. In \subref{fig:treekem-A-add-H}, $H$ is also unmerged relative to $Y$'s right child, but this information is redundant as it follows from $H$ being unmerged relative to $Y$.}
+	\label{fig:treekem-add}
+\end{figure}
+
+\paragraph{Resolution} We have now seen that when performing a commit, one must pay attention to blank nodes and unmerged leaves when providing encryptions. Instead of only providing encryptions for each node on the copath as in the ideal case, in the general case for each node $n$ on the copath one must provide an encryption for every node in the \emph{resolution} of $n$. The resolution of a non-blank node is the node itself and the set of all its unmerged leaves. The resolution of a blank leaf is the empty set and the resolution of a blank, non-leaf node is the union of the resolutions of its two children.
+
+\paragraph{Key packages and welcome messages} To encrypt to an existing group member it is clear that we can just use the public key in their leaf. But how do we encrypt to a new user? Before a user joins any group, they publish a \emph{key package}: this contains (among other things) the public key, their so-called \emph{init key}, to be used to encrypt information to the user when they join the group and the public key that should be associated with the user's leaf. The key package is included (or referenced) in the add proposal for the new user. Along with the seed of the committer's and the new user's lowest common ancestor in the tree, the new user must also be given the (public) state of the tree. This information is provided to the new user, encrypted with their init key, by the committer in a \emph{welcome message}.
+
 \subsection{Continuous Group Key Agreement}
 
 \subsubsection{The model}
