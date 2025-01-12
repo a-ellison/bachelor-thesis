@@ -1,5 +1,25 @@
 \section{Tighter GSD security}
 
+\subsection{Runtime in Theorem~\ref{theorem:sdgsd-security}} \label{sec:sdgsd-security-runtime}
+
+For completeness, we provide a more precise expression of the runtime $\tilde{t}$ in Theorem~\ref{theorem:sdgsd-security}. For appropriately chosen constants we have
+\[
+	\tilde{t} = t \begin{aligned}[t]
+		- & \mathcal{O}
+		\begin{aligned}[t]
+			\big(\rho \cdot t_{\mathrm{sample}} \cdot \ms & + (\gamma + \eta \cdot t_{\mathrm{sample}}) \cdot \mdh \\ + & N \cdot ((\rho + \eta) \cdot t_{\mathrm{sample}} + \mdh \cdot t_{\mathrm{op}} + t_{\dhies.\gen})  \\ + & N^2 \cdot t_{\dhies.\enc}\big), \\
+		\end{aligned}
+	\end{aligned}
+\]
+where the various variables denote the following
+\begin{itemize}
+	\item $t_{\mathrm{sample}}$: time to sample a uniform bit
+	\item $t_{\dhies.\enc}$: time to encrypt $s \in \{0, 1\}^\rho$ with $\dhies$
+	\item $t_{\dhies.\gen}$: runtime of $\dhies.\gen(1^\eta)$ (which is strictly greater than the runtime of $\dhies.\gen(1^\eta, r)$ for input randomness $r$)
+	\item $t_{\mathrm{op}}$: time to perform the group operation in a group output by $\mathcal{G}(1^\eta)$
+	\item $\gamma$: maximum length of any query to $\hdh$
+\end{itemize}
+
 \subsection{Proof of Lemma~\ref{lemma:mis-eav-from-eav}} \label{sec:mis-eav-from-eav-proof}
 
 \begin{proof}[of Lemma~\ref{lemma:mis-eav-from-eav}] Note that since the message space is finite, the time to encrypt a message is bounded. As outlined before Lemma~\ref{lemma:mis-eav-from-eav}, the lemma follows from a simple hybrid argument. Let $q$ a function in $\kappa$, let $\kappa$ arbitrary and let $\adv$ an arbitrary MIS-EAV adversary running in time $\tilde{t}(\kappa)$ and making at most $q(\kappa)$ queries. Define the sequence of hybrid games $H_0, \ldots, H_q$ where in the game $H_i$ the first $i$ encryptions given to the adversary encrypt $m_1$ and all remaining encryptions encrypt $m_0$. We will write

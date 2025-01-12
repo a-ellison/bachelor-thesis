@@ -14,7 +14,7 @@ In this section we present the main theoretical result behind Theorem~\ref{theor
 The GSD game defined here is inspired by the definition of the public-key GSD game (Definition 7) and the proof of Theorem 3 in \cite{ttkem}. We've already motivated the differences in Section~\ref{sec:gsd-intro}. We will call our adapted game \emph{Seeded GSD with Dependencies} (SD-GSD). A very similar definition appears in \cite{modular-group-messaging}, providing essentially the same abstraction over TreeKEM and also allowing for an adversary to provide the randmoness used for encryption and key generation. However, our definition has one notable difference: when asking to be challenged on a node with seed $s$, the adversary must distinguish $\hdep(s)$ from random as opposed to $s$. This stays true to how the group key is computed in TreeKEM and has the significant advantage of greatly simplifying our proof. On the other hand, the security implied by our definition is weaker (at least in the ROM), as it only guarantees that an adversary cannot compute the seed of the challenge node, whereas the other definitions guarantee that this seed cannot be distinguished from random.
 
 \begin{definition}[The SD-GSD game] \label{def:sd-gsd-game}
-	Let $\Pi = (\gen, \enc, \dec)$ a public-key encryption scheme, where $\gen(1^\eta)$ uses $\rho(\eta)$ bits of randomness and $\{0, 1\}^{\rho(\eta)}$ is a subset of the message space.
+	Let $\Pi = (\gen, \enc, \dec)$ a public-key encryption scheme, where $\gen(1^\eta)$ uses $\rho(\eta)$ random bits and $\{0, 1\}^{\rho(\eta)}$ is a subset of the message space.
 	Let $\fhgen = \{ \hgen^{(\eta)} \mid \eta \in \N\}, \fhdep = \{ \hdh^{(\eta)} \mid \eta \in \N\}$ families of functions with $\hgen^{(\eta)}, \hdep^{(\eta)} \colon \{0, 1\}^{\rho(\eta)} \to \{0, 1\}^{\rho(\eta)}$. We will write $\hgen \coloneqq \hgen^{(\eta)}, \hdep \coloneqq \hdep^{(\eta)}$ and $\rho \coloneqq \rho(\eta)$ if $\eta$ is clear from the context.
 	Define the game $\game{(\Pi, \fhgen, \fhdep)}{\eta}{SD-GSD}(\adv)$ for an adversary $\adv$:
 	\begin{enumerate}[1.]
@@ -81,23 +81,7 @@ Since in this work we are interested in SD-GSD security for the case where $\hge
 	\[
 		\tilde{\epsilon} = 2 \cdot \delta \cdot N \cdot \eeav + 2 \cdot N \cdot \eddh + \frac{2 \cdot \mdh \cdot N^2}{q} + \frac{\ms \cdot N}{2^{\rho - 1}},
 	\]
-	where $\ms$ is an upper bound on the number of queries made to either $\hgen$ or $\hdep$, $\mdh$ is an upper bound on the number of queries made to $\hdh$, $q$ is a lower bound on the size of the group output by $\mathcal{G}$ and $\rho$ is the number of random bits sampled by $\dhies.\gen$, and with
-	\[
-		\tilde{t} = t \begin{aligned}[t]
-			- & \mathcal{O}
-			\begin{aligned}[t]
-				\big(\rho \cdot t_{\mathrm{sample}} \cdot \ms & + (\gamma + \eta \cdot t_{\mathrm{sample}}) \cdot \mdh \\ + & N \cdot ((\rho + \eta) \cdot t_{\mathrm{sample}} + \mdh \cdot t_{\mathrm{op}} + t_{\dhies.\gen})  \\ + & N^2 \cdot t_{\dhies.\enc}\big), \\
-			\end{aligned}
-		\end{aligned}
-	\]
-	where the various variables denote the following
-	\begin{itemize}
-		\item $t_{\mathrm{sample}}$: time to sample a uniform bit
-		\item $t_{\dhies.\enc}$: time to encrypt $s \in \{0, 1\}^\rho$ with $\dhies$
-		\item $t_{\dhies.\gen}$: runtime of $\dhies.\gen(1^\eta)$ (which is strictly greater than the runtime of $\dhies.\gen(1^\eta, r)$ for input randomness $r$)
-		\item $t_{\mathrm{op}}$: time to perform the group operation in a group output by $\mathcal{G}(1^\eta)$
-		\item $\gamma$: maximum length of any query to $\hdh$
-	\end{itemize}
+	where $\ms$ is an upper bound on the number of queries made to either $\hgen$ or $\hdep$, $\mdh$ is an upper bound on the number of queries made to $\hdh$, $q$ is a lower bound on the size of the group output by $\mathcal{G}$ and $\rho$ is the number of random bits sampled by $\dhies.\gen$, and with $\tilde{t} \approx t$\footnote{We provide a more precise expression of the runtime in Section~\ref{sec:sdgsd-security-runtime} of the appendix.}.
 \end{theorem}
 
 In contrast, the result in \cite{ttkem} achieves a security loss in $\mathcal{O}(N^2)$ and reduces to the IND-CPA security of the public-key encryption scheme.
@@ -264,7 +248,7 @@ Moreover, at the time $g^{sk_a \cdot y_j}$ was queried, no hidden seed had yet b
 
 It is interesting to note that our approach does not require that $\adv$ has not queried $\hdep$ for a hidden seed (i.e. that $\qdep$ was not triggered) as is implied by the event $\fdh$, because knowing $\hgen(s_a)$ is the only way to learn about $sk_a$. Regardless, we still want to have our definition of $\fdh$ include this information, as the bound on $\pr{\qs \land \overline{\fdh} \,}$ in Lemma~\vref{lemma:eav-reduction} relies on the fact that in the event of $\qs \land \overline{\fdh}$ happening,  $\qdh$ was not yet triggered when the event $\qs$ was triggered, i.e. when either the event $\qgen$ \emph{or} the event $\qdep$ was triggered.
 
-The intuition is clear that this means that $\adv$ solved the Diffie-Hellman challenge $(g^{sk_a}, g^{y_j})$. What is not immediately clear is how to embed a \emph{given} Diffie-Hellman challenge $(g^x, g^y)$  from an instance of the DDH game and use $\adv$ to tell whether the key $k$ chosen by the challenger is the real key $g^{x \cdot y}$ or a uniformly random group element.
+The intuition is clear that this means that $\adv$ solved the Diffie-Hellman challenge $(g^{sk_a}, g^{y_j})$. What is not immediately clear is how to embed a \emph{given} Diffie-Hellman challenge $(g^x, g^y)$ from an instance of the DDH game and use $\adv$ to tell whether the key $k$ chosen by the challenger is the real key $g^{x \cdot y}$ or a uniformly random group element.
 An intuitive strategy would be to embed the challenge by setting $pk_a = g^x$ and $g^{y_j} = g^y$, which involves guessing $u_j$, and simply checking whether for any of the queries $q_i$ to $\hdh$ by $\adv$, such that $q_i$ encodes a group element in $\mathbb{G}$, it holds that $q_i = k$. Now:
 \begin{itemize}
 	\item If $k = g^{x \cdot y}$, $\adv$ triggers $\fdh$ and we guessed $a$ and $u_j$ correctly, then indeed as described above $q_i = g^{sk_a \cdot y_j} = g^{x \cdot y} = k$ will hold for some $i$.
