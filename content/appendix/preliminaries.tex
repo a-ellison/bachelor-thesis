@@ -1,4 +1,4 @@
-\section{Basic Cryptographic Definitions} \label{sec:preliminaries-appendix}
+\section{Basic cryptographic definitions} \label{sec:preliminaries-appendix}
 
 \subsection{Encryption schemes}
 
@@ -105,6 +105,35 @@ When analyzing the advantage of an adversary we may make use of the following we
 	\end{align*}
 \end{proof}
 
+\subsection{The Decisional Diffie-Hellman problem}
+
+\begin{definition}[Group-generation algorithm {\cite[Section 9.3.2]{introduction-to-modern-cryptography}}]
+	A \emph{group-generation algorithm} $\mathcal{G}$ is a probabilistic polynomial-time algorithm that takes as input $1^\eta$ and outputs $(\mathbb{G}, q, g)$, where $\mathbb{G}$ is (a description of) a cyclic group with order $q$ and $g \in \mathbb{G}$ is a generator. A group element is represented as a bit-string of length at most $\gamma(\eta)$. We write $(\mathbb{G}, q, g) \from \mathcal{G}(1^\eta)$.
+\end{definition}
+
+\begin{definition}[The Decisional Diffie-Hellman (DDH) problem {\cite[Section 9.3.2]{introduction-to-modern-cryptography}}]
+	Let $\mathcal{G}$ a group-generation algorithm.
+	Define the game $\game{\mathcal{G}}{\eta}{DDH}(\adv)$ for an adversary $\adv$:
+	\begin{enumerate}[1.]
+		\item $\mathcal{G}(1^\eta)$ is run to obtain $(\mathbb{G}, q, g)$, and exponents $x, y \from [q]$ and a bit $b \from \{0, 1\}$ are sampled.
+		\item The adversary $\adv$ is given $\mathbb{G}$, $q$, $g$, $h_1 \coloneqq g^x, h_2 \coloneqq g^y$ and
+		      \[
+			      k = \begin{cases}
+				      g^{x \cdot y} & b = 0 \\
+				      \tilde{k}     & b = 1
+			      \end{cases}
+		      \]
+		      where $\tilde{k} \from \mathbb{G}$.
+		\item $\adv$ outputs a bit $b'$. The output of the game is defined to be $1$ if $b' = b$, and $0$ otherwise.
+	\end{enumerate}
+\end{definition}
+
+\begin{definition}[Hardness of the DDH problem {\cite[Definition 9.64]{introduction-to-modern-cryptography}}]
+	The DDH problem is \emph{$(t, \epsilon)$-hard relative to} $\mathcal{G}$ if for all $\eta$, for any adversary $\adv$ running in time $t(\eta)$ we have
+	\begin{align*}
+		\advantage{\mathcal{G}}{\eta}{DDH}(\adv) \coloneqq 2 \cdot \left(\pr{\game{\mathcal{G}}{\eta}{DDH}(\adv) = 1} - \frac{1}{2}\right) \le \epsilon(\eta).
+	\end{align*}
+\end{definition}
 
 \subsection{The Random Oracle Model} \label{sec:rom}
 

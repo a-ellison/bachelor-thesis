@@ -1,27 +1,25 @@
-\section{TreeKEM security}
+\section{Our concrete result for TreeKEM}
 
 The following theorem, stated informally here, is our main practical result.
 
 \begin{theorem}[Informal] \label{theorem:treekem-security-informal}
 	If the DHIES scheme is used in TreeKEM, the private-key encryption scheme in DHIES is $(t, \eeav)$-EAV-secure and the DDH problem is $(t, \eddh)$-hard in the Diffie-Hellman group, then for all $c, p, u$, TreeKEM is $(\tilde{t}, \tilde{\epsilon}, c, p, u)$-secure in the ROM with $\tilde{t} \approx t$ and
 	\begin{align*}
-		\tilde{\epsilon} & = 2 \cdot \delta \cdot N \cdot \eeav + 2 \cdot N \cdot \eddh + \frac{2 \cdot \mdh \cdot N^2}{q} + \frac{\ms \cdot N}{2^{\rho - 1}} \\
-		\delta           & \coloneqq u                                                                                                                        \\
-		N                & \coloneqq 2 \cdot c \cdot \log(u) + u + p
+		\begin{split}
+			\tilde{\epsilon} ={} & 2 \cdot u \cdot (3 \cdot c \cdot \log(u) + p) \cdot \eeav \\
+			& + 2 \cdot (3 \cdot c \cdot \log(u) + p) \cdot \eddh \\
+			& + \mathrm{negl}(\eta)
+		\end{split}
 	\end{align*}
 	where
 	\begin{itemize}
 		\item $c$ is the number of commits created
 		\item $p$ is the number of add or update proposals created
 		\item $u$ is the maximum number of users
-		\item $\ms$ is the number of queries to the functions $\hgen$ or $\hdep$ in TreeKEM
-		\item $\mdh$ is the number of queries to $\hdh$ in DHIES
-		\item $q$ is the size of the Diffie-Hellman group
-		\item $\rho$ is the number of bits of randomness used by DHIES for key generation
 	\end{itemize}
 \end{theorem}
 
-In Section~\ref{sec:treekem-security} of the appendix we restate the above theorem formally. To this end, we also provide the formal definitions for propose and commit CGKA schemes needed to state our result and a high-level description of how to instantiate (the essence of) the TreeKEM protocol with our definitions.
+In Section~\ref{sec:treekem-security} of the appendix we restate the above theorem formally. To this end, we also provide the formal definitions for the syntax and security of propose and commit CGKA schemes and a high-level description of how to instantiate (the essence of) the TreeKEM protocol with our definitions.
 
 \subsection{Interpreting the result}
 
