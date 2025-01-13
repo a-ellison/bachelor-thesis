@@ -113,7 +113,7 @@ Our definition of the syntax of PC-CGKA schemes is inspired from the definition 
 
 \paragraph{Correctness}
 
-The above description of semantics already provides some explicit correctness properties or implicitly implies other ones. We will explicitly define one important correctness property that a PC-CGKA scheme should satisfy in Definition~\vref{def:cgka-correctness-consistent-history}. \todo{Justify why I mention this property and why it is important. Explain examples of commit history and why it plays a role in security.}
+The above description of semantics already provides some explicit correctness properties or implicitly implies other ones. We will explicitly define one important correctness property that a PC-CGKA scheme should satisfy in Definition~\ref{def:cgka-correctness-consistent-history}. \todo{Justify why I mention this property and why it is important. Explain examples of commit history and why it plays a role in security.}
 
 The correctness property concerns the handling of ``bad'' (malformed or inconsistent) inputs. The algorithms of a PC-CGKA scheme should have several checks built in to deal with such inputs. For example
 \begin{itemize}
@@ -217,7 +217,7 @@ The definition in \cite[Section B.1]{modular-group-messaging} is very similar in
 	We require an adversary playing the above game to adhere to the following:
 	\begin{itemize}
 		\item $\operatorname{create-group}$ is queried exactly once
-		\item The challenge commit is safe (see Definition~\vref{def:safe-commit})
+		\item The challenge commit is safe (see Definition~\ref{def:safe-commit})
 		\item For any query $\operatorname{deliver-commit}(i, j)$ where the commit $c_j$ was created by user $k$ while they where in state $\sigma_k'$, $\sigma_i$ and $\sigma_k'$ must be consistent
 		\item For any query $\operatorname{create-commit}(i, (j_1, \ldots, j_d))$, for every proposal $p_{j_l}$ created by a user while in state $\sigma_l'$, $\sigma_i$ and $\sigma_l'$ must be consistent
 		\item A user never processes a commit that they created
@@ -232,7 +232,7 @@ The concept of a safe user and safe commit is adapted from the so-called ``safe 
 
 To see what is needed for a commit to be safe, consider some commit $c$ with group key $k$ created by a user $i$ and let $j \neq i$ any user that $i$ would consider to be in the group after applying $c$ (Definition~\ref{def:group-members-after-applying-commit} clarifies exactly which users are considered to be in the group). The commit $c$ or an associated welcome message provides encrypted information for user $j$ to compute the new group key using its current key material. Clearly, if this key material has been compromised by the adversary corrupting user $j$, the commit should not be safe. If the adversary has not corrupted user $j$ since they last updated their key material, then we would not expect the adversary to be able to learn the group key $k$ through user $j$, even if user $j$ was corrupted before (recall PCS).
 Moreover, corrupting user $j$ after they have again updated their key material should not allow the adversary to compute the group key of $c$ either (recall FS). We will later say that the commit $c$ is \emph{safe with respect to user $j$} if $j$ was not corrupted in this window between their last and next update.
-Now, it is important to notice that the encrypted information in commit $c$ is for the key material that user $j$ had \emph{from user $i$'s view} when user $i$ created $c$. It is possible that when user $i$ created $c$, user $j$ had already processed a commit updating their key material that user $i$ has not yet processed. Thus, we must be careful to require exactly the right key material of user $j$ to be unknown to the adversary. Definition~\vref{def:safe-commit-wrt-user} formalizes this.
+Now, it is important to notice that the encrypted information in commit $c$ is for the key material that user $j$ had \emph{from user $i$'s view} when user $i$ created $c$. It is possible that when user $i$ created $c$, user $j$ had already processed a commit updating their key material that user $i$ has not yet processed. Thus, we must be careful to require exactly the right key material of user $j$ to be unknown to the adversary. Definition~\ref{def:safe-commit-wrt-user} formalizes this.
 
 \begin{definition} \label{def:group-members-after-applying-commit}
 	Let $c$ a commit and let $\sigma'$ the new group state ouptut by

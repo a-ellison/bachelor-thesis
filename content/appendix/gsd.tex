@@ -270,7 +270,7 @@ The key idea underlying the proof of the following Lemma was already provided at
 	which together with \eqref{eq:lemma-key-rerandomizability-advantage-same} concludes the proof.
 \end{proof}
 
-By assuming a key-rerandomizable encryption scheme and applying Lemma~\vref{lemma:mis-eav-from-eav-with-key-rerandomizability} instead of the hybrid argument (Lemma~\ref{lemma:mis-eav-from-eav}) in the proof of Lemma~\ref{lemma:eav-reduction}, we can drop the $\delta$ factor in the bound. This also allows us to drop the $\delta$ factor in Theorem~\vref{theorem:sdgsd-security}.
+By assuming a key-rerandomizable encryption scheme and applying Lemma~\ref{lemma:mis-eav-from-eav-with-key-rerandomizability} instead of the hybrid argument (Lemma~\ref{lemma:mis-eav-from-eav}) in the proof of Lemma~\ref{lemma:eav-reduction}, we can drop the $\delta$ factor in the bound. This also allows us to drop the $\delta$ factor in Theorem~\ref{theorem:sdgsd-security}.
 
 \begin{corollary}
 	Recall the setting of Theorem~\ref{theorem:sdgsd-security}. If the private-key encryption scheme $\Pi_s$ is additionally key-rerandomizable, then the bound in Lemma~\ref{lemma:eav-reduction} can be improved to
@@ -319,7 +319,7 @@ By assuming a key-rerandomizable encryption scheme and applying Lemma~\vref{lemm
 	\begin{equation} \label{eq:lemma-dh-reduction-b=0}
 		\pr{0 \from \adv' \mid b = 0} \ge \frac{\pr{\fdh}}{N}.
 	\end{equation}
-	This part of the proof proceeds very similarly to the proof of Lemma~\vref{lemma:eav-reduction} and we will be a bit more concise. We focus on executions of $\game{\mathcal{G}}{\eta}{DDH}(\adv')$ with $b = 0$. Let the games $G_1, G_2$ be defined as in Lemma~\ref{lemma:eav-reduction}, where we denote the node sampled at the beginning of each game by $a_1, a_2$, respectively (as opposed to $w_1, w_2$). Let $E = \fdh$ and let $E_1, E_2$ and $E'$ be the analogous events in $G_1, G_2$ and the game simulated by $\adv'$ (note that in this latter game, the group elements $pk_a^{\log_g(h_2) + r_j}$ are also hidden Diffie-Hellman keys). Finally, we introduce the random variable
+	This part of the proof proceeds very similarly to the proof of Lemma~\ref{lemma:eav-reduction} and we will be a bit more concise. We focus on executions of $\game{\mathcal{G}}{\eta}{DDH}(\adv')$ with $b = 0$. Let the games $G_1, G_2$ be defined as in Lemma~\ref{lemma:eav-reduction}, where we denote the node sampled at the beginning of each game by $a_1, a_2$, respectively (as opposed to $w_1, w_2$). Let $E = \fdh$ and let $E_1, E_2$ and $E'$ be the analogous events in $G_1, G_2$ and the game simulated by $\adv'$ (note that in this latter game, the group elements $pk_a^{\log_g(h_2) + r_j}$ are also hidden Diffie-Hellman keys). Finally, we introduce the random variable
 	\[
 		A = \begin{cases}
 			0 & \overline{\fdh}                                                                    \\

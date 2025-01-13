@@ -1,5 +1,24 @@
 \section{Basic cryptographic definitions} \label{sec:preliminaries-appendix}
 
+\subsection{Notation}
+
+We will use the following notation throughout:
+\begin{itemize}
+	\item We write $x \from S$ to say that $x$ is sampled u.a.r.\ from the finite set $S$
+	\item For $n \in \mathbb{N} \setminus \{0\}$, $[n] = \{1, \ldots, n\}$, and for $a, b \in \N$ s.t.\ $a \le b$, $[a, b] = \{a, a + 1, \ldots, b\}$
+	\item If $\mathbb{G}$ is a cyclic group of order $q$ and $g$ a generator, then
+	      \begin{itemize}
+		      \item We write the group operation in $\mathbb{G}$ multiplicatively
+		      \item $h^{-1}$ denotes the inverse of $h \in \mathbb{G}$
+		      \item $\log_g(h)$ denotes the unique $x \in [q]$ such that $g^x = h$
+	      \end{itemize}
+	\item We write $b \from \adv$ to denote the event that an adversary $\adv$ outputs the bit $b$ when playing a game where it must output a bit in the end
+	\item For $a, b \in \{0, 1\}^n$, $a \oplus b$ denotes the XOR of $a$ and $b$
+	\item We will stick to using $\kappa$ as the security parameter of private-key encryption schemes and $\eta$ as the parameter of public-key encryption schemes
+	\item For a function $f$ in the security parameter $\eta$ (or $\kappa$) we will often omit writing $\eta$ as an argument and simply write $f$ to refer to $f(\eta)$
+	\item For an encryption scheme $\Pi$ that contains an algorithm $X$, we may refer to $\Pi$'s implementation of $X$ by $\Pi.X$. (E.g. if $\Pi$ is an encryption scheme we can refer to its key-generation algorithm by $\Pi.X$)
+\end{itemize}
+
 \subsection{Encryption schemes}
 
 \subsubsection{Private-key encryption}

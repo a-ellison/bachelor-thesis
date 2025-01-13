@@ -1,6 +1,6 @@
 \section{Our concrete result for TreeKEM}
 
-The following theorem, stated informally here, is our main practical result.
+The following theorem describing the security of TreeKEM, stated informally here, is our main practical result. It bounds the advantage of any adversary creating (at most) $c$ commits and $p$ add or update proposals in a group with at most $u$ users in distinguishing the group key of any uncompromised commit from a random bit string.
 
 \begin{theorem}[Informal] \label{theorem:treekem-security-informal}
 	If the DHIES scheme is used in TreeKEM, the private-key encryption scheme in DHIES is $(t, \eeav)$-EAV-secure and the DDH problem is $(t, \eddh)$-hard in the Diffie-Hellman group, then for all $c, p, u$, TreeKEM is $(\tilde{t}, \tilde{\epsilon}, c, p, u)$-secure in the ROM with $\tilde{t} \approx t$ and
@@ -23,7 +23,7 @@ In Section~\ref{sec:treekem-security} of the appendix we restate the above theor
 
 \subsection{Interpreting the result}
 
-In the following we will go through some concrete examples to see what level of security our proof guarantees for TreeKEM with different parameter choices. We will look at the \texttt{MLS\_128\_DHKEMX25519\_AES128GCM\_SHA256\_Ed25519} cipher suite \cite[Section~17.1]{rfc9420} for 128-bit parameters, which uses Curve25519 as the Diffie-Hellman group and AES with a 128-bit key size for private-key encryption. We will assume that both Curve25519 and AES have a 128-bit security level, so for example we can set $(t, \eeav) = (t, \eddh) = (2^{64}, 2^{-64})$.
+In the following we will go through some concrete examples to see what level of security our proof guarantees for TreeKEM with different parameter choices. We will look at the \texttt{MLS\_128\_DHKEMX25519\_AES128GCM\_SHA256\_Ed25519} cipher suite \cite[Section~17.1]{rfc9420} for 128-bit parameters, which uses Curve25519 as the Diffie-Hellman group and AES with a 128-bit key size for private-key encryption. We will assume that both Curve25519 and AES have a 128-bit security level and we will set $(t, \eeav) = (t, \eddh) = (2^{48}, 2^{-80})$.
 
 For 256-bit parameters, we will look at the \texttt{MLS\_256\_DHKEMP521\_AES256GCM\_SHA512\_P521} cipher suite, which uses curve P-521 and 256-bit AES. We will assume that P-521 and 256-bit AES have a 256-bit security level and set $(t, \eeav) = (t, \eddh) = (2^{128}, 2^{-128})$.
 
@@ -33,7 +33,7 @@ In this example we consider a large group of about 10'000 users, existing for 5 
 
 Then with 128-bit parameters we get
 \[
-	\et \le 2^{46} \cdot \eeav + 2^{32} \cdot \eddh + \mathrm{negl} \le \frac{1}{2^{17}}
+	\et \le 2^{46} \cdot \eeav + 2^{32} \cdot \eddh + \mathrm{negl} \le \frac{1}{2^{33}}
 \]
 with the $\eeav$ term dominating the result. This only gives a security level of $\tilde{t}/\et \ge 2^{81}$. Since private-key encryption is relatively cheap, using 256-bit AES would have a small impact on the performance and would increase the security level to 95 bits (with the $\eddh$ term now dominating). Finally, using full 256-bit parameters yields 209 bits of security for TreeKEM.
 
