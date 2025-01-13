@@ -19,24 +19,36 @@ The following theorem, stated informally here, is our main practical result.
 	\end{itemize}
 \end{theorem}
 
-In Section~\ref{sec:treekem-security} of the appendix we restate the above theorem formally. To this end, we also provide the formal definitions for the syntax and security of propose and commit CGKA schemes and a high-level description of how to instantiate (the essence of) the TreeKEM protocol with our definitions.
+In Section~\ref{sec:treekem-security} of the appendix we restate the above theorem formally as Theorem~\ref{theorem:treekem-security}. To this end, we also provide formal definitions for the syntax and security of propose and commit CGKA schemes and a high-level description of how to instantiate (the essence of) the TreeKEM protocol with our definitions.
 
 \subsection{Interpreting the result}
 
-Let us go through a concrete example to see what level of security this bound guarantees for TreeKEM. We will look at the \texttt{MLS\_128\_DHKEMX25519\_AES128GCM\_SHA256\_Ed25519} cipher suite specified in \cite[Section~17.1]{rfc9420}, which uses Curve25519 as the Diffie-Hellman group, SHA2-256 as the key-derivation function in DHIES, and AES with a 128-bit key size for private-key encryption. We will assume that both Curve25519 and AES have a 128-bit security level, so for example we can set $(t, \eeav) = (t, \eddh) = (2^{80}, 2^{-48})$. The group size for Curve25519 is at least $2^{252}$ \cite{curve25519}. The seeds sampled in MLS (called ``path secrets" in the RFC) and used as arguments to $\hgen$ and $\hdep$ are 256 bits with SHA2-256 as the key-derivation function \cite{rfc9420}, meaning that $\rho = 256$. Furthermore we can set $\mdh \le 2^{60}$ and $\ms \le 2^{61}$.
+In the following we will go through some concrete examples to see what level of security our security proof guarantees for TreeKEM with different parameter choices. We will look at the \texttt{MLS\_128\_DHKEMX25519\_AES128GCM\_SHA256\_Ed25519} cipher suite \cite[Section~17.1]{rfc9420} for 128-bit parameters, which uses Curve25519 as the Diffie-Hellman group and AES with a 128-bit key size for private-key encryption. We will assume that both Curve25519 and AES have a 128-bit security level, so for example we can set $(t, \eeav) = (t, \eddh) = (2^{64}, 2^{-64})$.
 
-For the parameters $c$ and $u$ we can consider a large group of about 1000 users, existing for 5 years and making one commit every hour. Then $u \le 2^{10}$ and $c \le 2^{16}$. For $p$, if we assume that a significant fraction of the users will want to update with every commit and that add proposals are comparatively rare, then we can bound it by $p \le c \cdot u$.
+For 256-bit parameters, we will look at the \texttt{MLS\_256\_DHKEMP521\_AES256GCM\_SHA512\_P521} cipher suite, which uses curve P-521 and 256-bit AES. We will assume that P-521 and 256-bit AES have a 256-bit security level and set $(t, \eeav) = (t, \eddh) = (2^{128}, 2^{-128})$.
 
-These numbers yield the following results:
-\begin{align*}
-	\delta & \le 2^{10}, N \le 2^{27}                                                      \text{ (dominated by $p$)} \\
-	\et    & \le 2^{37} \cdot \eeav + 2^{27} \cdot \eddh + \frac{1}{2^{136}}                                          \\
-	       & \le \frac{1}{2^{10}}
-\end{align*}
-with the $\eeav$ term dominating the result. This gives a security level of $\tilde{t}/\et \ge 2^{90}$. Since private-key encryption is relatively cheap, using 256-bit AES would have a small impact on the performance and would increase the security level to 100 bits. Finally, using 256-bit AES and a Diffie-Hellman group with a 256-bit security level yields 139 bits of security for TreeKEM.
+\subsubsection{Large groups with hourly commits and frequent updates}
 
-The previous best result in \cite[Theorem 3]{ttkem} proved a bound with
+In this example we consider a large group of about 10'000 users, existing for 5 years and making one commit every hour. Then $u \le 2^{14}$ and $c \le 2^{16}$. In this example we assume that a significant fraction of the users will want to update with every commit. Then, assuming that add proposals are relatively rare, we can bound $p \le c \cdot u = 2^{30}$. This implies $3 \cdot c \cdot \log(u) + p \le 2^{31}$, dominated by $p$.
+
+Then with 128-bit parameters we get
 \[
-	\et \le 2 \cdot N^2 \cdot \epsilon + \mathrm{negl}(\eta)
+	\et \le 2^{46} \cdot \eeav + 2^{32} \cdot \eddh + \mathrm{negl} \le \frac{1}{2^{17}}
 \]
-for the GSD game, where $\epsilon$ is the IND-CPA security of the underlying public-key encryption scheme. Using the above parameters for a 128-bit security level this implies only 73 bits of security (and the result remains unchanged with 256-bit AES). Therefore, our result significantly improves the guaranteed security level of TreeKEM (in the ROM).
+with the $\eeav$ term dominating the result. This only gives a security level of $\tilde{t}/\et \ge 2^{81}$. Since private-key encryption is relatively cheap, using 256-bit AES would have a small impact on the performance and would increase the security level to 95 bits (with the $\eddh$ term now dominating). Finally, using full 256-bit parameters yields 209 bits of security for TreeKEM.
+
+The previous best result in \cite[Theorem 3]{ttkem} proved a bound that implies
+\[
+	\et \le 2 \cdot (3 \cdot c \cdot \log(u) + p)^2 \cdot \epsilon + \mathrm{negl}
+\]
+where $\epsilon$ is the IND-CPA security of the underlying public-key encryption scheme. If we assume that DHIES has an $x$-bit security level as a public-key encryption scheme with $x$-bit parameters, the result implies 64 bits of security with 128-bit parameters (with no change when using 256-bit AES) and 192 bits with 256-bit parameters.
+
+\subsubsection{Few updates}
+
+In this example we use the same number of users and commits, but assume that the number of proposals is small such that $p \le 3 \cdot c \cdot \log(u)$. In this case we have $3 \cdot c \cdot \log(u) + p \le 2^{22}$. Then our result guarantees 90 bits of security with 128-bit parameters, 104 bits with 256-bit AES and 218 bits with 256-bit parameters.
+
+In constrast, the bound in \cite{ttkem} implies 82 bits with 128-bit parameters and 210 bits with 256-bit parameters.
+
+\subsubsection{Very large groups with one commit every minute and frequent updates} In this example we consider more extreme values for $c$ and $u$ to highlight the gap between our result and the one proven in \cite{ttkem}. We assume a group of about 1 million users, existing for 50 years making one commit every minute. Furthermore, we again will again bound $p$ by $c \cdot u$. This means that $u \le 2^{20}$, $c \le 2^{25}$ and $3 \cdot c \cdot \log(u) + p \le 2^{46}$.
+
+These values imply a 61 bits of security with 128-bit parameters, 81 bits with 256-bit AES and 189 bits with 256-bit parameters using our result. The result in \cite{ttkem} implies 34 bits of security with 128-bit parameters and 162 bits with 256-bit parameters.
