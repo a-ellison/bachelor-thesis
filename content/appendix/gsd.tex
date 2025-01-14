@@ -90,7 +90,7 @@ where the various variables denote the following
 		\item \label{eav-reduction-mis-eav-adversary-step-init} $\adv'$ samples $w \from [n], s \from \{0, 1\}^\rho$ and gives $\delta$ and the messages $s_w, s$ to the challenger. Let $c_1, \ldots, c_\delta$ the encryptions it gets back.
 		\item $\adv'$ faithfully simulates the SD-GSD game to $\adv$ with the following exception: Whenever $\adv$ makes a query of the form $\operatorname{encrypt}(u, w)$ for any $u$, $\adv'$ replies with $\langle g^x, c_i \rangle$ where $x \from [q]$ and $i$ is the index of the next ciphertext (from step \ref{eav-reduction-mis-eav-adversary-step-init}) not yet used.
 
-		      All random oracles queries are simulated by sampling the output of the oracle u.a.r. for new queries and using the value first sampled for repeated queries.
+		      All random oracle queries are simulated by sampling the output of the oracle u.a.r. for new queries and using the value first sampled for repeated queries.
 
 		      During the simulation $\adv'$ also pays attention to the following:
 		      \begin{itemize}
@@ -103,7 +103,7 @@ where the various variables denote the following
 			      \item If $\adv$ queries $\hgen(s_w)$ or $\hdep(s_w)$, $\adv'$ aborts the simulation and outputs 0. This is the only point at which $\adv'$ outputs 0.
 		      \end{itemize}
 
-		      If the simulation arrives to the point where $\adv$ outputs its guess (step \ref{def:sd-gsd-game-step-output} of the SD-GSD game), then $\adv'$ outputs 1.
+		      If the simulation arrives at the point where $\adv$ outputs its guess (step \ref{def:sd-gsd-game-step-output} of the SD-GSD game), then $\adv'$ outputs 1.
 	\end{enumerate}
 
 	The advantage of $\adv'$ is given by
@@ -118,7 +118,7 @@ where the various variables denote the following
 		\pr{0 \from \adv' \mid b = 0} \ge \frac{\pr{\qs \land \overline{\fdh}\,}}{N}.
 	\end{equation}
 	Let $E = \qs \land \overline{\fdh}$ and let $E'$ the same event in the SD-GSD game simulated to $\adv$ during an execution of $\game{\Pi_s}{\eta}{MIS-EAV}(\adv')$ with $b = 0$. In the following while showing \eqref{eq:lemma-eav-reduction-b=0} we will implicitly assume that $b = 0$ when referring to the game simulated to $\adv$ by $\adv'$.
-	On a high level \eqref{eq:lemma-eav-reduction-b=0} holds due to the fact that as long as the game has not been aborted the encryptions $\adv$ receives from $\adv'$ are indistinguishable from what it would get in the real SD-GSD game and we get a factor $\frac{1}{N}$ from guessing the node that triggered $E$. However, showing this requires a few steps.
+	On a high level \eqref{eq:lemma-eav-reduction-b=0} holds because as long as the game has not been aborted the encryptions $\adv$ receives from $\adv'$ are indistinguishable from what it would get in the real SD-GSD game and we get a factor $\frac{1}{N}$ from guessing the node that triggered $E$. However, showing this requires a few steps.
 
 	Consider a modification of the SD-GSD game $G_1$ where the game is aborted whenever one of the following events occurs, where for all these events $\adv'$ would also abort the simulation:
 	\begin{itemize}
@@ -145,7 +145,7 @@ where the various variables denote the following
 			x & E \text{ was triggered at node } x
 		\end{cases}
 	\]
-	(if $x$ is not unique we choose the node with lowest identifier).
+	(if $x$ is not unique we choose the node with the lowest identifier).
 	Let $W_1$, $W_2$ and $W'$ be the corresponding random variables in game $G_1$, game $G_2$ and the game simulated by $\adv'$. Consider the probability $\pr{W_1 = w_1 \mid E_1}$. The node $w_1$ is sampled independently and does not affect the execution of the game. Therefore, in an execution where $E_1$ occurs and the GSD graph has size $n$ (so $W_1 \in [n]$), we correctly guess $W_1 = w_1$ with probability exactly $\frac{1}{n} \ge \frac{1}{N}$. Thus
 	\[
 		\pr{W_1 = w_1 \mid E_1} \ge \frac{1}{N}
@@ -293,7 +293,7 @@ By assuming a key-rerandomizable encryption scheme and applying Lemma~\ref{lemma
 		\item $\adv'$ runs $\adv$ to get $n$ and $D$, samples $a \from [n]$ and initializes the GSD graph, seeds and the set of edges and corrupted nodes as in step \ref{def:sd-gsd-game-step-init} of the SD-GSD game, with the sole exception that $pk_a = h_1$ (as opposed to setting it to the public key output by $\dhies.\gen(1^\eta, \hgen(s_a))$).
 		\item $\adv'$ faithfully simulates the SD-GSD game to $\adv$ with the following exception: For the $j$-th query $\operatorname{encrypt}(a, u_j)$ made by $\adv$, $\adv'$ replies with $\langle h_2 \cdot g^{r_j}, \Pi_s.\enc_{k_j}(s_{u_j}) \rangle$ where $r_j \from [q]$, $k_j \from \{0, 1\}^\eta$. $\adv'$ also computes and stores $R_j = \left(pk_a^{r_j}\right)^{-1}$.
 
-		      All random oracles queries are simulated by sampling the output of the oracle u.a.r. for new queries and using the value first sampled for repeated queries.
+		      All random oracle queries are simulated by sampling the output of the oracle u.a.r. for new queries and using the value first sampled for repeated queries.
 
 		      During the simulation $\adv'$ also pays attention to the following:
 		      \begin{itemize}
@@ -326,7 +326,7 @@ By assuming a key-rerandomizable encryption scheme and applying Lemma~\ref{lemma
 			x & \text{$\fdh$ holds and $\qdh$ was triggered on an encryption edge with source $x$}
 		\end{cases}
 	\]
-	(if $x$ is not unique we choose the node with smallest identifier) and let $A_1, A_2$ and $A'$ denote the corresponding random variables in game $G_1$, game $G_2$ and the game simulated by $\adv'$.
+	(if $x$ is not unique we choose the node with the lowest identifier) and let $A_1, A_2$ and $A'$ denote the corresponding random variables in game $G_1$, game $G_2$ and the game simulated by $\adv'$.
 
 	Just as argued in Lemma~\ref{lemma:eav-reduction},
 	\begin{equation} \label{eq:lemma-dh-reduction-E=E_1}
@@ -399,7 +399,7 @@ By assuming a key-rerandomizable encryption scheme and applying Lemma~\ref{lemma
 		\end{split}
 	\end{align}
 
-	Furthemore, going through the details yields that $\adv'$ runs in time
+	Furthermore, going through the details yields that $\adv'$ runs in time
 	\begin{align*}
 		\begin{split}
 			t_{\adv'} \coloneqq \tilde{t} + \mathcal{O}\big(\rho \cdot t_{\mathrm{sample}} \cdot \ms & + (\gamma + \eta \cdot t_{\mathrm{sample}}) \cdot \mdh \\

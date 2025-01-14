@@ -1,6 +1,6 @@
 \section{Tighter GSD security} \label{sec:tighter-gsd-security}
 
-In this section we present the main theoretical result behind Theorem~\ref{theorem:treekem-security-informal} in Theorem~\ref{theorem:sdgsd-security}. To this end, we first define a modified version of the public-key GSD game from \cite{ttkem} and then proceed to prove Theorem~\ref{theorem:sdgsd-security} in detail.
+In this section, we present the main theoretical result behind Theorem~\ref{theorem:treekem-security-informal} in Theorem~\ref{theorem:sdgsd-security}. To this end, we first define a modified version of the public-key GSD game from \cite{ttkem} and then proceed to prove Theorem~\ref{theorem:sdgsd-security} in detail.
 
 \subsection{Seeded GSD with Dependencies} \label{sec:sd-gsd-game}
 
@@ -11,7 +11,7 @@ In this section we present the main theoretical result behind Theorem~\ref{theor
 	\end{itemize}
 }
 
-The GSD game defined here is inspired by the definition of the public-key GSD game (Definition 7) and the proof of Theorem 3 in \cite{ttkem}. We've already motivated the differences in Section~\ref{sec:gsd-intro}. We will call our adapted game \emph{Seeded GSD with Dependencies} (SD-GSD). A very similar definition appears in \cite{modular-group-messaging}, providing essentially the same abstraction over TreeKEM and also allowing for an adversary to provide the randmoness used for encryption and key generation. However, our definition has one notable difference: when asking to be challenged on a node with seed $s$, the adversary must distinguish $\hdep(s)$ from random as opposed to $s$. This stays true to how the group key is computed in TreeKEM and has the significant advantage of greatly simplifying our proof. On the other hand, the security implied by our definition is weaker (at least in the ROM), as it only guarantees that an adversary cannot compute the seed of the challenge node, whereas the other definitions guarantee that this seed cannot be distinguished from random.
+The GSD game defined here is inspired by the definition of the public-key GSD game (Definition 7) and the proof of Theorem 3 in \cite{ttkem}. We've already motivated the differences in Section~\ref{sec:gsd-intro}. We will call our adapted game \emph{Seeded GSD with Dependencies} (SD-GSD). A very similar definition appears in \cite{modular-group-messaging}, providing essentially the same abstraction over TreeKEM and also allowing for an adversary to provide the randomness used for encryption and key generation. However, our definition has one notable difference: when asking to be challenged on a node with seed $s$, the adversary must distinguish $\hdep(s)$ from random as opposed to $s$. This stays true to how the group key is computed in TreeKEM and has the significant advantage of greatly simplifying our proof. On the other hand, the security implied by our definition is weaker (at least in the ROM), as it only guarantees that an adversary cannot compute the seed of the challenge node, whereas the other definitions guarantee that this seed cannot be distinguished from random.
 
 \begin{definition}[The SD-GSD game] \label{def:sd-gsd-game}
 	Let $\Pi = (\gen, \enc, \dec)$ a public-key encryption scheme, where $\gen(1^\eta)$ uses $\rho(\eta)$ random bits and $\{0, 1\}^{\rho(\eta)}$ is a subset of the message space.
@@ -48,7 +48,7 @@ The GSD game defined here is inspired by the definition of the public-key GSD ga
 	We require an adversary playing the above game to adhere to the following:
 	\begin{itemize}
 		\item The challenge node is safe
-		\item The graph $(V, E \cup D)$ always remain acyclic and without self-loops
+		\item The graph $(V, E \cup D)$ always remains acyclic and without self-loops
 		\item All paths in the graph $(V, D)$ are vertex disjoint\footnote{This ensures that any node is only the target of at most one seed dependency, such that the computation of seeds is well-defined.}
 	\end{itemize}
 \end{definition}
@@ -113,7 +113,7 @@ Without having queried $\hdep(s_p)$, by virtue of $\hdep$ being a random oracle 
 	\begin{center}
 		\includegraphics{figures/gsd-qs-triggered}
 	\end{center}
-	\caption{Illustration of the GSD graph when $\qs$ is triggered at a node $w$. The dashed edge represents a seed dependencey $(p, w)$ and the remaining edges represent encryption queries $c_i \from \operatorname{encrypt}(u_i, w)$.}
+	\caption{Illustration of the GSD graph when $\qs$ is triggered at a node $w$. The dashed edge represents a seed dependency $(p, w)$ and the remaining edges represent encryption queries $c_i \from \operatorname{encrypt}(u_i, w)$.}
 	\label{fig:gsd-qs-triggered}
 \end{figure}
 
@@ -124,7 +124,7 @@ Let $x_i = \log_g(pk_{u_i})$. Each encryption $c_i$ is a tuple of the form $\lan
 	\item \label{qs-triggered-case-1} If such a query was made, then $\adv$ solved the Diffie-Hellman challenge $(g^{x_j}, g^{y_j})$. (Remember that we assumed that $w$ is the first node for which $\qs$ is triggered and as before if $w$ is safe, then so are the nodes $u_i$. Thus the adversary has not learned the exponent $x_i$ through querying $\hgen(s_{u_i})$ for any $i$.)
 	\item \label{qs-triggered-case-2} If no such query was made, then from $\adv$'s perspective all the $k_i$ are independent, uniformly random keys and it still was able to learn $s_w$ from the EAV secure encryptions $\Pi_s.\enc_{k_1}(s_w), \ldots, \Pi_s.\enc_{k_d}(s_w)$.
 \end{enumerate}
-We can bound the probability of either of these events occurring using hardness of the DDH problem relative to $\mathcal{G}$ and EAV security of $\Pi_s$, respectively.
+We can bound the probability of either of these events occurring using the hardness of the DDH problem relative to $\mathcal{G}$ and EAV security of $\Pi_s$, respectively.
 
 To this end, we call a group element $h \in \mathbb{G}$ a \emph{hidden Diffie-Hellman key} if $h = pk_u^{y_{u, v}}$, where $(u, v)$ is an edge in the GSD graph, $u$ is safe and $y_{u, v}$ is the exponent chosen in the DHIES encryption of $s_v$ (i.e. $\adv$ was given a ciphertext of the form $\langle g^{y_{u, v}}, \ldots\rangle$ when it queried $\operatorname{encrypt}(u, v)$). Now analogously to above let $\qdh$ the event that $\adv$ queries $\hdh$ on a hidden Diffie-Hellman key, and let $\fdh$ the event that $\adv$ triggers $\qdh$ when $\qs$ has not (yet) been triggered.
 \todo{Querying a hidden DH key can also happen when the adversary first queries the group element and then later does an encrypt query that creates an edge with that group element as the key. Add notes in SD-GSD adversaries in proofs to explain how they keep track of this and check if any arguments must be adapted (what is essential is that the adversary has not queried $\hdh(k)$ for any hidden key $k$ and the simulations are thus distributed identically).}
@@ -159,7 +159,7 @@ We bound $\pr{\qs \land \fdh}$ and $\pr{\qs \land \overline{\fdh} \,}$ in Lemma~
 		                                    & = \frac{1}{2}.
 	\end{align*}
 
-	By Lemma~\ref{lemma:dh-reduction} we have\footnote{Note that we are again omitting the argument $\eta$ from the functions on the right hand side ($N, \eddh$ and $\mdh$ in this case).}
+	By Lemma~\ref{lemma:dh-reduction} we have\footnote{Note that we are again omitting the argument $\eta$ from the functions on the right-hand side ($N, \eddh$ and $\mdh$ in this case).}
 	\[
 		\pr{\qs \land \fdh} \le N \cdot \eddh + \frac{\mdh \cdot N^2}{q}.
 	\]
@@ -181,7 +181,7 @@ We bound $\pr{\qs \land \fdh}$ and $\pr{\qs \land \overline{\fdh} \,}$ in Lemma~
 
 \subsubsection{Reducing to EAV security}
 
-Recall case \ref{qs-triggered-case-2} in the high-level discussion of Theorem~\ref{theorem:sdgsd-security}: the adversary $\adv$ was able to learn the seed $s_w$ given the EAV secure encryptions $\Pi_s.\enc_{k_1}(s_w), \ldots, \Pi_s.\enc_{k_d}(s_w)$. We can see $\adv$ as an adversary against a security game where $\adv$ is given $d$ EAV secure encryptions $c_1 \from \Pi_s.\enc_{k_1}(m), \ldots, c_d \from \Pi_s.\enc_{k_d}(m)$ of a message $m$ with $k_i \from \Pi_s.\gen(1^\eta)$ and must compute $m$. If we can prove that beating such a game is hard, then we can bound the probability of $\adv$ actually learning $s_w$ in this way.
+Recall case \ref{qs-triggered-case-2} in the high-level discussion of Theorem~\ref{theorem:sdgsd-security}: the adversary $\adv$ was able to learn the seed $s_w$ given the EAV secure encryptions $\Pi_s.\enc_{k_1}(s_w), \ldots, \Pi_s.\enc_{k_d}(s_w)$. We can see $\adv$ as an adversary in a security game where $\adv$ is given $d$ EAV secure encryptions $c_1 \from \Pi_s.\enc_{k_1}(m), \ldots, c_d \from \Pi_s.\enc_{k_d}(m)$ of a message $m$ with $k_i \from \Pi_s.\gen(1^\eta)$ and must compute $m$. If we can prove that beating such a game is hard, then we can bound the probability of $\adv$ actually learning $s_w$ in this way.
 
 This is exactly how we proceed in this section. Instead of asking the adversary to compute an encrypted message $m$, we turn to a more familiar decisional formulation as in the IND-CPA game (where the adversary may choose a pair $m_0, m_1$ and must distinguish whether the $d$ ciphertexts encrypt $m_0$ or $m_1$). We call this security notion \emph{EAV security under multiple (M) independent (I) encryptions of a single (S) pair of messages} (MIS-EAV).
 
@@ -225,14 +225,14 @@ The details of the proof can be found in Section~\ref{sec:mis-eav-from-eav-proof
 
 \paragraph{Intuition} By Lemma~\ref{lemma:mis-eav-from-eav} we know that $\Pi_s$ is MIS-EAV secure. Continuing the high-level argument before the proof of Theorem~\ref{theorem:sdgsd-security}, consider the first moment that $\adv$ triggers $\qs \land \overline{\fdh}$ by querying the seed of some safe node $w$.  As intended, it follows from the definition of the event $\fdh$ that from $\adv$'s perspective all DHIES ciphertexts it got from queries $\operatorname{encrypt}(u, w)$ for any $u$ contain encryptions of $s_w$ under independent, uniformly random keys using $\Pi_s$. Moreover, as already argued once, $\adv$ has learned nothing from a potential seed dependency $(p, w)$, so these encryptions are everything $\adv$ had at its proposal to learn $s_w$.
 
-We can use $\adv$'s ability to compute the seed $s_w$ of a safe node $w$ from encryptions of $s_w$ to construct an MIS-EAV adversary: We first guess a node $w$ whose seed $\adv$ may query first. Next we give the MIS-EAV challenger $s_w$ and some other independent seed $s$. We simulate the SD-GSD game to $\adv$ and embed the encryptions from the MIS-EAV challenger when answering queries of the form $\operatorname{encrypt}(u, w)$ for any $u$. Now consider the behavior of $\adv$ depending on which seed the challenger chooses to encrypt:
+We can use $\adv$'s ability to compute the seed $s_w$ of a safe node $w$ from encryptions of $s_w$ to construct an MIS-EAV adversary: We first guess a node $w$ whose seed $\adv$ may query first. Next, we give the MIS-EAV challenger $s_w$ and some other independent seed $s$. We simulate the SD-GSD game to $\adv$ and embed the encryptions from the MIS-EAV challenger when answering queries of the form $\operatorname{encrypt}(u, w)$ for any $u$. Now consider the behavior of $\adv$ depending on which seed the challenger chooses to encrypt:
 \begin{itemize}
 	\item If the challenger chooses to encrypt $s_w$, then $\adv$ will trigger the event $\qs \land \overline{\fdh}$ with the same probability as before. We can detect whether $\qs \land \overline{\fdh}$ gets triggered since all seeds in the simulation are known. If $\qs \land \overline{\fdh}$ occurs and we guessed $w$ correctly, the event will be triggered at $w$ and $\adv$ will query $s_w$, telling us that the challenger encrypted $s_w$.
-	\item If the challenger chooses to encrypt $s$, then $\adv$ receives no information about $s_w$ and has negligible probability of querying it.
+	\item If the challenger chooses to encrypt $s$, then $\adv$ receives no information about $s_w$ and has a negligible probability of querying it.
 \end{itemize}
 Thus, the advantage of the MIS-EAV adversary is about $\pr{\qs \land \overline{\fdh}\,}/N$, where the factor $1/N$ arises from guessing $w$, and using that $\Pi_s$ is MIS-EAV secure we can bound this probability. Since we are only interested in checking whether the event was triggered for $w$, the adversary can abort when this is no longer possible ($w$ is corrupted, some other hidden seed is queried, etc.). The details of the proof can be found in Section~\ref{sec:eav-reduction-proof} of the appendix.
 
-For a certain class of schemes, we can improve on Lemma~\ref{lemma:mis-eav-from-eav} and achieve a tight reduction. This allows use to get rid of the factor $\delta$ in Lemma~\ref{lemma:eav-reduction}. However, we do not use this in our main result and refer the interested reader to Section~\ref{sec:tighter-mis-eav-security} of the appendix.
+For a certain class of schemes, we can improve on Lemma~\ref{lemma:mis-eav-from-eav} and achieve a tight reduction. This allows us to get rid of the factor $\delta$ in Lemma~\ref{lemma:eav-reduction}. However, we do not use this in our main result and refer the interested reader to Section~\ref{sec:tighter-mis-eav-security} of the appendix.
 
 \subsubsection{Reducing to the DDH problem}
 
@@ -256,7 +256,7 @@ An intuitive strategy would be to embed the challenge by setting $pk_a = g^x$ an
 \end{itemize}
 If we make sure not to change $\adv$'s view of the game in the case $k = g^{x \cdot y}$ in this process, we can achieve an advantage of about $\pr{\fdh} / N^2$, where one factor $1/N$ arises from guessing $a$ and another from guessing $u_j$. Unfortunately, this would yield no improvement over the result from \cite{ttkem}.
 
-To avoid this issue, we can use random self-reducability of the DDH problem and avoid guessing $u_j$. Instead of embedding $g^y$ into a single encryption edge, we embed it into all $d$ encryption edges. To get a uniformly random exponent from $y$ we set $y_j = y + r_j \mod q$ with $r_j \from [q]$. Given $g^{x \cdot y_j}$, we can easily compute $g^{x \cdot y}$:
+To avoid this issue, we can use random self-reducibility of the DDH problem and avoid guessing $u_j$. Instead of embedding $g^y$ into a single encryption edge, we embed it into all $d$ encryption edges. To get a uniformly random exponent from $y$ we set $y_j = y + r_j \mod q$ with $r_j \from [q]$. Given $g^{x \cdot y_j}$, we can easily compute $g^{x \cdot y}$:
 \[
 	g^{x \cdot y_j} = g^{x \cdot (y + r_j)} = g^{x \cdot y}	\cdot g^{x \cdot r_j} \iff g^{x \cdot y} = g^{x \cdot y_j} \cdot \underbrace{((g^x)^{r_j})^{-1}}_{\eqqcolon \, R_j}.
 \]
