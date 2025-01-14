@@ -18,7 +18,7 @@ The GSD game defined here is inspired by the definition of the public-key GSD ga
 	Let $\fhgen = \{ \hgen^{(\eta)} \mid \eta \in \N\}, \fhdep = \{ \hdh^{(\eta)} \mid \eta \in \N\}$ families of functions with $\hgen^{(\eta)}, \hdep^{(\eta)} \colon \{0, 1\}^{\rho(\eta)} \to \{0, 1\}^{\rho(\eta)}$. We will write $\hgen \coloneqq \hgen^{(\eta)}, \hdep \coloneqq \hdep^{(\eta)}$ and $\rho \coloneqq \rho(\eta)$ if $\eta$ is clear from the context.
 	Define the game $\game{(\Pi, \fhgen, \fhdep)}{\eta}{SD-GSD}(\adv)$ for an adversary $\adv$:
 	\begin{enumerate}[1.]
-		\item \label{def:sd-gsd-game-step-init} The adversary $\adv$ and outputs $n \in \N$ and a list of dependencies $D = \{(a_{i}, b_{i})\}_{i=1}^m \in [n]^2$. For each $v \in [n]$:
+		\item \label{def:sd-gsd-game-step-init} The adversary $\adv$ outputs $n \in \N$ and a list of dependencies $D = \{(a_{i}, b_{i})\}_{i=1}^m \subseteq [n]^2$. For each $v \in [n]$:
 		      \begin{enumerate}[(i)]
 			      \item \begin{itemize}
 				            \item \textbf{Case $v = b_i$ for some $i$ ($v$ is the target of some dependency):} set $s_v = \hdep(s_{a_i})$.
@@ -48,17 +48,18 @@ The GSD game defined here is inspired by the definition of the public-key GSD ga
 	We require an adversary playing the above game to adhere to the following:
 	\begin{itemize}
 		\item The challenge node is safe
-		\item The graph $(V, E \cup D)$ always remains acyclic and without self-loops
-		\item All paths in the graph $(V, D)$ are vertex disjoint\footnote{This ensures that any node is only the target of at most one seed dependency, such that the computation of seeds is well-defined.}
+		\item The challenge node is not the source of a seed dependency\footnote{Otherwise the adversary could learn the value of $\hdep$ on the seed of the challenge node by creating a seed dependency with the challenge node as the source and corrupting the target node.}
+		\item Every node is the source and target of at most one seed dependency\footnote{If a node were the source node of multiple seed dependencies, then corrupting one target node would reveal the seeds of all target nodes. Additionally, the computation of seeds is not well-defined if a node is the target of multiple dependencies.}
+		\item The graph $([n], E \cup D)$ is acyclic and without self-loops
 	\end{itemize}
 \end{definition}
 
 It is interesting to note that previous definitions of the GSD game also included the following restrictions to the adversary:
 \begin{itemize}
-	\item The challenge node always remains a sink
+	\item The challenge node always remains a sink in $([n], E)$
 	\item $\operatorname{reveal}$ is never queried on the challenge node
 \end{itemize}
-Our proof in the ROM does not require these restrictions. If $\hdep$ is modelled as a random oracle, then an encryption edge or seed dependency outgoing from the challenge node, or knowing its public key gives no advantage to $\adv$, as by the assumption of $\hdep$ being a random oracle the only way to learn information about $\hdep(s)$ is by querying $s$.
+Our proof in the ROM does not require these restrictions. If $\hdep$ is modelled as a random oracle, then an encryption edge outgoing from the challenge node, or knowing its public key gives no advantage to $\adv$, as by the assumption of $\hdep$ being a random oracle the only way to learn information about $\hdep(s)$ is by querying $s$.
 
 \begin{definition}[SD-GSD security]
 	Let $\Pi, \fhgen$ and $\fhdep$ as in Definition~\ref{def:sd-gsd-game} above and let $t, \epsilon, N, \delta$ functions in $\eta$.

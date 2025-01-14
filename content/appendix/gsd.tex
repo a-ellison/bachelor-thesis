@@ -88,7 +88,7 @@ where the various variables denote the following
 	\begin{enumerate}[1.]
 		\item $\adv'$ runs $\adv$ to get $n$ and $D$ and initializes the GSD graph, seeds and the set of edges and corrupted nodes as in step \ref{def:sd-gsd-game-step-init} of the SD-GSD game.
 		\item \label{eav-reduction-mis-eav-adversary-step-init} $\adv'$ samples $w \from [n], s \from \{0, 1\}^\rho$ and gives $\delta$ and the messages $s_w, s$ to the challenger. Let $c_1, \ldots, c_\delta$ the encryptions it gets back.
-		\item $\adv'$ faithfully simulates the SD-GSD game to $\adv$ with the following exception: Whenever $\adv$ makes a query of the form $\operatorname{encrypt}(u, w)$ for any $u$, $\adv'$ replies with $\langle g^x, c_i \rangle$ where $x \from [q]$ and $i$ is the index of the next ciphertext (from step \ref{eav-reduction-mis-eav-adversary-step-init}) not yet used.
+		\item $\adv'$ faithfully simulates the SD-GSD game to $\adv$ with the following exception: Whenever $\adv$ makes a query of the form $\operatorname{encrypt}(u, w)$ for any $u$, $\adv'$ replies with $\langle g^x, c_i \rangle$ where $x \from [q]$ and $i$ is the index of the next ciphertext (from step \ref{eav-reduction-mis-eav-adversary-step-init} of the MIS-EAV game) not yet used.
 
 		      All random oracle queries are simulated by sampling the output of the oracle u.a.r. for new queries and using the value first sampled for repeated queries.
 

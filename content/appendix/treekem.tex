@@ -408,9 +408,7 @@ More concretely, let us go over how the various queries in the PC-CGKA game can 
 \end{itemize}
 To simulate $\operatorname{deliver-commit}$ and $\operatorname{deliver-welcome}$, $\adv'$ updates the public state of the target user's tree accordingly. Queries to $\operatorname{corrupt}$ are a bit more involved. Since $\adv'$ can only keep track of the public state of each user, it must be prepared to compute the real group state of a user upon receiving such a query. Note however that the secret keys known by a group member can always be computed as a function of their current secret key, which can be learned using a $\operatorname{corrupt}$ query in the SD-GSD game, and the transcript of commits applied by the member with this secret key.
 
-Finally, it follows from Definition~\ref{def:safe-commit} that when $\adv$ challenges a safe commit (in a group with more than one user), the corresponding GSD node that $\adv'$ challenges is also safe.
-
-For a detailed proof we refer the reader to \cite[Theorem 12]{modular-group-messaging}.
+Finally, it follows from Definition~\ref{def:safe-commit} that when $\adv$ challenges a safe commit (in a group with more than one user), the corresponding GSD node that $\adv'$ challenges is also safe. For a detailed proof we refer the reader to \cite[Theorem 12]{modular-group-messaging}.
 
 Theorems~\ref{theorem:sdgsd-security} and \ref{theorem:cgka-from-sdgsd} together imply the following final result on the security of TreeKEM when DHIES is used as the public-key encryption scheme. This result was already stated informally in Theorem~\ref{theorem:treekem-security-informal}.
 

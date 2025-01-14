@@ -2,7 +2,7 @@
 
 \subsection{Notation}
 
-We will use the following notation throughout:
+We use the following notation throughout:
 \begin{itemize}
 	\item We write $x \from S$ to say that $x$ is sampled u.a.r.\ from the finite set $S$
 	\item For $n \in \mathbb{N} \setminus \{0\}$, $[n] = \{1, \ldots, n\}$, and for $a, b \in \N$ s.t.\ $a \le b$, $[a, b] = \{a, a + 1, \ldots, b\}$
@@ -14,8 +14,8 @@ We will use the following notation throughout:
 	      \end{itemize}
 	\item We write $b \from \adv$ to denote the event that an adversary $\adv$ outputs the bit $b$ when playing a game where it must output a bit in the end
 	\item For $a, b \in \{0, 1\}^n$, $a \oplus b$ denotes the XOR of $a$ and $b$
-	\item We will stick to using $\kappa$ as the security parameter of private-key encryption schemes and $\eta$ as the parameter of public-key encryption schemes
-	\item For a function $f$ in the security parameter $\eta$ (or $\kappa$) we will often omit writing $\eta$ as an argument and simply write $f$ to refer to $f(\eta)$
+	\item We stick to using $\kappa$ as the security parameter of private-key encryption schemes and $\eta$ as the parameter of public-key encryption schemes
+	\item For a function $f$ in the security parameter $\eta$ (or $\kappa$) we often omit writing $\eta$ as an argument and simply write $f$ to refer to $f(\eta)$
 	\item For an encryption scheme $\Pi$ that contains an algorithm $X$, we may refer to $\Pi$'s implementation of $X$ by $\Pi.X$. (E.g. if $\Pi$ is an encryption scheme we can refer to its key-generation algorithm by $\Pi.X$)
 \end{itemize}
 
@@ -26,7 +26,7 @@ We will use the following notation throughout:
 \begin{definition}[Private-key encryption {\cite[Definition 3.7]{introduction-to-modern-cryptography}}]
 	Let $\kappa$ denote the security parameter. A \emph{private-key encryption scheme} $\Pi$ consists of three probabilistic polynomial-time algorithms $(\gen, \enc, \dec)$ such that:
 	\begin{enumerate}[1.]
-		\item The \emph{key-generation algorithm} $\gen$ takes as input $1^\kappa$ (in unary) and outputs a key $k$. We will write $k \from \gen(1^\kappa)$.
+		\item The \emph{key-generation algorithm} $\gen$ takes as input $1^\kappa$ (in unary) and outputs a key $k$. We write $k \from \gen(1^\kappa)$.
 		\item The \emph{encryption algorithm} $\enc$ takes as input a key $k$ and a message $m \in \{0, 1\}^*$, or $m \in \{0, 1\}^{\le l(\kappa)}$ for some function $l$ if the message space is finite, and outputs a ciphertext $c$. We write this as $c \from \enc_k(m)$.
 		\item The deterministic \emph{decryption algorithm} $\dec$ takes as input a key $k$ and a ciphertext $c$, and outputs a message $m$ or $\bot$ (denoting an error). We write this as $m = \dec_{k}(c)$.
 	\end{enumerate}
@@ -36,13 +36,13 @@ We will use the following notation throughout:
 
 \subsubsection{Public-key encryption}
 
-In the following definition we will be more explicit about the randomness used by the algorithm $\gen$, as we will require a way to provide the randomness as input.
+In the following definition we will be more explicit about the randomness used by the algorithm $\gen$, as we require a way to provide the randomness as input.
 
 \begin{definition}[Public-key encryption {\cite[Definition 12.1]{introduction-to-modern-cryptography}}] \label{def:public-key-encryption}
 	Let $\eta$ denote the security parameter.
 	A \emph{public-key encryption scheme} $\Pi$ consists of three probabilistic polynomial-time algorithms $(\gen, \enc, \dec)$ such that:
 	\begin{enumerate}[1.]
-		\item The \emph{key-generation algorithm} $\gen$ takes as input $1^\eta$ (in unary) and outputs a pair of keys $(pk, sk)$ (a public and private key). We will write $(pk, sk) \from \gen(1^\eta)$.
+		\item The \emph{key-generation algorithm} $\gen$ takes as input $1^\eta$ (in unary) and outputs a pair of keys $(pk, sk)$ (a public and private key). We write $(pk, sk) \from \gen(1^\eta)$.
 
 		      The public key defines a message space $\mathcal{M}_{pk}$.
 
@@ -75,7 +75,7 @@ In the following definition we will be more explicit about the randomness used b
 	\end{align*}
 \end{definition}
 
-We will make use of a weaker form of security called ``indistinguishability in the presence of an eavesdropper'' \cite{introduction-to-modern-cryptography} and will refer to it as ``EAV security''. It is identical to IND-CPA security with the sole exception that the adversary does not have access to an encryption oracle.
+We make use of a weaker form of security called ``indistinguishability in the presence of an eavesdropper'' \cite{introduction-to-modern-cryptography} and refer to it as ``EAV security''. It is identical to IND-CPA security with the sole exception that the adversary does not have access to an encryption oracle.
 
 \begin{definition}[The EAV game]
 	Let $\kappa$ denote the security parameter and let $\Pi$ a private-key encryption scheme. Define the game $\game{\Pi}{\kappa}{EAV}(\adv)$ for an adversary $\adv$:
@@ -156,7 +156,7 @@ When analyzing the advantage of an adversary we may make use of the following we
 
 \subsection{The Random Oracle Model} \label{sec:rom}
 
-We will work in the commonly used Random Oracle Model (ROM) to prove our results. We refer the reader to \cite[Chapter 6.5]{introduction-to-modern-cryptography} for an informal overview of the ROM and to \cite{rom} for the original work that introduced the model. The ROM introduces the concept of a \emph{random oracle}. If a function $H : A \to B$ is modelled as a random oracle, then certain assumptions are made about what an adversary $\adv$ knows about $H$ and how it interacts with it:
+We work in the commonly used Random Oracle Model (ROM) to prove our results. We refer the reader to \cite[Chapter 6.5]{introduction-to-modern-cryptography} for an informal overview of the ROM and to \cite{rom} for the original work that introduced the model. The ROM introduces the concept of a \emph{random oracle}. If a function $H : A \to B$ is modelled as a random oracle, then certain assumptions are made about what an adversary $\adv$ knows about $H$ and how it interacts with it:
 \begin{itemize}
 	\item From $\adv$'s perspective, $H$ is a black-box function. The only way for $\adv$ to interact with $H$ is for it to provide a value $a \in A$ and get back $H(a)$, and this is the only way for $\adv$ to learn $H(a)$. We say that $\adv$ \emph{queries} $H(a)$ or that $\adv$ \emph{queries $H$ for $a$}. This well-defined interface of $\adv$ to $H$ implies that a reduction can extract the queries that $\adv$ makes to $H$.
 	\item From $\adv$'s perspective, $H$ is a random variable, sampled u.a.r.\ from the set of all functions from $A$ to $B$. Thus, if $\adv$ queries $H$ for some $a \in A$ that it has not queried before, the value $H(a)$ is a random variable uniformly distributed in $B$ from $\adv$'s perspective.
