@@ -11,12 +11,12 @@ In this section, we present the main theoretical result behind Theorem~\ref{theo
 	\end{itemize}
 }
 
-The GSD game defined here is inspired by the definition of the public-key GSD game (Definition 7) and the proof of Theorem 3 in \cite{ttkem}. We've already motivated the differences in Section~\ref{sec:gsd-intro}. We will call our adapted game \emph{Seeded GSD with Dependencies} (SD-GSD). A very similar definition appears in \cite{modular-group-messaging}, providing essentially the same abstraction over TreeKEM and also allowing for an adversary to provide the randomness used for encryption and key generation. However, our definition has one notable difference: when asking to be challenged on a node with seed $s$, the adversary must distinguish $\hdep(s)$ from random as opposed to $s$. This stays true to how the group key is computed in TreeKEM and has the significant advantage of greatly simplifying our proof. On the other hand, the security implied by our definition is weaker (at least in the ROM), as it only guarantees that an adversary cannot compute the seed of the challenge node, whereas the other definitions guarantee that this seed cannot be distinguished from random.
+The GSD game defined here is inspired by the definition of the public-key GSD game (Definition 7) and the proof of Theorem 3 in \cite{ttkem}. We have already motivated the differences in Section~\ref{sec:gsd-intro}. We will call our adapted game \emph{Seeded GSD with Dependencies} (SD-GSD). A very similar definition appears in \cite{modular-group-messaging}, providing essentially the same abstraction over TreeKEM and also allowing for an adversary to provide the randomness used for encryption and key generation. However, our definition has one notable difference: when asking to be challenged on a node with seed $s$, the adversary must distinguish $\hdep(s)$ from random as opposed to $s$. This stays true to how the group key is computed in TreeKEM and has the significant advantage of greatly simplifying our proof. On the other hand, the security implied by our definition is weaker (at least in the ROM), as it only guarantees that an adversary cannot compute the seed of the challenge node, whereas the other definitions guarantee that this seed cannot be distinguished from random.
 
 \begin{definition}[The SD-GSD game] \label{def:sd-gsd-game}
 	Let $\Pi = (\gen, \enc, \dec)$ a public-key encryption scheme, where $\gen(1^\eta)$ uses $\rho(\eta)$ random bits and $\{0, 1\}^{\rho(\eta)}$ is a subset of the message space.
 	Let $\fhgen = \{ \hgen^{(\eta)} \mid \eta \in \N\}, \fhdep = \{ \hdh^{(\eta)} \mid \eta \in \N\}$ families of functions with $\hgen^{(\eta)}, \hdep^{(\eta)} \colon \{0, 1\}^{\rho(\eta)} \to \{0, 1\}^{\rho(\eta)}$. We will write $\hgen \coloneqq \hgen^{(\eta)}, \hdep \coloneqq \hdep^{(\eta)}$ and $\rho \coloneqq \rho(\eta)$ if $\eta$ is clear from the context.
-	Define the game $\game{(\Pi, \fhgen, \fhdep)}{\eta}{SD-GSD}(\adv)$ for an adversary $\adv$:
+	Define the game $\game{(\Pi, \fhgen, \fhdep)}{\eta}{SD\text{-}GSD}(\adv)$ for an adversary $\adv$:
 	\begin{enumerate}[1.]
 		\item \label{def:sd-gsd-game-step-init} The adversary $\adv$ outputs $n \in \N$ and a list of dependencies $D = \{(a_{i}, b_{i})\}_{i=1}^m \subseteq [n]^2$. For each $v \in [n]$:
 		      \begin{enumerate}[(i)]
@@ -28,7 +28,7 @@ The GSD game defined here is inspired by the definition of the public-key GSD ga
 			      \item Compute $(pk_v, sk_v) = \gen(1^\eta, \hgen(s_v))$.
 		      \end{enumerate}
 		      Set $\mathcal{C} = E = \varnothing$. We call the directed graph $([n], E)$ a \emph{GSD graph} of \emph{size} $n$.
-		\item $\adv$ may adaptively do the following queries:
+		\item $\adv$ may adaptively make the following queries:
 		      \begin{itemize}
 			      \item $\mathrm{reveal}(v)$ for $v \in [n]$: $\adv$ is given $pk_v$.
 			      \item $\mathrm{encrypt}(u, v)$ for $u, v \in [n], u \neq v, (u, v) \notin E$: $(u, v)$ is added to $E$ and $\adv$ is given $c \from \enc_{pk_u}(s_v)$.
@@ -63,9 +63,9 @@ Our proof in the ROM does not require these restrictions. If $\hdep$ is modelled
 
 \begin{definition}[SD-GSD security]
 	Let $\Pi, \fhgen$ and $\fhdep$ as in Definition~\ref{def:sd-gsd-game} above and let $t, \epsilon, N, \delta$ functions in $\eta$.
-	The triple $(\Pi, \hgen, \hdep)$ is \emph{$(t, \epsilon, N, \delta)$-SD-GSD-secure} if for all $\eta$, for any adversary $\adv$ constructing a GSD graph of size at most $N(\eta)$ and indegree at most $\delta(\eta)$ and running time in $t(\eta)$ we have
+	The triple $(\Pi, \hgen, \hdep)$ is \emph{$(t, \epsilon, N, \delta)$-SD-GSD-secure} if for all $\eta$, for any adversary $\adv$ constructing a GSD graph of size at most $N(\eta)$ and indegree at most $\delta(\eta)$ and running in time $t(\eta)$ we have
 	\begin{align*}
-		\advantage{(\Pi, \fhgen, \fhdep)}{\eta}{SD-GSD}(\adv) \coloneqq 2 \cdot \left(\pr{\game{(\Pi, \fhgen, \fhdep)}{\eta}{SD-GSD}(\adv) = 1} - \frac{1}{2}\right) \le \epsilon(\eta).
+		\advantage{(\Pi, \fhgen, \fhdep)}{\eta}{SD\text{-}GSD}(\adv) \coloneqq 2 \cdot \left(\pr{\game{(\Pi, \fhgen, \fhdep)}{\eta}{SD-GSD}(\adv) = 1} - \frac{1}{2}\right) \le \epsilon(\eta).
 	\end{align*}
 \end{definition}
 
@@ -82,7 +82,7 @@ Since in this work we are interested in SD-GSD security for the case where $\hge
 	\[
 		\tilde{\epsilon} = 2 \cdot \delta \cdot N \cdot \eeav + 2 \cdot N \cdot \eddh + \frac{2 \cdot \mdh \cdot N^2}{q} + \frac{\ms \cdot N}{2^{\rho - 1}},
 	\]
-	where $\ms$ is an upper bound on the number of queries made to either $\hgen$ or $\hdep$, $\mdh$ is an upper bound on the number of queries made to $\hdh$, $q$ is a lower bound on the size of the group output by $\mathcal{G}$ and $\rho$ is the number of random bits sampled by $\dhies.\gen$, and with $\tilde{t} \approx t$\footnote{We provide a more precise expression of the runtime in Section~\ref{sec:sdgsd-security-runtime} of the appendix.}.
+	where $\ms$ is an upper bound on the number of queries made to either $\hgen$ or $\hdep$, $\mdh$ is an upper bound on the number of queries made to $\hdh$, $q$ is a lower bound on the size of the group output by $\mathcal{G}$ and $\rho$ is the number of random bits sampled by $\dhies.\gen$, and with $\tilde{t} \approx t$.\footnote{We provide a more precise expression of the runtime in Section~\ref{sec:sdgsd-security-runtime} of the appendix.}
 \end{theorem}
 
 In contrast, the result in \cite{ttkem} achieves a security loss in $\mathcal{O}(N^2)$ and reduces to the IND-CPA security of the public-key encryption scheme.
@@ -90,7 +90,7 @@ In contrast, the result in \cite{ttkem} achieves a security loss in $\mathcal{O}
 For ease of exposition, we will assume that $\mathcal{G}(1^\eta)$ is deterministic, as is the case in practice. We will therefore set $pk \coloneqq h_1, sk \coloneqq x$ in $\dhies.\gen$, as $\mathbb{G}, q, g$ are implied by $\eta$. The results nevertheless hold also for the general case.
 
 \paragraph{Intuition}
-Consider an arbitrary SD-GSD adversary $\adv$. For an execution of $\game{\dhies}{\eta}{SD-GSD}(\adv)$ we say ``\emph{$\adv$ wins}" to denote the event $\game{\dhies}{\eta}{SD-GSD}(\adv) = 1$.
+Consider an arbitrary SD-GSD adversary $\adv$. For an execution of $\game{\dhies}{\eta}{SD-GSD}(\adv)$ we say ``\emph{$\adv$ wins}" to denote the event $\game{\dhies}{\eta}{SD\text{-}GSD}(\adv) = 1$.
 As usual with random oracles we proceed by a case distinction on whether they were queried on some interesting value. Accordingly, let $Q_{x}$ denote the event that $\adv$ queries $H_{x}$ on a hidden seed for $x \in \{\mathrm{gen}, \mathrm{dep}\}$. Then we can write
 \begin{align} \label{eq:theorem-sd-gsd-security-win-cases}
 	\begin{split}
@@ -101,9 +101,7 @@ As usual with random oracles we proceed by a case distinction on whether they we
 		& \le \pr{\qs} + \frac{1}{2},
 	\end{split}
 \end{align}
-where $\qs \coloneqq \qgen \cup \qdep$ ($\mathrm{s}$ for \emph{seed}). Step $(\dagger)$ intuitively holds because without having queried $\hdep$ for any hidden seed, in particular the seed $s_v$ of the challenge node $v$, $\hdep(s_v)$ is a uniformly random value from $\adv$'s perspective. Therefore, it can do no better than guessing to distinguish $\hdep(s_v)$ from $s \from \{0, 1\}^\rho$.
-
-\todo{Motivate why we introduce $\qs$. (Reason: If we try to bound $\qdep$ by itself, we must separately deal with the case where the adversary was able to trigger it at a node $v$ by triggering $\qgen$ at a parent node $p$ and subsequently decrypting a ciphertext. But our argument  To eliminate this, we want to look at the point in time where either of the two events was first triggered.)}
+where $\qs \coloneqq \qgen \cup \qdep$ ($\mathrm{s}$ for \emph{seed}). Step $(\dagger)$ intuitively holds because without having queried $\hdep$ for any hidden seed, in particular the seed $s_v$ of the challenge node $v$, $\hdep(s_v)$ is a uniformly random value from $\adv$'s perspective. Therefore, it can do no better than guessing to distinguish $\hdep(s_v)$ from $s \from \{0, 1\}^\rho$. \todo{correct this note based on changes.}
 
 The heart of the proof is to bound $\pr{\qs}$. When the adversary first triggers $\qs$ by querying the seed of some safe node $w$, (with overwhelming probability $w$ will be the only node with this seed and) it can only have learned the seed through encryptions
 $c_1 \from \dhies.\enc_{pk_{u_1}}(s_w), \ldots, c_d \from \dhies.\enc_{pk_{u_d}}(s_w)$
@@ -133,13 +131,14 @@ Then we can split the event $\qs$ into two cases as motivated above:
 \begin{align*}
 	\pr{\qs} & = \pr{\qs \land \fdh} + \pr{\qs \land \overline{\fdh}\,}.
 \end{align*}
-We bound $\pr{\qs \land \fdh}$ and $\pr{\qs \land \overline{\fdh} \,}$ in Lemma~\ref{lemma:dh-reduction} and Lemma~\ref{lemma:eav-reduction}, respectively. Overall this gives us a bound on the advantage of $\adv$ using \eqref{eq:theorem-sd-gsd-security-win-cases}. (To be precise, the event $\qs \land \fdh$ is a superset of case (\ref{qs-triggered-case-1}) above. However, the argument applied in Lemma~\ref{lemma:dh-reduction} gives the same bound for either event and this more general event has the advantage of being simpler.)
+We bound $\pr{\qs \land \fdh}$ and $\pr{\qs \land \overline{\fdh} \,}$ in Lemma~\ref{lemma:dh-reduction} and Lemma~\ref{lemma:eav-reduction}, respectively.\footnote{To be precise, the event $\qs \land \fdh$ is a superset of case \ref{qs-triggered-case-1} above. However, the argument applied in Lemma~\ref{lemma:dh-reduction} gives the same bound for either event and this more general event has the advantage of being simpler.}
+Overall this gives us a bound on the advantage of $\adv$ using \eqref{eq:theorem-sd-gsd-security-win-cases}.
 
 \begin{proof}[of Theorem~\ref{theorem:sdgsd-security}]
 	Let $\delta, N$ functions in $\eta$ (mapping to $\N$) with $\delta \le N$.
 	Let $\eta$ arbitrary and let $\adv$ an arbitrary SD-GSD adversary constructing a GSD graph of size at most $N(\eta)$ and indegree at most $\delta(\eta)$, making at most $\ms(\eta)$ queries to $\hgen$ or $\hdep$ and at most $\mdh(\eta)$ queries to $\hdh$, each of length at most $\gamma(\eta)$, and running in time $\tilde{t}(\eta)$. We will use the events defined above.
 
-	We first justify step $(\dagger)$ in \eqref{eq:theorem-sd-gsd-security-win-cases}. Note that by the rules imposed on the adversary in the SD-GSD game, the challenge node $v$ is safe and its seed $s_v$ thus indeed hidden. If $\qdep$ does not hold, then $\adv$ has not queried $\hdep$ for $s_v$ and, by virtue of $\hdep$ being a random oracle, $\hdep(s_v)$ is a uniformly distributed value in $\{0, 1\}^\rho$ from $\adv$'s perspective. The value $s$ follows the same distribution. Thus, $\adv$ behaves the same when given either $r = s$ or $r = \hdep(s_v)$ and
+	We first justify step $(\dagger)$ in \eqref{eq:theorem-sd-gsd-security-win-cases}. Note that by the rules imposed on the adversary in the SD-GSD game, the challenge node $v$ is safe and its seed is thus indeed hidden. If $\qdep$ does not hold, then $\adv$ has not queried $\hdep$ for $s_v$ and, by virtue of $\hdep$ being a random oracle, $\hdep(s_v)$ is a uniformly distributed value in $\{0, 1\}^\rho$ from $\adv$'s perspective. The value $s$ follows the same distribution. Thus, $\adv$ behaves the same when given either $r = s$ or $r = \hdep(s_v)$ and
 	\begin{align} \label{eq:theorem-sd-gsd-security-not-qdep-behavior}
 		\begin{split}
 			\pr{1 \from \adv \mid \overline{\qdep}, b = 1} & = \pr{1 \from \adv \mid \overline{\qdep}, r = s}          \\
@@ -174,7 +173,7 @@ We bound $\pr{\qs \land \fdh}$ and $\pr{\qs \land \overline{\fdh} \,}$ in Lemma~
 	\end{equation}
 	Then
 	\begin{align*}
-		\advantage{\Pi}{\eta}{SD-GSD}(\adv) & = 2 \cdot \left(\pr{\wins} - \frac{1}{2}\right)                                                   \\
+		\advantage{\Pi}{\eta}{SD\text{-}GSD}(\adv) & = 2 \cdot \left(\pr{\wins} - \frac{1}{2}\right)                                                   \\
 		                                    & \stackrel{\mathclap{\eqref{eq:theorem-sd-gsd-security-win-cases}}}{\le} \;  2 \cdot \pr{\qs}      \\
 		                                    & \stackrel{\mathclap{\eqref{eq:theorem-sd-gsd-security-qs-bound}}}{\le} \; \tilde{\epsilon}(\eta).
 	\end{align*}
@@ -202,12 +201,12 @@ This is exactly how we proceed in this section. Instead of asking the adversary 
 	\end{align*}
 \end{definition}
 
-Similar to how IND-CPA security for a single encryption query implies IND-CPA security for $q$ queries with a security loss of $q$ by a standard hybrid argument, one can show that EAV security implies MIS-EAV security with the same loss. To see why, recall the hybrid argument for IND-CPA security (as discussed in e.g. \cite[Theorem 12.6]{introduction-to-modern-cryptography}): We define the sequence of hybrid games $H_0, \ldots, H_q$ where in the game $H_i$ the first $i$ encryption queries encrypt the second message and the remaining $q - i$ queries encrypt the first message. Then given an IND-CPA adversary $\adv$ for multiple encryptions, an IND-CPA adversary $\adv'$ is constructed to bound
+Similar to how IND-CPA security for a single encryption query implies IND-CPA security for $q$ queries with a security loss of $q$ by a standard hybrid argument, one can show that EAV security implies MIS-EAV security with the same loss. To see why, recall the hybrid argument for IND-CPA security (as discussed in e.g. \cite[Theorem 12.6]{introduction-to-modern-cryptography}): We define the sequence of hybrid games $G_0, \ldots, G_q$ where in the game $G_i$ the first $i$ encryption queries encrypt the second message and the remaining $q - i$ queries encrypt the first message. Then given an IND-CPA adversary $\adv$ for multiple encryptions, an IND-CPA adversary $\adv'$ is constructed to bound
 \[
-	\abs*{\pr{\adv \text{ outputs } 0 \text{ in game } H_{i - 1}} - \pr{\adv \text{ outputs } 0 \text{ in game } H_{i}}}
+	\abs*{\pr{\adv \text{ outputs } 0 \text{ in game } G_{i - 1}} - \pr{\adv \text{ outputs } 0 \text{ in game } G_{i}}}
 \]
 for arbitrary $i$.
-The adversary $\adv'$ simulates $H_{i - 1}$ or $H_{i}$ to $\adv$ depending on whether the ciphertext received from the (single-query) IND-CPA challenger, which gets passed on as the response to the $i$-th query, encrypts the first or the second message from the $i$-th pair of messages. $\adv'$ then uses the encryption oracle to pass on the right encryptions to $\adv$ for all other queries. Now notice that if we wanted to simulate to an MIS-EAV adversary we wouldn't need access to an encryption oracle since for the MIS-EAV security game all the other encryptions can easily be generated by $\adv'$ sampling the new keys itself.
+The adversary $\adv'$ simulates $G_{i - 1}$ or $G_{i}$ to $\adv$ depending on whether the ciphertext received from the (single-query) IND-CPA challenger, which gets passed on as the response to the $i$-th query, encrypts the first or the second message from the $i$-th pair of messages. $\adv'$ then uses the encryption oracle to pass on the right encryptions to $\adv$ for all other queries. Now notice that if we wanted to simulate to an MIS-EAV adversary we would not need access to an encryption oracle since for the MIS-EAV security game all the other encryptions can easily be generated by $\adv'$ sampling the new keys itself.
 
 The argument would of course also work without restricting the adversary to a single pair of messages (which we could call MI-EAV security). However, we will make use of this restriction to provide a tighter reduction for a certain class of schemes in the appendix.
 
@@ -257,7 +256,7 @@ An intuitive strategy would be to embed the challenge by setting $pk_a = g^x$ an
 \end{itemize}
 If we make sure not to change $\adv$'s view of the game in the case $k = g^{x \cdot y}$ in this process, we can achieve an advantage of about $\pr{\fdh} / N^2$, where one factor $1/N$ arises from guessing $a$ and another from guessing $u_j$. Unfortunately, this would yield no improvement over the result from \cite{ttkem}.
 
-To avoid this issue, we can use random self-reducibility of the DDH problem and avoid guessing $u_j$. Instead of embedding $g^y$ into a single encryption edge, we embed it into all $d$ encryption edges. To get a uniformly random exponent from $y$ we set $y_j = y + r_j \mod q$ with $r_j \from [q]$. Given $g^{x \cdot y_j}$, we can easily compute $g^{x \cdot y}$:
+To avoid this issue, we can use the random self-reducibility of the DDH problem and avoid guessing $u_j$. Instead of embedding $g^y$ into a single encryption edge, we embed it into all $d$ encryption edges. To get a uniformly random exponent from $y$ we set $y_j = y + r_j \mod q$ with $r_j \from [q]$. Given $g^{x \cdot y_j}$, we can easily compute $g^{x \cdot y}$:
 \[
 	g^{x \cdot y_j} = g^{x \cdot (y + r_j)} = g^{x \cdot y}	\cdot g^{x \cdot r_j} \iff g^{x \cdot y} = g^{x \cdot y_j} \cdot \underbrace{((g^x)^{r_j})^{-1}}_{\eqqcolon \, R_j}.
 \]

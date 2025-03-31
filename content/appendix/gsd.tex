@@ -22,11 +22,11 @@ where the various variables denote the following
 
 \subsection{Proof of Lemma~\ref{lemma:mis-eav-from-eav}} \label{sec:mis-eav-from-eav-proof}
 
-\begin{proof}[of Lemma~\ref{lemma:mis-eav-from-eav}] Note that since the message space is finite, the time to encrypt a message is bounded. As outlined before Lemma~\ref{lemma:mis-eav-from-eav}, the lemma follows from a simple hybrid argument. Let $q$ a function in $\kappa$, let $\kappa$ arbitrary and let $\adv$ an arbitrary MIS-EAV adversary running in time $\tilde{t}(\kappa)$ and making at most $q(\kappa)$ queries. Define the sequence of hybrid games $H_0, \ldots, H_q$ where in the game $H_i$ the first $i$ encryptions given to the adversary encrypt $m_1$ and all remaining encryptions encrypt $m_0$. We will write
+\begin{proof}[of Lemma~\ref{lemma:mis-eav-from-eav}] Note that since the message space is finite, the time to encrypt a message is bounded. As outlined before Lemma~\ref{lemma:mis-eav-from-eav}, the lemma follows from a simple hybrid argument. Let $q$ a function in $\kappa$, let $\kappa$ arbitrary and let $\adv$ an arbitrary MIS-EAV adversary running in time $\tilde{t}(\kappa)$ and making at most $q(\kappa)$ queries. Define the sequence of hybrid games $G_0, \ldots, G_q$ where in the game $G_i$ the first $i$ encryptions given to the adversary encrypt $m_1$ and all remaining encryptions encrypt $m_0$. We will write
 	\[
-		\pr{0 \from \adv \mid H_i}
+		\pr{0 \from \adv \mid G_i}
 	\]
-	for the probability of $\adv$ outputting $0$ when playing the hybrid game $H_i$.
+	for the probability of $\adv$ outputting $0$ when playing the hybrid game $G_i$.
 
 	Let $i \in [q]$. Construct an EAV adversary $\adv'$ that behaves as follows:
 	\begin{enumerate}[1.]
@@ -43,19 +43,19 @@ where the various variables denote the following
 		      and $k_j \from \Pi.\gen(1^\kappa) \; \forall j$.
 		\item $\adv'$ outputs whatever bit $\adv$ outputs.
 	\end{enumerate}
-	Now consider the value of the bit $b$ sampled in $\game{\Pi}{\kappa}{EAV}(\adv')$. If $b = 0$, then the first $i - 1$ ciphertexts that $\adv$ received were encryptions of $m_1$ and the remaining ciphertexts were encryptions of $m_0$, where all encryptions were under keys sampled independently with $\Pi.\gen$. Thus, from the view of $\adv$ everything followed the same distribution as in the game $H_{i - 1}$ and
+	Now consider the value of the bit $b$ sampled in $\game{\Pi}{\kappa}{EAV}(\adv')$. If $b = 0$, then the first $i - 1$ ciphertexts that $\adv$ received were encryptions of $m_1$ and the remaining ciphertexts were encryptions of $m_0$, where all encryptions were under keys sampled independently with $\Pi.\gen$. Thus, from the view of $\adv$ everything followed the same distribution as in the game $G_{i - 1}$ and
 	\[
-		\pr{0 \from \adv' \mid b = 0} = \pr{0 \from \adv \mid H_{i - 1}}.
+		\pr{0 \from \adv' \mid b = 0} = \pr{0 \from \adv \mid G_{i - 1}}.
 	\]
 	Analogously, in the case $b = 1$ the first $i$ ciphertexts received by $\adv$ were encryptions of $m_1$ and the rest encryptions of $m_0$, so
 	\[
-		\pr{0 \from \adv' \mid b = 1} = \pr{0 \from \adv \mid H_{i}}.
+		\pr{0 \from \adv' \mid b = 1} = \pr{0 \from \adv \mid G_{i}}.
 	\]
 	Then
 	\begin{align} \label{eq:eav-to-mis-eav-hybrid-distinguisher}
 		\begin{split}
 			\begin{split}
-				\pr{0 \from \adv \mid H_{i - 1}} - & \pr{0 \from \adv \mid H_{i}} \\
+				\pr{0 \from \adv \mid G_{i - 1}} - & \pr{0 \from \adv \mid G_{i}} \\
 				& = \pr{0 \from \adv' \mid b = 0} - \pr{0 \from \adv' \mid b = 1}
 			\end{split} \\
 			& \stackrel{\mathclap{\eqref{eq:advantage-equality}}}{=} \advantage{\Pi}{\kappa}{EAV}(\adv')                                         \\
@@ -66,17 +66,17 @@ where the various variables denote the following
 
 	Now let $b$ be the bit sampled in the MIS-EAV game. Notice that
 	\[
-		\pr{0 \from \adv \mid b = 0} = \pr{0 \from \adv \mid H_0}
+		\pr{0 \from \adv \mid b = 0} = \pr{0 \from \adv \mid G_0}
 	\]
 	and
 	\[
-		\pr{0 \from \adv \mid b = 1} = \pr{0 \from \adv \mid H_q}.
+		\pr{0 \from \adv \mid b = 1} = \pr{0 \from \adv \mid G_q}.
 	\]
 	Then
 	\begin{align*}
 		\advantage{\Pi}{\kappa}{MIS-EAV}(\adv) & \stackrel{\mathclap{\eqref{eq:advantage-equality}}}{=} \; \pr{0 \from \adv \mid b = 0} - \pr{0 \from \adv \mid b = 1} \\
-		                                       & = \pr{0 \from \adv \mid H_0} - \pr{0 \from \adv \mid H_q}                                                             \\
-		                                       & = \sum_{i = 1}^{q} \pr{0 \from \adv \mid H_{i - 1}} - \pr{0 \from \adv \mid H_i}                                      \\
+		                                       & = \pr{0 \from \adv \mid G_0} - \pr{0 \from \adv \mid G_q}                                                             \\
+		                                       & = \sum_{i = 1}^{q} \pr{0 \from \adv \mid G_{i - 1}} - \pr{0 \from \adv \mid G_i}                                      \\
 		                                       & \stackrel{\mathclap{\eqref{eq:eav-to-mis-eav-hybrid-distinguisher}}}{\le} q \cdot \epsilon.
 	\end{align*}
 \end{proof}
@@ -117,7 +117,7 @@ where the various variables denote the following
 	\begin{equation} \label{eq:lemma-eav-reduction-b=0}
 		\pr{0 \from \adv' \mid b = 0} \ge \frac{\pr{\qs \land \overline{\fdh}\,}}{N}.
 	\end{equation}
-	Let $E = \qs \land \overline{\fdh}$ and let $E'$ the same event in the SD-GSD game simulated to $\adv$ during an execution of $\game{\Pi_s}{\eta}{MIS-EAV}(\adv')$ with $b = 0$. In the following while showing \eqref{eq:lemma-eav-reduction-b=0} we will implicitly assume that $b = 0$ when referring to the game simulated to $\adv$ by $\adv'$.
+	Let $E = \qs \land \overline{\fdh}$ and let $E'$ the same event in the SD-GSD game simulated to $\adv$ during an execution of $\game{\Pi_s}{\eta}{MIS-EAV}(\adv')$ with $b = 0$. In the following, while showing \eqref{eq:lemma-eav-reduction-b=0} we will implicitly assume that $b = 0$ when referring to the game simulated to $\adv$ by $\adv'$.
 	On a high level \eqref{eq:lemma-eav-reduction-b=0} holds because as long as the game has not been aborted the encryptions $\adv$ receives from $\adv'$ are indistinguishable from what it would get in the real SD-GSD game and we get a factor $\frac{1}{N}$ from guessing the node that triggered $E$. However, showing this requires a few steps.
 
 	Consider a modification of the SD-GSD game $G_1$ where the game is aborted whenever one of the following events occurs, where for all these events $\adv'$ would also abort the simulation:
@@ -125,7 +125,7 @@ where the various variables denote the following
 		\item $\adv$ queries $\hdh$ for a hidden Diffie-Hellman key
 		\item $\adv$ queries $\hgen$ or $\hdep$ for a hidden seed
 	\end{itemize}
-	(Since we are not interested in the output of the game we can define \emph{aborting the game} as the game ending with output 0.) The game $G_1$ is something between the real SD-GSD game and what $\adv'$ simulates to $\adv$. The only difference in when $G_1$ aborts compared to the game simulated by $\adv'$ is that we aren't paying attention to some specific node $w$ remaining safe. Aborting the game in this way does not alter the probability of $\adv$ triggering the event $E$ in $G_1$, since in either case when the game is aborted either $E$ or $\overline{E}$ is already known to hold:
+	(Since we are not interested in the output of the game we can define \emph{aborting the game} as the game ending with output 0.) The game $G_1$ is something between the real SD-GSD game and what $\adv'$ simulates to $\adv$. The only difference in when $G_1$ aborts compared to the game simulated by $\adv'$ is that we are not paying attention to some specific node $w$ remaining safe. Aborting the game in this way does not alter the probability of $\adv$ triggering the event $E$ in $G_1$, since in either case when the game is aborted either $E$ or $\overline{E}$ is already known to hold:
 	\begin{itemize}
 		\item If $\adv$ queries $\hdh$ for a hidden Diffie-Hellman key, then it triggers $\qdh$ and $\qs$ has not been triggered before since this would have caused the game to be aborted. Thus, $\adv$ triggered $\fdh$ and $\qs \land \overline{\fdh}$ cannot hold in this execution of the game.
 		\item If $\adv$ queries $\hgen$ or $\hdep$ for a hidden seed, then this triggers $\qs$. Moreover, $\overline{\fdh}$ also holds at this moment since the game would have aborted earlier if $\qdh$ had already been triggered. Thus, $\qs \land \overline{\fdh}$ holds.

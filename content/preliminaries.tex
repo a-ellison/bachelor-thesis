@@ -1,6 +1,6 @@
 \section{Preliminaries}
 
-Our definitions were adapted from \cite{introduction-to-modern-cryptography}. A summary of our notation, some simple lemmas, definitions for private-key and public-key encryption, IND-CPA security, EAV security, group-generation algorithms and the Decisional Diffie-Hellman (DDH) problem, and an explanation of the Random Oracle Model (ROM) can be found in section \ref{sec:preliminaries-appendix} of the appendix.
+Our definitions were adapted from \cite{introduction-to-modern-cryptography}. A summary of our notation, some simple lemmas, definitions for private-key and public-key encryption, IND-CPA security, EAV security, group-generation algorithms and the Decisional Diffie-Hellman (DDH) problem, and an explanation of the Random Oracle Model (ROM) can be found in Section~\ref{sec:preliminaries-appendix} of the appendix.
 
 \subsection{DHIES}
 
@@ -12,7 +12,7 @@ In the following definition we will refer to ``key-derivation functions''. This 
 		\item $\gen$: on input $1^\eta$ run $\mathcal{G}(1^\eta)$ to obtain $(\mathbb{G}, q, g)$. Sample $x \from [q]$ and set $h_1 \coloneqq g^x$. Set $pk \coloneqq \langle \mathbb{G}, q, g, h_1 \rangle$ and $sk \coloneqq \langle \mathbb{G}, q, g, x \rangle$, and output $(pk, sk)$.
 
 		      The message space is the message space of $\Pi_s$.
-		\item $\enc$: on input a public key $\langle \mathbb{G}, q, g, h_1 \rangle$ and a message $m$, sample $y \from [q]$, set $h_2 \coloneqq g^y, k \coloneqq \hdh(h_1^y)$\footnote{Where for $h \in \mathbb{G}$, $\hdh(h)$ denotes the output of $\hdh$ with the binary representation of $h$ given as input.}, compute $c' \from \Pi_s.\enc_k(m)$ and output the ciphertext $\langle h_2, c' \rangle$.
+		\item $\enc$: on input a public key $\langle \mathbb{G}, q, g, h_1 \rangle$ and a message $m$, sample $y \from [q]$, set $h_2 \coloneqq g^y, k \coloneqq \hdh(h_1^y)$,\footnote{Where for $h \in \mathbb{G}$, $\hdh(h)$ denotes the output of $\hdh$ with the binary representation of $h$ given as input.} compute $c' \from \Pi_s.\enc_k(m)$ and output the ciphertext $\langle h_2, c' \rangle$.
 		\item $\dec$: on input a private key $\langle \mathbb{G}, q, g, x\rangle$ and a ciphertext $\langle h_2, c' \rangle$, compute $k \coloneqq H(h_2^x)$ and output $\Pi_s.\dec_k(c')$. If the ciphertext is not of the right form or $\Pi_s.\dec$ outputs $\bot$, output $\bot$.
 	\end{itemize}
 	The public-key encryption scheme $\dhies \coloneqq (\gen, \enc, \dec)$ is called the Diffie-Hellman Integrated Encryption Scheme (DHIES).

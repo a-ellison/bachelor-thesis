@@ -16,6 +16,7 @@ The following theorem describing the security of TreeKEM, stated informally here
 		\item $c$ is the number of commits created
 		\item $p$ is the number of add or update proposals created
 		\item $u$ is the maximum number of users
+		\item the term $\mathrm{negl}(\eta)$ is much smaller than the other terms
 	\end{itemize}
 \end{theorem}
 
@@ -35,7 +36,7 @@ Then with 128-bit parameters we get
 \[
 	\et \le 2^{46} \cdot \eeav + 2^{32} \cdot \eddh + \mathrm{negl} \le \frac{1}{2^{33}}
 \]
-with the $\eeav$ term dominating the result. This only gives a security level of $\tilde{t}/\et \ge 2^{81}$. Since private-key encryption is relatively cheap, using 256-bit AES would have a small impact on the performance and would increase the security level to 95 bits (with the $\eddh$ term now dominating). Finally, using full 256-bit parameters yields 209 bits of security for TreeKEM.
+with the $\eeav$ term dominating the result. This only gives a security level of $\tilde{t}/\et \ge 2^{81}$. Since private-key encryption is relatively cheap, using 256-bit AES would have a small impact on the performance and would increase the security level to 95 bits (with the $\eddh$ term now dominating).\footnote{For this we set $(t, \eeav) = (2^{48}, 2^{-208})$.} Finally, using full 256-bit parameters yields 209 bits of security for TreeKEM.
 
 The previous best result in \cite[Theorem 3]{ttkem} proved the bound
 \[
@@ -49,6 +50,6 @@ In this example we use the same number of users and commits, but assume that the
 
 In contrast, the bound in \cite{ttkem} implies 82 bits with 128-bit parameters and 210 bits with 256-bit parameters.
 
-\subsubsection{Very large groups with one commit every minute and frequent updates} In this example we consider more extreme values for $c$ and $u$ to highlight the gap between our result and the one in \cite{ttkem}. We assume a group of about 1 million users, existing for 50 years and making one commit every minute. Furthermore, will again use $p \le c \cdot u$. This means that $u \le 2^{20}$, $c \le 2^{25}$ and $3 \cdot c \cdot \log(u) + p \le 2^{46}$.
+\subsubsection{Very large groups with one commit every minute and frequent updates} In this example we consider more extreme values for $c$ and $u$ to highlight the gap between our result and the one in \cite{ttkem}. We assume a group of about 1 million users, existing for 50 years and making one commit every minute. Furthermore, we will again use $p \le c \cdot u$. This means that $u \le 2^{20}$, $c \le 2^{25}$ and $3 \cdot c \cdot \log(u) + p \le 2^{46}$.
 
 These values imply 60 bits of security with 128-bit parameters, 80 bits with 256-bit AES and 188 bits with 256-bit parameters using our result. The result in \cite{ttkem} implies 34 bits of security with 128-bit parameters and 162 bits with 256-bit parameters.

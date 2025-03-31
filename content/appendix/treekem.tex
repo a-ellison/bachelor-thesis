@@ -14,7 +14,7 @@ Instead, $E$'s leaf and all nodes on $E$'s direct path are replaced by \emph{bla
 	\caption{The commit by user $A$ removing user $E$ described in the text. Nodes with a dashed border represent the (new) blank nodes.}\label{fig:treekem-remove}
 \end{figure}
 
-Creating a commit with an update proposal for user a $U$ is analogous. The update proposal simply contains the public key of user $U$'s new leaf, while $U$ stored the corresponding secret key locally when creating the proposal. Because we don't want the committer to know the secret keys along $U$'s direct path, we must again replace these nodes with blank ones and encrypt to the non-blank nodes below directly.
+Creating a commit with an update proposal for user a $U$ is analogous. The update proposal simply contains the public key of user $U$'s new leaf, while $U$ stored the corresponding secret key locally when creating the proposal. Because we do not want the committer to know the secret keys along $U$'s direct path, we must again replace these nodes with blank ones and encrypt to the non-blank nodes below directly.
 
 \paragraph{Add proposals} Adding a user introduces one new but similar complication. Consider the same group as in Figure~\ref{fig:treekem-tree}, but with the leaf of user $H$ blank. Now say user $A$ would like to add user $H$ to the group. Although we would want $H$ to know all secret keys on their direct path, $A$ can only provide the secrets of their lowest common ancestor, which is the root node in this case.
 In such a situation where a non-blank node $n$ has a leaf $l$ below it where $l$ does not know $n$'s secret key, we say that $l$ is \emph{unmerged} relative to $n$. Every non-blank, non-leaf node stores its list of unmerged leaves and whenever one encrypts to a node, one should also encrypt to all its unmerged leaves. A user's leaf becomes ``merged'' as the nodes on their direct path are replaced and they are provided the seeds to compute the secret keys of the new nodes.
@@ -191,7 +191,7 @@ The definition in \cite[Section B.1]{modular-group-messaging} is very similar in
 		\item \label{def:cgka-game-step-init} $\adv$ outputs $n \in \mathbb{N}$. For each $i \in [n]$, initialize a user $i$ by creating a (unique) identifier $id_i$, generating $(pk_i, sk_i) \from \Sigma.\gen(1^\eta)$, preparing $U_i = \varnothing$, the set of unconfirmed commits at user $i$, and setting $\sigma_i \coloneqq \varnothing$, where $\varnothing$ denotes the empty value. The state output by an algorithm of $\Sigma$ is never the empty value. $\adv$ is given $(pk_1, id_1), \ldots, (pk_n, id_n)$.
 
 		      Set $P = C = W = 0$, where $P$ denotes the number of proposals, $C$ the number of commits and $W$ the number of welcome messages created.
-		\item $\adv$ may adaptively do the following queries:
+		\item $\adv$ may adaptively make the following queries:
 		      \begin{itemize}
 			      \item $\operatorname{create-group}(i)$ for $i \in [n]$: set $\sigma_i \from \operatorname{CreateGroup}(1^\eta)$.
 			      \item $\operatorname{propose-update}(i)$ for $i \in [n], \sigma_i \neq \varnothing$: run $(\sigma_i, p_{P + 1}) \from \operatorname{ProposeUpdate}(\sigma_i)$ to update user $i$'s state and get a proposal $p_{P + 1}$. $\adv$ is given $p_{P + 1}$. Set $P \coloneqq P + 1$.

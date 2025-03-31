@@ -16,7 +16,7 @@ We use the following notation throughout:
 	\item For $a, b \in \{0, 1\}^n$, $a \oplus b$ denotes the XOR of $a$ and $b$
 	\item We stick to using $\kappa$ as the security parameter of private-key encryption schemes and $\eta$ as the parameter of public-key encryption schemes
 	\item For a function $f$ in the security parameter $\eta$ (or $\kappa$) we often omit writing $\eta$ as an argument and simply write $f$ to refer to $f(\eta)$
-	\item For an encryption scheme $\Pi$ that contains an algorithm $X$, we may refer to $\Pi$'s implementation of $X$ by $\Pi.X$. (E.g. if $\Pi$ is an encryption scheme we can refer to its key-generation algorithm by $\Pi.X$)
+	\item For an encryption scheme $\Pi$ that contains an algorithm $X$, we may refer to $\Pi$'s implementation of $X$ by $\Pi.X$. (E.g. if $\Pi$ is an encryption scheme we can refer to its key-generation algorithm by $\Pi.\gen$)
 \end{itemize}
 
 \subsection{Encryption schemes}
@@ -56,7 +56,7 @@ In the following definition we will be more explicit about the randomness used b
 	It is required that for every $\eta$, every key $(pk, sk)$ output by $\gen$, and every message $m$, it holds that $\pr{\dec_{sk}(\enc_{pk}(m)) = m} = 1$ (where the probability is over the randomness of $\enc_{pk}$).
 \end{definition}
 
-\subsection{Security definitions}
+\subsection{Security definitions} \label{sec:security-definitions}
 
 \begin{definition}[The IND-CPA game]
 	Let $\kappa$ denote the security parameter and let $\Pi$ a private-key encryption scheme. Define the game $\game{\Pi}{\kappa}{IND-CPA}(\adv)$ for an adversary $\adv$:
