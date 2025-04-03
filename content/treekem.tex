@@ -1,6 +1,6 @@
 \section{Our concrete result for TreeKEM}
 
-The following theorem describing the security of TreeKEM, stated informally here, is our main practical result. It bounds the advantage of any adversary creating (at most) $c$ commits and $p$ add or update proposals in a group with at most $u$ users in distinguishing the group key of any uncompromised commit from a random bit string.
+The following theorem describing the security of TreeKEM, stated informally here, is our main practical result. It bounds the advantage of any adversary creating $c$ commits and $p$ add or update proposals in a group with at most $u$ users in distinguishing the group key of any uncompromised commit from a random bit string.
 
 \begin{theorem}[Informal] \label{theorem:treekem-security-informal}
 	If the DHIES scheme is used in TreeKEM, the private-key encryption scheme in DHIES is $(t, \eeav)$-EAV-secure and the DDH problem is $(t, \eddh)$-hard in the Diffie-Hellman group, then for all $c, p, u$, TreeKEM is $(\tilde{t}, \tilde{\epsilon}, c, p, u)$-secure in the ROM with $\tilde{t} \approx t$ and
@@ -8,7 +8,7 @@ The following theorem describing the security of TreeKEM, stated informally here
 		\begin{split}
 			\tilde{\epsilon} ={} & 2 \cdot u \cdot (3 \cdot c \cdot \log(u) + p) \cdot \eeav \\
 			& + 2 \cdot (3 \cdot c \cdot \log(u) + p) \cdot \eddh \\
-			& + \mathrm{negl}(\eta)
+			& + \mathrm{negl}
 		\end{split}
 	\end{align*}
 	where
@@ -16,11 +16,13 @@ The following theorem describing the security of TreeKEM, stated informally here
 		\item $c$ is the number of commits created
 		\item $p$ is the number of add or update proposals created
 		\item $u$ is the maximum number of users
-		\item the term $\mathrm{negl}(\eta)$ is much smaller than the other terms
+		\item the term $\mathrm{negl} = \mathrm{negl}(\eta)$ is much smaller than the other terms
 	\end{itemize}
 \end{theorem}
 
 In Section~\ref{sec:treekem-security} of the appendix we restate the above theorem formally as Theorem~\ref{theorem:treekem-security}. To this end, we also provide formal definitions for the syntax and security of propose and commit CGKA schemes and a high-level description of how to instantiate (the essence of) the TreeKEM protocol with our definitions.
+
+\subsection{Security against multiple challenges} As noted in the introduction, although our security definitions only allow the adversary to make a single challenge query, it is straightforward to adapt our proof to show the same security loss with multiple challenge queries. See the note after Theorem~\ref{theorem:treekem-security} in the appendix for details.
 
 \subsection{Interpreting the result}
 

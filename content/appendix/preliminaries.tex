@@ -59,7 +59,7 @@ In the following definition we will be more explicit about the randomness used b
 \subsection{Security definitions} \label{sec:security-definitions}
 
 \begin{definition}[The IND-CPA game]
-	Let $\kappa$ denote the security parameter and let $\Pi$ a private-key encryption scheme. Define the game $\game{\Pi}{\kappa}{IND-CPA}(\adv)$ for an adversary $\adv$:
+	Let $\kappa$ denote the security parameter and let $\Pi$ a private-key encryption scheme. Define the game $\game{\Pi}{\kappa}{IND\text{-}CPA}(\adv)$ for an adversary $\adv$:
 	\begin{enumerate}[1.]
 		\item A key $k \from \gen(1^\kappa)$ is generated.
 		\item The adversary $\adv$ is given oracle access to $\Pi.\enc_k$, and outputs a pair of messages $m_0, m_1$ of the same length.
@@ -71,7 +71,7 @@ In the following definition we will be more explicit about the randomness used b
 \begin{definition}[IND-CPA security {\cite[Definition 3.21]{introduction-to-modern-cryptography}}]
 	For functions $t, \epsilon$ in the security parameter $\kappa$, a private-key encryption scheme $\Pi$ is \emph{$(t, \epsilon)$-IND-CPA-secure} if for all $\kappa$, for any adversary $\adv$ running in time $t(\kappa)$ we have
 	\begin{align*}
-		\advantage{\Pi}{\kappa}{IND-CPA}(\adv) \coloneqq 2 \cdot \left(\pr{\game{\Pi}{\kappa}{IND-CPA}(\adv) = 1} - \frac{1}{2}\right) \le \epsilon(\kappa).
+		\advantage{\Pi}{\kappa}{IND\text{-}CPA}(\adv) \coloneqq 2 \cdot \left(\pr{\game{\Pi}{\kappa}{IND\text{-}CPA}(\adv) = 1} - \frac{1}{2}\right) \le \epsilon(\kappa).
 	\end{align*}
 \end{definition}
 

@@ -41,7 +41,7 @@ Note that for any non-leaf node $n$, any one of its descendants $d$ and any unme
 
 \paragraph{Key packages and welcome messages} To encrypt to an existing group member it is clear that we can just use the public key in their leaf. But how do we encrypt to a new user? Before a user joins any group, they publish a \emph{key package}: this contains (among other things) the public key, their so-called \emph{init key}, to be used to encrypt information to the user when they join the group and the public key that should be associated with the user's leaf. The key package is included (or referenced) in the add proposal for the new user. Along with the seed of the committer's and the new user's lowest common ancestor in the tree, the new user must also be given the (public) state of the tree. This information is provided to the new user, encrypted with their init key, by the committer in a \emph{welcome message}.
 
-\subsection{Continuous Group Key Agreement}
+\subsection{Continuous Group Key Agreement} \label{sec:cgka}
 
 \subsubsection{The model}
 
@@ -113,7 +113,7 @@ Our definition of the syntax of PC-CGKA schemes is inspired by the definition in
 
 \paragraph{Correctness}
 
-The above description of semantics already provides some explicit correctness properties or implicitly implies other ones. We will explicitly define one important correctness property that a PC-CGKA scheme should satisfy in Definition~\ref{def:cgka-correctness-consistent-history}. \todo{Justify why I mention this property and why it is important. Explain examples of commit history and why it plays a role in security.}
+The above description of semantics already provides some explicit correctness properties or implicitly implies other ones. We will explicitly define one important correctness property that a PC-CGKA scheme should satisfy in Definition~\ref{def:cgka-correctness-consistent-history}.
 
 The correctness property concerns the handling of ``bad'' (malformed or inconsistent) inputs. The algorithms of a PC-CGKA scheme should have several checks built in to deal with such inputs. For example
 \begin{itemize}
@@ -203,7 +203,7 @@ The definition in \cite[Section B.1]{modular-group-messaging} is very similar in
 			      \item $\operatorname{deliver-welcome}(i, j)$ for $i \in [n], \sigma_i = \varnothing, j \in [W]$: set $\sigma_i \from \operatorname{ProcessWelcome}(pk_j, sk_j, w_j)$.\footnote{Note that in a real execution of the protocol the user must delete $sk_j$ from their local state after processing the welcome message $w_j$. Accordingly, $sk_j$ is no longer leaked to the adversary in a later query $\operatorname{corrupt}(j)$.}
 			      \item $\operatorname{corrupt}(i)$ for $i \in [n]$: If $\sigma_i = \varnothing$, $\adv$ is given $sk_i$. Otherwise, $\adv$ is given $\sigma_i$ and $U_i$.
 		      \end{itemize}
-		\item $\adv$ picks $i \in [0, C]$. We call the commit $c_i$ the \emph{challenge commit}, where $c_0$ refers to the initial $\operatorname{CreateGroup}$ operation. Let $\sigma$ the group state output by the operation that created $c_i$ (the state output by $\operatorname{CreateCommit}$ if $i > 0$ or the state output by $\operatorname{CreateGroup}$ if $i = 0$). A bit $b \from \{0, 1\}$ is sampled and $\adv$ is given
+		\item \label{def:cgka-game-step-challenge} $\adv$ picks $i \in [0, C]$. We call the commit $c_i$ the \emph{challenge commit}, where $c_0$ refers to the initial $\operatorname{CreateGroup}$ operation. Let $\sigma$ the group state output by the operation that created $c_i$ (the state output by $\operatorname{CreateCommit}$ if $i > 0$ or the state output by $\operatorname{CreateGroup}$ if $i = 0$). A bit $b \from \{0, 1\}$ is sampled and $\adv$ is given
 		      \[
 			      k = \begin{cases}
 				      \Sigma.\operatorname{Key}(\sigma) & b = 0 \\
@@ -284,8 +284,6 @@ Now, it is important to notice that the encrypted information in commit $c$ is f
 	The commit $c^*$ is \emph{safe with respect to user $j$} if there was no $\operatorname{corrupt}(j)$ query in the interval $[q^-, q^+]$.
 \end{definition}
 
-\todo{Explain how this definition improves on \cite{ttkem}. (\cite{ttkem} is ambiguous in some case and also makes the interval unnecessarily large.)}
-
 Continuing the discussion above, so far we have considered a necessary condition to keep the commit $c$ safe by restricting the corruptions made to a specific user $j$. If $c$ is safe with respect to every user that $i$ considered to be in the group after applying $c$ (including user $i$), we would expect that the adversary is not able to compute the corresponding group key. Indeed, this is how we define a safe commit.
 
 \begin{definition}[Safe commit] \label{def:safe-commit}
@@ -360,8 +358,7 @@ The TreeKEM protocol discussed in the literature is not described as a self-cont
 			            \begin{itemize}
 				            \item if $i > 1$, compute $s_i \coloneqq \hdep(s_{i - 1})$ and $(pk, sk) = \Pi.\gen(1^\eta, \hgen(s_i))$
 				            \item replace $v_i$ with a new node $v_i'$ with key pair $(pk, sk)$ (and no unmerged leaves)
-				            \item for every node $u$ in the resolution of $w_i$: If $u$ is the leaf of a user $id'$ and the commit contains an add proposal $(\mathrm{add}, id', (pk_{\mathrm{init}}', pk_{\mathrm{leaf}}'))$, compute a ciphertext $c_u \from \Pi.\enc_{pk_{\mathrm{init}}'}(s_i)$
-				                  \footnote{As defined here, there is no use for the init key in the protocol and we could simply encrypt the seed under the leaf's public key (in other words set $(pk_{\mathrm{init}}', sk_{\mathrm{init}}') = (pk_{\mathrm{leaf}}', sk_{\mathrm{leaf}}')$). In the real TreeKEM protocol the message encrypted using the init key includes additional information and is different from the type of message encrypted under a leaf's public key.}. Otherwise, compute a ciphertext $c_u \from \Pi.\enc_{pk_u}(s_i)$ and store it in the commit $c$.
+				            \item for every node $u$ in the resolution of $w_i$: If $u$ is the leaf of a user $id'$ and the commit contains an add proposal $(\mathrm{add}, id', (pk_{\mathrm{init}}', pk_{\mathrm{leaf}}'))$, compute a ciphertext $c_u \from \Pi.\enc_{pk_{\mathrm{init}}'}(s_i)$. \footnote{As defined here, there is no use for the init key in the protocol and we could simply encrypt the seed under the leaf's public key (in other words set $(pk_{\mathrm{init}}', sk_{\mathrm{init}}') = (pk_{\mathrm{leaf}}', sk_{\mathrm{leaf}}')$). In the real TreeKEM protocol the message encrypted using the init key includes additional information and is different from the type of message encrypted under a leaf's public key.} Otherwise, compute a ciphertext $c_u \from \Pi.\enc_{pk_u}(s_i)$ and store it in the commit $c$.
 			            \end{itemize}
 			            Set the group key to $\hdep(s_d)$ where $v_d$ is the last node on $id$'s direct path, i.e.\ the root. Store the list of pubic keys $(pk_{\mathrm{leaf}}, pk_{v_1'}, \ldots, pk_{v_d'})$ in $c$.
 			      \item for every add proposal $p_j = (\mathrm{add}, id', (pk_{\mathrm{init}}', pk_{\mathrm{leaf}}'))$:
@@ -392,7 +389,7 @@ The full TreeKEM protocol as described in the RFC achieves the correctness prope
 
 \subsection{TreeKEM security from SD-GSD security}
 
-We have already described the relationship between the TreeKEM protocol and the SD-GSD security game at the beginning of Chapter~\ref{sec:tighter-gsd-security}. The following theorem formalizes this.
+We have already described the relationship between the TreeKEM protocol and the SD-GSD security game at the beginning of Section~\ref{sec:tighter-gsd-security}. The following theorem formalizes this.
 
 \begin{theorem} \label{theorem:cgka-from-sdgsd}
 	Let $\treekem$ the TreeKEM protocol instantiated with a public-key encryption scheme $\Pi$. Let $c, p, u$ functions in $\eta$. Set $N \coloneqq c \cdot (\ceil{\log(u)} + 1) + u + p$ and $\delta \coloneqq u$. If $\Pi$ is $(t, \epsilon, N, \delta)$-SD-GSD-secure in the ROM and the functions $\hgen, \hdep$ in $\treekem$ are modelled as random oracles, then $\treekem$ is $(\tilde{t}, \epsilon, c, p, u)$-PC-CGKA-secure with $\tilde{t} \approx t$.
@@ -426,3 +423,8 @@ Theorems~\ref{theorem:sdgsd-security} and \ref{theorem:cgka-from-sdgsd} together
 \begin{proof}
 	Combine Theorem~\ref{theorem:sdgsd-security} and Theorem~\ref{theorem:cgka-from-sdgsd}, and note that $\ceil{\log(x)} + 1 \le 2 \cdot \log(x)$ for $x \ge 3$.
 \end{proof}
+
+\subsubsection{Security against multiple challenges} \label{sec:cgka-multiple-challenges}
+As noted already in the introduction, the result also holds for a PC-CGKA security definition with multiple challenge queries. Analogous to what was outlined for the SD-GSD game, in a multi-challenge PC-CGKA game the adversary has access to a new \emph{challenge} oracle to perform a challenge on any commmit as in step \ref{def:cgka-game-step-challenge} of the PC-CGKA game, and must ensure that all challenge commits remain safe throughout the game.
+
+Recall that the result in Theorem~\ref{theorem:sdgsd-security} also holds for the multi-challenge SD-GSD game as argued in Section~\ref{sec:sd-gsd-multi-challenge-security}. It remains to show that the multi-challenge PC-CGKA game can be reduced tightly to the multi-challenge SD-GSD game. The reduction is almost identical to the one used for proving Theorem~\ref{theorem:cgka-from-sdgsd}, with the minor difference that now multiple queries to the challenge oracle in the PC-CGKA game get translated into challenge queries in the SD-GSD game.

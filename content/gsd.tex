@@ -4,13 +4,6 @@ In this section, we present the main theoretical result behind Theorem~\ref{theo
 
 \subsection{Seeded GSD with Dependencies} \label{sec:sd-gsd-game}
 
-\todo{Allow adversary to adaptively create nodes and seed dependencies.
-	\begin{itemize}
-		\item adapt proofs to guess from $[N]$ as opposed to $[n]$
-		\item handle case where $\qs$ triggered because adversary queried a seed and that seed later became the seed of a newly created safe node
-	\end{itemize}
-}
-
 The GSD game defined here is inspired by the definition of the public-key GSD game (Definition 7) and the proof of Theorem 3 in \cite{ttkem}. We have already motivated the differences in Section~\ref{sec:gsd-intro}. We will call our adapted game \emph{Seeded GSD with Dependencies} (SD-GSD). A very similar definition appears in \cite{modular-group-messaging}, providing essentially the same abstraction over TreeKEM and also allowing for an adversary to provide the randomness used for encryption and key generation. However, our definition has one notable difference: when asking to be challenged on a node with seed $s$, the adversary must distinguish $\hdep(s)$ from random as opposed to $s$. This stays true to how the group key is computed in TreeKEM and has the significant advantage of greatly simplifying our proof. On the other hand, the security implied by our definition is weaker (at least in the ROM), as it only guarantees that an adversary cannot compute the seed of the challenge node, whereas the other definitions guarantee that this seed cannot be distinguished from random.
 
 \begin{definition}[The SD-GSD game] \label{def:sd-gsd-game}
@@ -34,7 +27,7 @@ The GSD game defined here is inspired by the definition of the public-key GSD ga
 			      \item $\mathrm{encrypt}(u, v)$ for $u, v \in [n], u \neq v, (u, v) \notin E$: $(u, v)$ is added to $E$ and $\adv$ is given $c \from \enc_{pk_u}(s_v)$.
 			      \item $\mathrm{corrupt}(v)$ for $v \in [n], v \notin \mathcal{C}$: $\adv$ is given $s_v$ and $v$ is added to $\mathcal{C}$. We call such a node $v \in \mathcal{C}$ \emph{corrupted}. All nodes not reachable from any corrupted node in the graph $([n], E \cup D)$ are \emph{safe} (while all other nodes are \emph{unsafe}) and we call their seeds \emph{hidden} (even if an unsafe node happens to have the same seed).
 		      \end{itemize}
-		\item $\adv$ outputs a node $v \in [n]$. We call $v$ the \emph{challenge node}. A bit $b \from \{0, 1\}$ is sampled and $\adv$ is given
+		\item \label{def:sd-gsd-game-step-challenge} $\adv$ outputs a node $v \in [n]$. We call $v$ the \emph{challenge node}. A bit $b \from \{0, 1\}$ is sampled and $\adv$ is given
 		      \[
 			      r = \begin{cases}
 				      \hdep(s_v) & b = 0 \\
@@ -65,14 +58,14 @@ Our proof in the ROM does not require these restrictions. If $\hdep$ is modelled
 	Let $\Pi, \fhgen$ and $\fhdep$ as in Definition~\ref{def:sd-gsd-game} above and let $t, \epsilon, N, \delta$ functions in $\eta$.
 	The triple $(\Pi, \hgen, \hdep)$ is \emph{$(t, \epsilon, N, \delta)$-SD-GSD-secure} if for all $\eta$, for any adversary $\adv$ constructing a GSD graph of size at most $N(\eta)$ and indegree at most $\delta(\eta)$ and running in time $t(\eta)$ we have
 	\begin{align*}
-		\advantage{(\Pi, \fhgen, \fhdep)}{\eta}{SD\text{-}GSD}(\adv) \coloneqq 2 \cdot \left(\pr{\game{(\Pi, \fhgen, \fhdep)}{\eta}{SD-GSD}(\adv) = 1} - \frac{1}{2}\right) \le \epsilon(\eta).
+		\advantage{(\Pi, \fhgen, \fhdep)}{\eta}{SD\text{-}GSD}(\adv) \coloneqq 2 \cdot \left(\pr{\game{(\Pi, \fhgen, \fhdep)}{\eta}{SD\text{-}GSD}(\adv) = 1} - \frac{1}{2}\right) \le \epsilon(\eta).
 	\end{align*}
 \end{definition}
 
 Since in this work we are interested in SD-GSD security for the case where $\hgen$ and $\hdep$ are modelled as random oracles and our focus is on the encryption scheme being used, we introduce the following definition for convenience.
 
 \begin{definition}[SD-GSD security in the ROM]
-	A public-key encryption scheme $\Pi$ is \emph{$(t, \epsilon, N, \delta)$-SD-GSD-secure in the ROM} if the triple $(\Pi, \fhgen, \fhdep)$ is $(t, \epsilon, N, \delta)$-SD-GSD-secure when $\hgen$ and $\hdep$ are modelled as random oracles. For security parameter $\eta$ and an adversary $\adv$, we write $\game{\Pi}{\eta}{SD-GSD}(\adv)$ to denote the game where $\hgen$ and $\hdep$ are modelled as random oracles and $\advantage{\Pi}{\eta}{SD-GSD}(\adv)$ for $\adv$'s advantage in this game.
+	A public-key encryption scheme $\Pi$ is \emph{$(t, \epsilon, N, \delta)$-SD-GSD-secure in the ROM} if the triple $(\Pi, \fhgen, \fhdep)$ is $(t, \epsilon, N, \delta)$-SD-GSD-secure when $\hgen$ and $\hdep$ are modelled as random oracles. For security parameter $\eta$ and an adversary $\adv$, we write $\game{\Pi}{\eta}{SD\text{-}GSD}(\adv)$ to denote the game where $\hgen$ and $\hdep$ are modelled as random oracles and $\advantage{\Pi}{\eta}{SD\text{-}GSD}(\adv)$ for $\adv$'s advantage in this game.
 \end{definition}
 
 \subsection{Proving SD-GSD security for DHIES in the ROM}
@@ -90,7 +83,7 @@ In contrast, the result in \cite{ttkem} achieves a security loss in $\mathcal{O}
 For ease of exposition, we will assume that $\mathcal{G}(1^\eta)$ is deterministic, as is the case in practice. We will therefore set $pk \coloneqq h_1, sk \coloneqq x$ in $\dhies.\gen$, as $\mathbb{G}, q, g$ are implied by $\eta$. The results nevertheless hold also for the general case.
 
 \paragraph{Intuition}
-Consider an arbitrary SD-GSD adversary $\adv$. For an execution of $\game{\dhies}{\eta}{SD-GSD}(\adv)$ we say ``\emph{$\adv$ wins}" to denote the event $\game{\dhies}{\eta}{SD\text{-}GSD}(\adv) = 1$.
+Consider an arbitrary SD-GSD adversary $\adv$. For an execution of $\game{\dhies}{\eta}{SD\text{-}GSD}(\adv)$ we say ``\emph{$\adv$ wins}" to denote the event $\game{\dhies}{\eta}{SD\text{-}GSD}(\adv) = 1$.
 As usual with random oracles we proceed by a case distinction on whether they were queried on some interesting value. Accordingly, let $Q_{x}$ denote the event that $\adv$ queries $H_{x}$ on a hidden seed for $x \in \{\mathrm{gen}, \mathrm{dep}\}$. Then we can write
 \begin{align} \label{eq:theorem-sd-gsd-security-win-cases}
 	\begin{split}
@@ -101,7 +94,7 @@ As usual with random oracles we proceed by a case distinction on whether they we
 		& \le \pr{\qs} + \frac{1}{2},
 	\end{split}
 \end{align}
-where $\qs \coloneqq \qgen \cup \qdep$ ($\mathrm{s}$ for \emph{seed}). Step $(\dagger)$ intuitively holds because without having queried $\hdep$ for any hidden seed, in particular the seed $s_v$ of the challenge node $v$, $\hdep(s_v)$ is a uniformly random value from $\adv$'s perspective. Therefore, it can do no better than guessing to distinguish $\hdep(s_v)$ from $s \from \{0, 1\}^\rho$. \todo{correct this note based on changes.}
+where $\qs \coloneqq \qgen \cup \qdep$ ($\mathrm{s}$ for \emph{seed}). Step $(\dagger)$ intuitively holds because without having queried $\hdep$ for any hidden seed, in particular the seed $s_v$ of the challenge node $v$, $\hdep(s_v)$ is a uniformly random value from $\adv$'s perspective. Therefore, it can do no better than guessing to distinguish $\hdep(s_v)$ from $s \from \{0, 1\}^\rho$. \todo{correct this note based on fix to the argument.}
 
 The heart of the proof is to bound $\pr{\qs}$. When the adversary first triggers $\qs$ by querying the seed of some safe node $w$, (with overwhelming probability $w$ will be the only node with this seed and) it can only have learned the seed through encryptions
 $c_1 \from \dhies.\enc_{pk_{u_1}}(s_w), \ldots, c_d \from \dhies.\enc_{pk_{u_d}}(s_w)$
@@ -126,7 +119,6 @@ Let $x_i = \log_g(pk_{u_i})$. Each encryption $c_i$ is a tuple of the form $\lan
 We can bound the probability of either of these events occurring using the hardness of the DDH problem relative to $\mathcal{G}$ and EAV security of $\Pi_s$, respectively.
 
 To this end, we call a group element $h \in \mathbb{G}$ a \emph{hidden Diffie-Hellman key} if $h = pk_u^{y_{u, v}}$, where $(u, v)$ is an edge in the GSD graph, $u$ is safe and $y_{u, v}$ is the exponent chosen in the DHIES encryption of $s_v$ (i.e. $\adv$ was given a ciphertext of the form $\langle g^{y_{u, v}}, \ldots\rangle$ when it queried $\operatorname{encrypt}(u, v)$). Now analogously to above let $\qdh$ the event that $\adv$ queries $\hdh$ on a hidden Diffie-Hellman key, and let $\fdh$ the event that $\adv$ triggers $\qdh$ when $\qs$ has not (yet) been triggered.
-\todo{Querying a hidden DH key can also happen when the adversary first queries the group element and then later does an encrypt query that creates an edge with that group element as the key. Add notes in SD-GSD adversaries in proofs to explain how they keep track of this and check if any arguments must be adapted (what is essential is that the adversary has not queried $\hdh(k)$ for any hidden key $k$ and the simulations are thus distributed identically).}
 Then we can split the event $\qs$ into two cases as motivated above:
 \begin{align*}
 	\pr{\qs} & = \pr{\qs \land \fdh} + \pr{\qs \land \overline{\fdh}\,}.
@@ -174,10 +166,16 @@ Overall this gives us a bound on the advantage of $\adv$ using \eqref{eq:theorem
 	Then
 	\begin{align*}
 		\advantage{\Pi}{\eta}{SD\text{-}GSD}(\adv) & = 2 \cdot \left(\pr{\wins} - \frac{1}{2}\right)                                                   \\
-		                                    & \stackrel{\mathclap{\eqref{eq:theorem-sd-gsd-security-win-cases}}}{\le} \;  2 \cdot \pr{\qs}      \\
-		                                    & \stackrel{\mathclap{\eqref{eq:theorem-sd-gsd-security-qs-bound}}}{\le} \; \tilde{\epsilon}(\eta).
+		                                           & \stackrel{\mathclap{\eqref{eq:theorem-sd-gsd-security-win-cases}}}{\le} \; 2 \cdot \pr{\qs}       \\
+		                                           & \stackrel{\mathclap{\eqref{eq:theorem-sd-gsd-security-qs-bound}}}{\le} \; \tilde{\epsilon}(\eta).
 	\end{align*}
 \end{proof}
+
+\subsubsection{Security against multiple challenges} \label{sec:sd-gsd-multi-challenge-security}
+As noted already in the introduction, it is straightforward to prove the same result for an SD-GSD game with multiple challenge queries. In this SD-GSD game, the adversary would have access to an additional \emph{challenge} oracle to perform a challenge on any node as in step \ref{def:sd-gsd-game-step-challenge} of the original game, with the bit $b$ sampled once at the beginning of the game, and the seed $s$ sampled fresh for every query. Of course, the adversary must ensure that the restrictions that apply to the challenge node in the original game apply to all challenge nodes in this new game.
+
+To prove security in this multi-challenge SD-GSD game, the same case distinction can be performed as in \eqref{eq:theorem-sd-gsd-security-win-cases} and, concerning step $(\dagger)$, it can be shown through a sequence of statistically indistinguishable hybrids that the adversary has no advantage if they did not trigger $\qdep$.
+\todo{adapt based on how the argument changes}
 
 \subsubsection{Reducing to EAV security}
 
