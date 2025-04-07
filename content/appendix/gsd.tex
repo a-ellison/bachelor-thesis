@@ -74,7 +74,7 @@ where the various variables denote the following
 	\]
 	Then
 	\begin{align*}
-		\advantage{\Pi}{\kappa}{MIS-EAV}(\adv) & \stackrel{\mathclap{\eqref{eq:advantage-equality}}}{=} \; \pr{0 \from \adv \mid b = 0} - \pr{0 \from \adv \mid b = 1} \\
+		\advantage{\Pi}{\kappa}{MIS\text{-}EAV}(\adv) & \stackrel{\mathclap{\eqref{eq:advantage-equality}}}{=} \; \pr{0 \from \adv \mid b = 0} - \pr{0 \from \adv \mid b = 1} \\
 		                                       & = \pr{0 \from \adv \mid G_0} - \pr{0 \from \adv \mid G_q}                                                             \\
 		                                       & = \sum_{i = 1}^{q} \pr{0 \from \adv \mid G_{i - 1}} - \pr{0 \from \adv \mid G_i}                                      \\
 		                                       & \stackrel{\mathclap{\eqref{eq:eav-to-mis-eav-hybrid-distinguisher}}}{\le} q \cdot \epsilon.
@@ -108,7 +108,7 @@ where the various variables denote the following
 
 	The advantage of $\adv'$ is given by
 	\begin{equation} \label{eq:lemma-eav-reduction-advantage}
-		\advantage{\Pi_s}{\eta}{MIS-EAV}(\adv') \stackrel{\eqref{eq:advantage-equality}}{=}  \pr{0 \from \adv' \mid b = 0} - \pr{0 \from \adv' \mid b = 1},
+		\advantage{\Pi_s}{\eta}{MIS\text{-}EAV}(\adv') \stackrel{\eqref{eq:advantage-equality}}{=}  \pr{0 \from \adv' \mid b = 0} - \pr{0 \from \adv' \mid b = 1},
 	\end{equation}
 	where $b$ is the bit sampled by the MIS-EAV challenger.
 
@@ -117,7 +117,7 @@ where the various variables denote the following
 	\begin{equation} \label{eq:lemma-eav-reduction-b=0}
 		\pr{0 \from \adv' \mid b = 0} \ge \frac{\pr{\qs \land \overline{\fdh}\,}}{N}.
 	\end{equation}
-	Let $E = \qs \land \overline{\fdh}$ and let $E'$ the same event in the SD-GSD game simulated to $\adv$ during an execution of $\game{\Pi_s}{\eta}{MIS-EAV}(\adv')$ with $b = 0$. In the following, while showing \eqref{eq:lemma-eav-reduction-b=0} we will implicitly assume that $b = 0$ when referring to the game simulated to $\adv$ by $\adv'$.
+	Let $E = \qs \land \overline{\fdh}$. In the following, while showing \eqref{eq:lemma-eav-reduction-b=0} we will implicitly assume that $b = 0$ when referring to an execution of $\game{\Pi_s}{\eta}{MIS\text{-}EAV}(\adv')$.
 	On a high level \eqref{eq:lemma-eav-reduction-b=0} holds because as long as the game has not been aborted the encryptions $\adv$ receives from $\adv'$ are indistinguishable from what it would get in the real SD-GSD game and we get a factor $\frac{1}{N}$ from guessing the node that triggered $E$. However, showing this requires a few steps.
 
 	Consider a modification of the SD-GSD game $G_1$ where the game is aborted whenever one of the following events occurs, where for all these events $\adv'$ would also abort the simulation:
@@ -181,7 +181,7 @@ where the various variables denote the following
 	\end{align*}
 	as promised.
 
-	Second, returning to \eqref{eq:lemma-eav-reduction-advantage}, we can more easily show that $\pr{0 \from \adv' \mid b = 1}$ is negligible. In the SD-GSD game simulated to $\adv$ during an execution of $\game{\Pi_s}{\eta}{MIS-EAV}(\adv')$ with $b = 1$, the seed $s_w$ is a random variable independent of any information given to $\adv$:
+	Second, returning to \eqref{eq:lemma-eav-reduction-advantage}, we can more easily show that $\pr{0 \from \adv' \mid b = 1}$ is negligible. In the SD-GSD game simulated to $\adv$ during an execution of $\game{\Pi_s}{\eta}{MIS\text{-}EAV}(\adv')$ with $b = 1$, the seed $s_w$ is a random variable independent of any information given to $\adv$:
 	\begin{itemize}
 		\item the game aborts when $w$ becomes unsafe, so $s_w$ cannot be learned by querying $\operatorname{corrupt}(w)$ or by querying $\hdep(s_p)$ for an unsafe node $p$ where $(p, w)$ is a seed dependency
 		\item querying $\hdep(s_p)$ for a safe node $p$ where $(p, w)$ is a seed dependency results in the game being aborted and by virtue of $\hdep$ being a random oracle, from $\adv$'s perspective $s_w$ follows the same distribution regardless of whether there is a seed dependency $(p, w)$ or not
@@ -199,7 +199,7 @@ where the various variables denote the following
 	Combining \eqref{eq:lemma-eav-reduction-advantage}, \eqref{eq:lemma-eav-reduction-b=0} and \eqref{eq:lemma-eav-reduction-b=1} we get
 	\begin{align} \label{eq:lemma-eav-reduction-advantage-lower-bound}
 		\begin{split}
-			\advantage{\Pi_s}{\eta}{MIS-EAV}(\adv') & = \pr{0 \from \adv' \mid b = 0} - \pr{0 \from \adv' \mid b = 1}           \\
+			\advantage{\Pi_s}{\eta}{MIS\text{-}EAV}(\adv') & = \pr{0 \from \adv' \mid b = 0} - \pr{0 \from \adv' \mid b = 1}           \\
 			& \ge \frac{\pr{\qs \land \overline{\fdh}\,}}{N} - \frac{\ms}{2^\rho}.
 		\end{split}
 	\end{align}
@@ -218,7 +218,7 @@ where the various variables denote the following
 	\]
 	By Lemma~\ref{lemma:mis-eav-from-eav} $\Pi_s$ is $(t - \mathcal{O}(\delta \cdot (t_{\Pi_s.\gen} + t_{\Pi_s.\enc})), \delta \cdot \eeav, \delta)$-MIS-EAV-secure, so
 	\begin{equation} \label{eq:lemma-eav-reduction-advantage-upper-bound}
-		\advantage{\Pi_s}{\eta}{MIS-EAV}(\adv') = \delta \cdot \eeav.
+		\advantage{\Pi_s}{\eta}{MIS\text{-}EAV}(\adv') = \delta \cdot \eeav.
 	\end{equation}
 
 	Finally, if we now combine \eqref{eq:lemma-eav-reduction-advantage-lower-bound} and \eqref{eq:lemma-eav-reduction-advantage-upper-bound} we get
@@ -260,7 +260,7 @@ The key idea underlying the proof of the following Lemma was already provided at
 	\end{enumerate}
 	We apply the properties of $\operatorname{ReRan}$ given in Definition~\ref{def:key-rerandomizability} to show that the game simulated to $\adv$ is distributed identically to the MIS-EAV game. For this we need only show that the ciphertexts $c_1, \ldots, c_q$ given to $\adv$ in the simulation are distributed identically to the ciphertexts $c_1', \ldots, c_q'$ that $\adv$ would get in the real MIS-EAV game. It is immediate that $c_1$ is distributed identically to $c_1'$. Now let $i \in \{2, \ldots, q\}$. By Definition~\ref{def:key-rerandomizability} $\operatorname{ReRan}(c)$ outputs a ciphertext encrypting $m_b$ (where $b$ is the bit chosen by the EAV challenger) distributed identically to a ciphertext encrypting $m_b$ output by the MIS-EAV challenger. Thus, indeed for any $i$, $c_i$ is distributed identically to $c_i'$ and the claim holds. Therefore
 	\begin{equation} \label{eq:lemma-key-rerandomizability-advantage-same}
-		\advantage{\Pi}{\kappa}{MIS-EAV}(\adv) = \advantage{\Pi}{\kappa}{EAV}(\adv').
+		\advantage{\Pi}{\kappa}{MIS\text{-}EAV}(\adv) = \advantage{\Pi}{\kappa}{EAV}(\adv').
 	\end{equation}
 
 	Because $\adv'$ is an EAV adversary running in time $\tilde{t} + \mathcal{O}(q \cdot t_{\operatorname{ReRan}}) = t$ we know that
