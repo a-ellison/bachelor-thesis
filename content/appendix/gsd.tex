@@ -75,9 +75,9 @@ where the various variables denote the following
 	Then
 	\begin{align*}
 		\advantage{\Pi}{\kappa}{MIS\text{-}EAV}(\adv) & \stackrel{\mathclap{\eqref{eq:advantage-equality}}}{=} \; \pr{0 \from \adv \mid b = 0} - \pr{0 \from \adv \mid b = 1} \\
-		                                       & = \pr{0 \from \adv \mid G_0} - \pr{0 \from \adv \mid G_q}                                                             \\
-		                                       & = \sum_{i = 1}^{q} \pr{0 \from \adv \mid G_{i - 1}} - \pr{0 \from \adv \mid G_i}                                      \\
-		                                       & \stackrel{\mathclap{\eqref{eq:eav-to-mis-eav-hybrid-distinguisher}}}{\le} q \cdot \epsilon.
+		                                              & = \pr{0 \from \adv \mid G_0} - \pr{0 \from \adv \mid G_q}                                                             \\
+		                                              & = \sum_{i = 1}^{q} \pr{0 \from \adv \mid G_{i - 1}} - \pr{0 \from \adv \mid G_i}                                      \\
+		                                              & \stackrel{\mathclap{\eqref{eq:eav-to-mis-eav-hybrid-distinguisher}}}{\le} q \cdot \epsilon.
 	\end{align*}
 \end{proof}
 
@@ -279,7 +279,7 @@ By assuming a key-rerandomizable encryption scheme and applying Lemma~\ref{lemma
 	\]
 	and the bound $\tilde{\epsilon}$ on the success probability of an SD-GSD adversary thus improved to
 	\[
-		\tilde{\epsilon} = 2 \cdot N \cdot (\eeav + \eddh) + \frac{2 \cdot \mdh \cdot N^2}{q} + \frac{\ms \cdot N}{2^{\rho - 1}}
+		\tilde{\epsilon} = 2 \cdot N \cdot (\eeav + \eddh) + \frac{2 \cdot \mdh \cdot N^2}{q} + \frac{\ms \cdot N}{2^{\rho - 1}} + \frac{N^2}{2^{\rho - 3}}
 	\]
 	(with appropriate changes to the runtime $\tilde{t}$).
 \end{corollary}
