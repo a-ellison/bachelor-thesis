@@ -144,10 +144,10 @@ Overall this gives us a bound on the advantage of $\adv$ using \eqref{eq:theorem
 	\[
 		\pr{C_g} \le \frac{N(N - 1)}{2 \cdot 2^\rho}.
 	\]
-	Now consider $\pr{C \mid \overline{C_g}}$. The source seed of every seed dependency is distinct if $\overline{C_g}$. Therefore, given $\overline{C_g}$ every additional seed is sampled u.a.r. from $\{0, 1\}^\rho$, with up to $N$ seeds already being taken. Similar to proving the birthday bound, the probability that the $i$-th seed derived from a seed dependency collides with one of the already sampled seeds is at most $\frac{N + i}{2^\rho}$. Therefore,
+	Now consider $\pr{C \mid \overline{C_g} \,}$. The source seed of every seed dependency is distinct if $\overline{C_g}$. Therefore, given $\overline{C_g}$ every additional seed is sampled u.a.r. from $\{0, 1\}^\rho$, with up to $N$ seeds already being taken. Similar to proving the birthday bound, the probability that the $i$-th seed derived from a seed dependency collides with one of the already sampled seeds is at most $\frac{N + i}{2^\rho}$. Therefore,
 	\begin{align*}
-		\pr{C \mid \overline{C_g}} & \le \frac{N + 0}{2^\rho} + \ldots + \frac{N + (N - 1)}{2^\rho} \\
-		                           & = \frac{N^2}{2^\rho} + \frac{N(N - 1)}{2 \cdot 2^\rho}.
+		\pr{C \mid \overline{C_g} \,} & \le \frac{N + 0}{2^\rho} + \ldots + \frac{N + (N - 1)}{2^\rho} \\
+		                              & = \frac{N^2}{2^\rho} + \frac{N(N - 1)}{2 \cdot 2^\rho}.
 	\end{align*}
 	Then
 	\begin{align} \label{eq:bound-collision}
@@ -254,7 +254,7 @@ The details of the proof can be found in Section~\ref{sec:mis-eav-from-eav-proof
 \begin{lemma} \label{lemma:eav-reduction}
 	Recall the assumptions, variables and events from the statement and proof of Theorem~\ref{theorem:sdgsd-security}. In particular, assume that $\Pi_s$ is $(t, \eeav)$-EAV-secure. Let $\eta$ arbitrary and let $\adv$ an SD-GSD adversary constructing a GSD graph of size at most $N(\eta)$ and indegree at most $\delta(\eta)$, making at most $\ms(\eta)$ queries to $\hgen$ or $\hdep$ and at most $\mdh(\eta)$ queries to $\hdh$, and running in time $\tilde{t}(\eta)$. Then
 	\[
-		\pr{\qs \land \overline{\fdh}} \le \delta \cdot N \cdot \eeav + \frac{\ms \cdot N}{2^\rho}.
+		\pr{\qs \land \overline{\fdh} \,} \le \delta \cdot N \cdot \eeav + \frac{\ms \cdot N}{2^\rho}.
 	\]
 \end{lemma}
 
