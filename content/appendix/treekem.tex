@@ -137,7 +137,7 @@ Before we can formally define our correctness property, we must first introduce 
 	we say that the user \emph{applied} commit $c$.
 \end{definition}
 
-In the following, when talking about \emph{time} for a user that was a part of some group, we are referring to the sequence of group states they went through as members of the group\footnote{We are only interested in state transitions from applying a commit, but for completeness we will also consider transitions due to creating proposals as a part of this sequence.}.
+In the following, when talking about \emph{time} for a user that was a part of some group, we are referring to the sequence of group states they went through as members of the group.\footnote{We are only interested in state transitions from applying a commit, but for completeness we will also consider transitions due to creating proposals as a part of this sequence.}
 
 \begin{definition}[Last commit]
 	Let $u$ a user that at some point in time was a member of a group and had group state $\sigma$. We define the \emph{last commit} in $\sigma$ to be the most recent commit $c$ that $u$ applied up to arriving in state $\sigma$.
@@ -152,7 +152,7 @@ In the above definition, the user's last commit will always exist since they eit
 We can now define the correctness property motivated above.
 
 \begin{definition}[Consistent history] \label{def:cgka-correctness-consistent-history}
-	A PC-CGKA scheme $\Sigma$ \emph{maintains a consistent history} if a user with group state $\sigma$ only successfully\footnote{As noted, we ignore checks for bad input in our syntax. To describe schemes satisfying correctness related to bad inputs, one would need to extend the syntax such that e.g.\ an algorithm can also output an error, and the user's state remains unchanged if this is the case.} processes a commit $c \from \operatorname{CreateCommit}(\sigma', \cdot)$ for some $\sigma'$\footnote{Here we only consider states $\sigma'$ that an honest user would get as output from one of the PC-CGKA algorithms.} (with $\operatorname{ProcessCommit}$) if $\sigma$ and $\sigma'$ are consistent.
+	A PC-CGKA scheme $\Sigma$ \emph{maintains a consistent history} if a user with group state $\sigma$ only successfully\footnote{As noted, we ignore checks for bad input in our syntax. To describe schemes satisfying correctness related to bad inputs, one would need to extend the syntax such that e.g.\ an algorithm can also output an error, and the user's state remains unchanged if this is the case.} processes a commit $c \from \operatorname{CreateCommit}(\sigma', \cdot)$ for some $\sigma'$ (with $\operatorname{ProcessCommit}$) if $\sigma$ and $\sigma'$ are consistent.\footnote{Here we only consider states $\sigma'$ that an honest user would get as output from one of the PC-CGKA algorithms.}
 \end{definition}
 
 Definition~\ref{def:consistent-group-state} also allows us to express the following important correctness property: any set of members with consistent group states must compute the same group key with $\Sigma.\operatorname{Key}$ and must agree on the set of members of the group.
