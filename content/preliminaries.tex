@@ -1,10 +1,10 @@
 \section{Preliminaries}
 
-Our definitions were adapted from \cite{introduction-to-modern-cryptography}. A summary of our notation, some simple lemmas, definitions for private-key and public-key encryption, IND-CPA security, EAV security, group-generation algorithms and the Decisional Diffie-Hellman (DDH) problem, and an explanation of the Random Oracle Model (ROM) can be found in Section~\ref{sec:preliminaries-appendix} of the appendix.
+Our definitions were adapted from \cite{introduction-to-modern-cryptography}. A summary of our notation, some simple lemmas, definitions for private-key and public-key encryption, IND-CPA security, EAV security, group-generation algorithms and the Decisional Diffie-Hellman (DDH) problem, and an explanation of the Random Oracle Model (ROM) can be found in \cite[Section~\ref*{sec:preliminaries-appendix}]{full-version}.
 
 \subsection{DHIES}
 
-In the following definition we will refer to ``key-derivation functions''. This is only meant as a hint to the reader. We do not provide a definition here, as we will always model such a function as a random oracle (see Section~\ref{sec:rom}).
+In the following definition we will refer to ``key-derivation functions''. This is only meant as a hint to the reader. We do not provide a definition here, as we will always model such a function as a random oracle.
 
 \begin{definition}[DHIES {\cite[Construction 12.19]{introduction-to-modern-cryptography}}]
 	Let $\mathcal{G}$ a group-generation algorithm (for Diffie-Hellman groups). Let $\Pi_s$ a private-key encryption scheme where $\Pi_s.\gen(1^\eta)$ samples a key u.a.r.\ from $\{0, 1\}^\eta$. Let $\fhdh = \{\hdh^{(\eta)} \mid \eta \in \N \}$ a family of key-derivation functions where $\hdh^{(\eta)} \colon \{0, 1\}^* \to \{0, 1\}^{\eta}$. We write $\hdh \coloneqq \hdh^{(\eta)}$ when $\eta$ is clear from the context. Define the algorithms $\gen, \enc$ and $\dec$ as follows:
