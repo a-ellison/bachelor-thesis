@@ -36,6 +36,7 @@ thesis.pdf: $(texfiles) thesis.bbl
 
 thesis.bbl: thesis.aux
 	$(Q)$(Q_OTHER) $(BIBTEX) thesis
+	-$(Q) $(Q_LATEX) $(LATEX) -interaction=nonstopmode -file-line-error thesis.tex
 
 thesis.aux: $(texfiles)
 	-$(Q) $(Q_LATEX) $(LATEX) -interaction=nonstopmode -file-line-error thesis.tex
