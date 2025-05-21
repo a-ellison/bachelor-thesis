@@ -1,4 +1,4 @@
-# Tighter Security for Group Key Agreement in the Random Oracle Model ([paper](./thesis.pdf), [slides](./presentation/presentation.pdf))
+# Tighter provable security for TreeKEM ([paper](https://eprint.iacr.org/2024/1878), [slides](./presentation/presentation.pdf))
 
 ## Abstract
 
